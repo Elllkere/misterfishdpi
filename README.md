@@ -37,3 +37,12 @@
 
 ## Почему MisterFish?
 https://www.youtube.com/watch?v=I7JVD-wo3cI
+
+## Credits & Contributors
+<p align="left">
+  <a href="https://github.com/Elllkere/misterfishdpi/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=Elllkere/misterfishdpi" />
+  </a>
+</p>
+
+* [bol-van](https://github.com/bol-van/), creator of original [zapret](https://github.com/bol-van/zapret/) repository.
