@@ -2,7 +2,7 @@
 Обход блокировок РКН через [zapret](https://github.com/bol-van/zapret/) Windows
 
 > [!IMPORTANT]
-> Я не являюсь разработчиком дурения DPI, я лишь разработал интерфейс для удобного управления оригинального zapret (с добавлеием ip фильтрации и пресетом настроек)
+> Я не являюсь разработчиком дурения DPI, я лишь разработал интерфейс для удобного управления оригинального zapret (с добавлеием пресетов настроек)
 
 > [!WARNING]
 > Возможна неправильная работа с VPN приложениеями, включая VPNGame, Exitlag и прочих снижающих пинг приложений.
@@ -34,9 +34,9 @@
 > [!TIP]
 > Я буду стараться следить за актуальностью пресетов, но буду благодарен, если кто - то будет присылать новые пресеты для новых блокировок или исправления, а так же других пресетов для определенных провайдеров.
 >
->  Присылать пресеты можно в дискуссии, либо напрямую в pull requests, меняя [Zapret::startProcces()](https://github.com/Elllkere/misterfishdpi/blob/main/ZapretGUI/data.hpp#L146). Напомню, что я изменил оригинальный nfq и добавил туда ip фильтрацию аналогичную hostlist, но с приоритетом над хостами, т.е. если будет указан iplist, hostlist будет игнорироваться, если он указан в конкретной стратегии вместе с iplist (IP нужно указывать без маски в чистом виде без http(s)://).
+> Присылать пресеты можно в дискуссии, либо напрямую в pull requests, меняя [Zapret::startProcces()](https://github.com/Elllkere/misterfishdpi/blob/main/ZapretGUI/data.hpp#L146).
 >
-> Проверять работоспособность можно на оригинальном [zapret](https://github.com/bol-van/zapret/), только не забывать, что это только для Windows, соотвественно проверять там же через winws (nfqws) или если нужна ip фильтрация, то можно напрямую из моей релизной версии winws.
+> Проверять работоспособность можно на оригинальном [zapret](https://github.com/bol-van/zapret/), только не забывать, что это только для Windows, соотвественно проверять там же через winws (nfqws) или можно напрямую из моей релизной версии winws.
 
 ## Почему MisterFish?
 https://www.youtube.com/watch?v=I7JVD-wo3cI
@@ -49,3 +49,4 @@ https://www.youtube.com/watch?v=I7JVD-wo3cI
 </p>
 
 * [bol-van](https://github.com/bol-van/), creator of original [zapret](https://github.com/bol-van/zapret/) repository.
+* [ocornut](https://github.com/ocornut/), creator of original [ImGui](https://github.com/ocornut/imgui) repository.

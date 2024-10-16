@@ -190,7 +190,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         switch (lParam)
         {
-            case WM_LBUTTONDBLCLK:
+            case WM_LBUTTONDOWN:
             {
                 // ƒвойной клик по иконке в трее Ч восстановление окна
                 ShowWindow(g_hWnd, SW_RESTORE);
