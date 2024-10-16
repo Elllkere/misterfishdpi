@@ -10,10 +10,102 @@
 
 #include "json.hpp"
 
+#define CURL_STATICLIB
+#include <curl/curl.h>
+
 using json = nlohmann::json;
 
 namespace tools
 {
+    struct MemoryStruct {
+        char* memory;
+        size_t size;
+    };
+
+    static size_t _writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp)
+    {
+        size_t realsize = size * nmemb;
+        struct MemoryStruct* mem = (struct MemoryStruct*)userp;
+
+        char* ptr = (char*)realloc(mem->memory, mem->size + realsize + 1);
+        if (!ptr) 
+        {
+            /* out of memory! */
+            printf("not enough memory (realloc returned NULL)\n");
+            return 0;
+        }
+
+        mem->memory = ptr;
+        memcpy(&(mem->memory[mem->size]), contents, realsize);
+        mem->size += realsize;
+        mem->memory[mem->size] = 0;
+
+        return realsize;
+    }
+
+    bool request(const std::string& url, const std::string& post_data, std::string* answer)
+    {
+        bool result = false; 
+
+        CURL* curl;
+        CURLcode res;
+        struct MemoryStruct chunk;
+
+        chunk.memory = (char*)malloc(1);  /* grown as needed by realloc above */
+        chunk.size = 0;    /* no data at this point */
+
+        curl_global_init(CURL_GLOBAL_ALL);
+        curl = curl_easy_init();
+        if (curl) 
+        {
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+            /* send all data to this function  */
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _writeMemoryCallback);
+
+            /* we pass our 'chunk' struct to the callback function */
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
+
+            /* some servers do not like requests that are made without a user-agent
+               field, so we provide one */
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+
+            if (post_data.size() > 0)
+            {
+                const char* postthis = post_data.c_str();
+
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postthis);
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(postthis));
+            }
+
+            /* Perform the request, res gets the return code */
+            res = curl_easy_perform(curl);
+            /* Check for errors */
+            if (res != CURLE_OK) {
+                fprintf(stderr, "curl_easy_perform() failed: %s\n",
+                    curl_easy_strerror(res));
+            }
+            else 
+            {
+                *answer = chunk.size > 0 ? std::string(chunk.memory) : "";
+                result = true;
+            }
+
+            /* always cleanup */
+            curl_easy_cleanup(curl);
+        }
+
+        free(chunk.memory);
+        curl_global_cleanup();
+
+        return result;
+    }
+
+    bool request(const std::string& url, std::string* answer)
+    {
+        return request(url, "", answer);
+    }
+
     void createTaskSchedulerEntry() 
     {
         HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -340,6 +432,27 @@ namespace tools
         return true;
     }
 
+    bool recursiveSeachSettings(json& base, const json& updates)
+    {
+        bool flag_update = false;
+
+        for (auto& [key, value] : updates.items()) 
+        {
+            if (base.find(key) == base.end()) 
+            {
+                base[key] = value;
+                flag_update = true;
+            }
+            else if (value.is_object() && base[key].is_object()) 
+            {
+                if (recursiveSeachSettings(base[key], value))
+                    flag_update = true;
+            }
+        }
+
+        return flag_update;
+    }
+
     json loadSettings(const json& n)
     {
         json settings;
@@ -367,7 +480,7 @@ namespace tools
             }
         }
 
-        if (flag_update)
+        if (recursiveSeachSettings(settings, n))
             updateSettings(settings);
 
         return settings;

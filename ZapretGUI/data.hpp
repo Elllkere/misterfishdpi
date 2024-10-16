@@ -101,12 +101,14 @@ namespace vars
         {"log", false },
         {"win_start", false},
         {"tray_start", false},
+        {"start_version_check", true},
         {"provider", 0},
         {"auto_start", 0},
         {"services",
         {
             {"youtube", false},
-            {"discord", false}
+            {"discord", false},
+            {"7tv", false}
         }}
     };
 
@@ -115,6 +117,7 @@ namespace vars
     bool bLog = false;
     bool bWin_start = false;
     bool bTray_start = false;
+    bool bStart_v_check = false;
 
 	std::vector<Zapret*> services;
     std::map<int, std::string> providers =
@@ -129,7 +132,7 @@ namespace vars
         {1, u8"–еестр (с выкл. UAC)"},
     };
 
-	std::string version = "v1.0.1";
+	std::string version = "v1.0.2";
 
     void init()
     {
@@ -140,6 +143,7 @@ namespace vars
         bLog = json_settings["log"];
         bWin_start = json_settings["win_start"];
         bTray_start = json_settings["tray_start"];
+        bStart_v_check = json_settings["start_version_check"];
     }
 }
 
@@ -162,9 +166,14 @@ void Zapret::startProcces()
     }
     else if (id_name == "discord")
     {
-        args = std::format("--wf-tcp=443 --wf-udp=443-65535 --filter-udp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake --dpi-desync-udplen-increment=10 --dpi-desync-repeats=6 --dpi-desync-udplen-pattern=0xDEADBEEF --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, cur_path);
+        args = std::format("--wf-tcp=443 --wf-udp=443,50000-50099 --filter-udp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake --dpi-desync-udplen-increment=10 --dpi-desync-repeats=6 --dpi-desync-udplen-pattern=0xDEADBEEF --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, cur_path);
         args += std::format("--filter-udp=50000-50099 --ipset=\"{}\\list-discord-ip.txt\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, cur_path);
         args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin", cur_path, cur_path);
+    }
+    else if (id_name == "7tv")
+    {
+        args = std::format("--wf-tcp=443 --wf-udp=443 --filter-tcp=443 --hostlist=\"{}\\list-7tv.txt\" --dpi-desync=fake,split2 --dpi-desync-ttl=8 --new ", cur_path);
+        args += std::format("--filter-udp=443 --hostlist=\"{}\\list-7tv.txt\" --dpi-desync=fake", cur_path);
     }
 
     prc = new Process(cur_path + "\\winws.exe", args);

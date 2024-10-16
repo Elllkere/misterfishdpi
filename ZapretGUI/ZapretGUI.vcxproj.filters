@@ -57,9 +57,6 @@
     <ClCompile Include="main.cpp">
       <Filter>main</Filter>
     </ClCompile>
-    <ClCompile Include="tools\CHTTPSession.cpp">
-      <Filter>main\tools</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tools\json.hpp">
@@ -110,8 +107,8 @@
     <ClInclude Include="icons\discord.hpp">
       <Filter>main\render\icons</Filter>
     </ClInclude>
-    <ClInclude Include="tools\CHTTPSession.h">
-      <Filter>main\tools</Filter>
+    <ClInclude Include="icons\7tv.hpp">
+      <Filter>main\render\icons</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

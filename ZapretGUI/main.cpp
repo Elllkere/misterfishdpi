@@ -16,8 +16,7 @@
 
 #include "icons/youtube.hpp"
 #include "icons/discord.hpp"
-
-#include "tools/CHTTPSession.h"
+#include "icons/7tv.hpp"
 
 int page = 0;
 
@@ -59,11 +58,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     tools::setWorkingDirectoryToExecutablePath();
     vars::init();
 
+#ifndef _DEBUG
     if (!IsRunAsAdmin())
     {
         RelaunchAsAdmin(lpCmdLine);
         return 0;
     }
+#endif
 
     HANDLE hMutexOnce;
     {
@@ -186,28 +187,35 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 0;
     }
 
+    int _7tv_width = 0;
+    int _7tv_height = 0;
+    ID3D11ShaderResourceView* _7tv_texture = NULL;
+    if (!LoadTextureFromMemory(_7tv_data, sizeof(_7tv_data), &_7tv_texture, &_7tv_width, &_7tv_height))
+    {
+        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        ::DestroyWindow(g_hWnd);
+        return 0;
+    }
+
     vars::services =
     {
         new Zapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"], youtube_texture),
         new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"], discord_texture),
+        new Zapret(ds_width, ds_height, "7tv", "7tv", vars::json_settings["services"]["7tv"], _7tv_texture),
     };
 
-    CHTTPSession* HTTP = new CHTTPSession;
-    std::string answer;
-    bool failed = false;
-
-    HTTP->Transmit(HTTP_POST, HTTP_SSL, "elllkere.top/misterfish", answer, "", 0);
-    if (answer.empty())
-        failed = true;
-    else
+    bool failed_ver_check = false;
+    if (vars::bStart_v_check)
     {
-        if (answer != vars::version)
-            MessageBoxA(g_hWnd, "Вышла новая версия, скачать можно в настройках", window::window_name, MB_OK);
+        std::string answer;
+        bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer);
+        if (!result || answer.empty())
+            failed_ver_check = true;
+        else if (answer != vars::version)
+            MessageBoxA(0, "Вышла новая версия, скачать можно в настройках", window::window_name, MB_OK);
     }
 
-    delete HTTP;
-
-    if (!failed)
+    if (!failed_ver_check)
     {
         if (strstr(lpCmdLine, "/autostart") && vars::bTray_start == false)
             ::ShowWindow(g_hWnd, nCmdShow);
@@ -405,6 +413,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(45, 45, 45).Value);
                 ImGui::PushStyleColor(ImGuiCol_CheckMark, ImColor(10, 10, 10).Value);
 
+                if (ImGui::Checkbox(u8"Проверка версии при запуске", &vars::bStart_v_check))
+                {
+                    vars::json_settings["start_version_check"] = vars::bStart_v_check;
+                    tools::updateSettings(vars::json_settings);
+                }
+
                 if (ImGui::Checkbox(u8"Автозапуск с windows", &vars::bWin_start))
                 {
                     vars::json_settings["win_start"] = vars::bWin_start;
@@ -502,10 +516,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                 if (ImGui::Button(u8"Проверить версию", ImVec2(200, 30)))
                 {
-                    CHTTPSession* HTTP = new CHTTPSession;
                     std::string answer;
-                    HTTP->Transmit(HTTP_POST, HTTP_SSL, "elllkere.top/misterfish", answer, "", 0);
-                    if (answer.empty())
+                    bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer);
+                    if (!result || answer.empty())
                         MessageBoxA(g_hWnd, "Не удалось проверить версию", window::window_name, MB_OK);
                     else
                     {
@@ -514,8 +527,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         else
                             system("start https://github.com/Elllkere/misterfishdpi/releases/latest");
                     }
-
-                    delete HTTP;
                 }
 
                 if (ImGui::Button("GitHub", ImVec2(200, 30)))

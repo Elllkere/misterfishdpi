@@ -27,10 +27,10 @@
     <ClCompile Include="imgui\src\imgui_tables.cpp" />
     <ClCompile Include="imgui\src\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="tools\CHTTPSession.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="data.hpp" />
+    <ClInclude Include="icons\7tv.hpp" />
     <ClInclude Include="icons\discord.hpp" />
     <ClInclude Include="icons\youtube.hpp" />
     <ClInclude Include="imgui\imgui_impl.hpp" />
@@ -44,7 +44,6 @@
     <ClInclude Include="imgui\src\imstb_truetype.h" />
     <ClInclude Include="imgui\src\stb_image.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="tools\CHTTPSession.h" />
     <ClInclude Include="tools\json.hpp" />
     <ClInclude Include="tools\tools.hpp" />
   </ItemGroup>
@@ -105,9 +104,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>MisterFish</TargetName>
+    <IncludePath>C:\Coding\MVS\C++\Projects\ZapretGUI\curl\x64\Debug\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\MVS\C++\Projects\ZapretGUI\curl\x64\Debug\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>MisterFish</TargetName>
+    <IncludePath>C:\Coding\MVS\C++\Projects\ZapretGUI\curl\x64\Release\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\MVS\C++\Projects\ZapretGUI\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -151,6 +154,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <AdditionalDependencies>libcurl_a_debug.lib;advapi32.lib;crypt32.lib;normaliz.lib;ws2_32.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -167,6 +171,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,6 +180,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <UACUIAccess>false</UACUIAccess>
+      <AdditionalDependencies>libcurl_a.lib;advapi32.lib;crypt32.lib;normaliz.lib;ws2_32.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
