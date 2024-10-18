@@ -132,7 +132,7 @@ namespace vars
         {1, u8"–еестр (с выкл. UAC)"},
     };
 
-	std::string version = "v1.0.2";
+	std::string version = "v1.0.3";
 
     void init()
     {
@@ -162,7 +162,7 @@ void Zapret::startProcces()
         if (vars::provider == 0)
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
         else
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split --dpi-desync-autottl=5 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
     }
     else if (id_name == "discord")
     {

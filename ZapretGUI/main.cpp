@@ -570,6 +570,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     DestroyTrayIcon();
 
+    system("sc stop WinDivert");
+
     if (hMutexOnce)
     {
         ReleaseMutex(hMutexOnce);
