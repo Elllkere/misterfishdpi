@@ -123,7 +123,8 @@ namespace vars
     std::map<int, std::string> providers =
     {
         {0, u8"Другой"},
-        {1, u8"Ростелеком"}
+        {1, u8"Ростелеком"},
+        {2, u8"МТС"}
     };
 
     std::map<int, std::string> auto_starts =
@@ -132,7 +133,7 @@ namespace vars
         {1, u8"Реестр (с выкл. UAC)"},
     };
 
-	std::string version = "v1.3.4";
+	std::string version = "v1.4.0";
 
     void init()
     {
@@ -154,15 +155,26 @@ void Zapret::startProcces()
 
     if (id_name == "youtube")
     {
-        args = std::format("--wf-tcp=80,443 --wf-udp=443 --filter-udp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, cur_path);
-        args += std::format("--filter-udp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake --dpi-desync-repeats=11 --new ", cur_path);
-        args += std::format("--filter-tcp=80 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path);
-        args += std::format("--hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path);
+        if (vars::provider < 2)
+        {
+            args = std::format("--wf-tcp=80,443 --wf-udp=443 ");
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, cur_path);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake --dpi-desync-repeats=11 --new ", cur_path);
+            args += std::format("--filter-tcp=80 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path);
+            args += std::format("--hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path);
 
-        if (vars::provider == 0)
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
-        else
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split --dpi-desync-autottl=5 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
+            if (vars::provider == 0)
+                args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
+            else
+                args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split --dpi-desync-autottl=5 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
+        }
+        else if (vars::provider == 2)
+        {
+            args = std::format("--wf-tcp=80,443 --wf-udp=443 ");
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, cur_path);
+            args += std::format("--filter-tcp=80 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-youtube.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
+        }
     }
     else if (id_name == "discord")
     {
