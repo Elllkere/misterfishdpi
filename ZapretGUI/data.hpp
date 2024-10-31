@@ -133,7 +133,7 @@ namespace vars
         {1, u8"–еестр (с выкл. UAC)"},
     };
 
-	std::string version = "v1.4.0";
+	std::string version = "v1.4.3";
 
     void init()
     {
@@ -179,9 +179,9 @@ void Zapret::startProcces()
     else if (id_name == "discord")
     {
         args = std::format("--wf-tcp=443 --wf-udp=443,50000-50100 ");
-        args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=disorder2 --new ", cur_path);
-        args += std::format("--filter-udp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake --dpi-desync-repeats=2 --new ", cur_path);
-        args += std::format("--filter-udp=50000-50100 --ipset=\"{}\\list-discord-ip.txt\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, cur_path);
+        args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake --dpi-desync-ttl=3 --new ", cur_path);
+        args += std::format("--filter-udp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake --dpi-desync-repeats=6 --new ", cur_path);
+        args += std::format("--filter-udp=50000-50100 --ipset=\"{}\\list-discord-ip.txt\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, cur_path);
     }
     else if (id_name == "7tv")
     {
