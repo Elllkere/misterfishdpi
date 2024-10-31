@@ -104,6 +104,7 @@ namespace vars
         {"start_version_check", true},
         {"provider", 0},
         {"auto_start", 0},
+        {"x_method", 0},
         {"services",
         {
             {"youtube", false},
@@ -114,6 +115,7 @@ namespace vars
 
     int provider = 0;
     int auto_start = 0;
+    int x_method = 0;
     bool bLog = false;
     bool bWin_start = false;
     bool bTray_start = false;
@@ -133,7 +135,13 @@ namespace vars
         {1, u8"Реестр (с выкл. UAC)"},
     };
 
-	std::string version = "v1.4.3";
+    std::map<int, std::string> x_methods =
+    {
+        {0, u8"Закрыть"},
+        {1, u8"Свернуть"},
+    };
+
+	std::string version = "v1.5.0";
 
     void init()
     {
@@ -141,6 +149,7 @@ namespace vars
 
         provider = json_settings["provider"];
         auto_start = json_settings["auto_start"];
+        x_method = json_settings["x_method"];
         bLog = json_settings["log"];
         bWin_start = json_settings["win_start"];
         bTray_start = json_settings["tray_start"];
@@ -179,7 +188,7 @@ void Zapret::startProcces()
     else if (id_name == "discord")
     {
         args = std::format("--wf-tcp=443 --wf-udp=443,50000-50100 ");
-        args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake --dpi-desync-ttl=3 --new ", cur_path);
+        args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake --dpi-desync-ttl=4 --new ", cur_path);
         args += std::format("--filter-udp=443 --hostlist=\"{}\\list-discord.txt\" --dpi-desync=fake --dpi-desync-repeats=6 --new ", cur_path);
         args += std::format("--filter-udp=50000-50100 --ipset=\"{}\\list-discord-ip.txt\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, cur_path);
     }

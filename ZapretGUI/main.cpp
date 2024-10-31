@@ -311,7 +311,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
             ImGui::SameLine();
             if (ImGui::Button("X", ImVec2(20, window::header_size)))
-                quit = true;
+            {
+                if (vars::x_method == 0)
+                    quit = true;
+                else
+                {
+                    ShowWindow(g_hWnd, SW_HIDE);
+                    CreateTrayIcon();
+                }
+            }                
 
             ImGui::PopStyleColor(3);
             ImGui::PopStyleVar();
@@ -508,7 +516,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"UAC - контроль учетных записей (окошко с подтверждением при запуске программы)");
+                    ImGui::SetTooltip(u8"UAC - контроль учетных записей\n(окошко с подтверждением при запуске программы)");
+
+                if (ImGui::Combo(u8"Действие при Х", &vars::x_method, tools::convertMapToCharArray(vars::x_methods).data(), vars::x_methods.size()))
+                {
+                    vars::json_settings["x_method"] = vars::x_method;
+                    tools::updateSettings(vars::json_settings);
+                }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Что делать при нажатии на Х");
 
                 ImGui::PushStyleColor(ImGuiCol_Button, ImColor(40, 40, 40).Value);
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(45, 45, 45).Value);
