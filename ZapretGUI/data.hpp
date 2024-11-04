@@ -48,6 +48,8 @@ public:
 
         if (!TerminateProcess(processHandle, 0))
             MessageBoxA(0, std::format("Ошибка завершения процесса: {}", GetLastError()).c_str(), 0, 0);
+
+        CloseHandle(processHandle);
     }
 
 private:
@@ -141,7 +143,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-	std::string version = "v1.5.0";
+	std::string version = "v1.6.0";
 
     void init()
     {

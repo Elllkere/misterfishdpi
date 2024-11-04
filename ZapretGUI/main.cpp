@@ -232,6 +232,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     ::UpdateWindow(g_hWnd);
 
+    tools::killAll();
+
     for (auto& s : vars::services)
     {
         if (s->active && !s->isRunning())
@@ -385,7 +387,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                     if (ImGui::ImageButton(service->name.c_str(), service->texture, ImVec2(service->width, service->height)))
                     {
-                        service->active ^= 1;
+                        if (service->active && !service->isRunning())
+                            service->active = 1;
+                        else
+                            service->active ^= 1;
+
                         vars::json_settings["services"][service->id_name] = service->active;
                         tools::updateSettings(vars::json_settings);
 
@@ -530,6 +536,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 ImGui::PushStyleColor(ImGuiCol_Button, ImColor(40, 40, 40).Value);
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(45, 45, 45).Value);
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
+
+                if (ImGui::Button(u8"Завершить все обходы", ImVec2(200, 30)))
+                    tools::killAll();
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Завершит все прошлые и нынешние процессы zapret");
 
                 if (ImGui::Button(u8"Проверить версию", ImVec2(200, 30)))
                 {

@@ -4,6 +4,7 @@
 #include <taskschd.h>
 #include <comdef.h>
 #include <filesystem>
+#include <TlHelp32.h>
 
 #pragma comment(lib, "taskschd.lib")
 #pragma comment(lib, "comsupp.lib")
@@ -104,6 +105,40 @@ namespace tools
     bool request(const std::string& url, std::string* answer)
     {
         return request(url, "", answer);
+    }
+
+    void killAll()
+    {
+        PROCESSENTRY32   pe32;
+        HANDLE         hSnapshot = NULL;
+        pe32.dwSize = sizeof(PROCESSENTRY32);
+        hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+        if (Process32First(hSnapshot, &pe32))
+        {
+            do
+            {
+                std::string str = pe32.szExeFile;
+
+                std::transform(str.begin(), str.end(), str.begin(),
+                    [](unsigned char c) { return std::tolower(c); });
+
+
+                if (strcmp(str.c_str(), "winws.exe") == 0)
+                {
+                    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID);
+                    if (hProcess == NULL)
+                        continue;
+
+                    TerminateProcess(hProcess, 0);
+                    CloseHandle(hProcess);
+                }
+
+            } while (Process32Next(hSnapshot, &pe32));
+        }
+
+        if (hSnapshot != INVALID_HANDLE_VALUE)
+            CloseHandle(hSnapshot);
     }
 
     void createTaskSchedulerEntry() 
