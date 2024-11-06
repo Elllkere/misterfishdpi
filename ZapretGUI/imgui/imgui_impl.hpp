@@ -137,7 +137,7 @@ void ShowTrayContextMenu(HWND hwnd, POINT pt)
 {
     HMENU hMenu = CreatePopupMenu();
     if (hMenu) {
-        InsertMenu(hMenu, -1, MF_BYPOSITION | MF_STRING, ID_TRAY_RESTORE, "Октрыть");
+        InsertMenu(hMenu, -1, MF_BYPOSITION | MF_STRING, ID_TRAY_RESTORE, "Открыть");
         InsertMenu(hMenu, -1, MF_BYPOSITION | MF_STRING, ID_TRAY_EXIT, "Выход");
 
         SetForegroundWindow(hwnd);

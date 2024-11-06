@@ -68,7 +68,13 @@ public:
 	ID3D11ShaderResourceView* texture = NULL;
     Process* prc = nullptr;
 
-    Zapret(int width, int height, std::string name, std::string id_name, bool active, ID3D11ShaderResourceView* texture)
+    //for non interactive
+    Zapret(const std::string& id_name)
+    {
+        this->id_name = id_name;
+    }
+
+    Zapret(int width, int height, const std::string& name, const std::string& id_name, bool active, ID3D11ShaderResourceView* texture)
     {
         this->width = width;
         this->height = height;
@@ -143,7 +149,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-	std::string version = "v1.6.0";
+	std::string version = "v1.7.0";
 
     void init()
     {
@@ -164,7 +170,20 @@ void Zapret::startProcces()
     std::string args = "";
     std::string cur_path = std::filesystem::current_path().string();
 
-    if (id_name == "youtube")
+    if (id_name == "cf-ech")
+    {
+        if (vars::provider < 2)
+        {
+            args = std::format("--wf-tcp=443 ");
+            args += std::format("--hostlist=\"{}\\list-cf-ech.txt\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path);
+
+            if (vars::provider == 0)
+                args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-cf-ech.txt\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
+            else
+                args += std::format("--filter-tcp=443 --hostlist=\"{}\\list-cf-ech.txt\" --dpi-desync=fake,split --dpi-desync-autottl=5 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, cur_path);
+        }
+    }
+    else if (id_name == "youtube")
     {
         if (vars::provider < 2)
         {
@@ -196,8 +215,8 @@ void Zapret::startProcces()
     }
     else if (id_name == "7tv")
     {
-        args = std::format("--wf-tcp=443 --wf-udp=443 --filter-tcp=443 --hostlist=\"{}\\list-7tv.txt\" --dpi-desync=fake,split2 --dpi-desync-ttl=8 --new ", cur_path);
-        args += std::format("--filter-udp=443 --hostlist=\"{}\\list-7tv.txt\" --dpi-desync=fake", cur_path);
+        args = std::format("--wf-tcp=443 --wf-udp=443 --filter-tcp=443 --hostlist=\"{}\\list-7tv.txt\" --dpi-desync=fake,split2 --dpi-desync-ttl=3 --new ", cur_path);
+        args += std::format("--filter-udp=443 --hostlist=\"{}\\list-7tv.txt\" --dpi-desync=fake --dpi-desync-repeats=6", cur_path);
     }
 
     prc = new Process(cur_path + "\\winws.exe", args);

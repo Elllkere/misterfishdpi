@@ -197,6 +197,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 0;
     }
 
+    Zapret* system_service = new Zapret("cf-ech");
+
     vars::services =
     {
         new Zapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"], youtube_texture),
@@ -233,6 +235,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ::UpdateWindow(g_hWnd);
 
     tools::killAll();
+
+    system_service->startProcces();
 
     for (auto& s : vars::services)
     {
@@ -587,6 +591,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     {
         s->terminate();
     }
+
+    system_service->terminate();
 
     // Cleanup
     ImGui_ImplDX11_Shutdown();
