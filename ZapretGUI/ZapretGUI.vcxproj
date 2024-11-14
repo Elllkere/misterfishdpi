@@ -46,6 +46,8 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="tools\json.hpp" />
     <ClInclude Include="tools\tools.hpp" />
+    <ClInclude Include="zapret\zapret.hpp" />
+    <ClInclude Include="zapret\zapret_imp.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

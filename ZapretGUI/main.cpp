@@ -3,16 +3,20 @@
 #include <string>
 #include <dwmapi.h> 
 #include <map>
-
-#pragma comment(lib,"d3d11.lib")
-#include <d3d11.h>
+#include <set>
+#include <vector>
 
 #include "resource.h"
 
 #include "imgui/imgui_impl.hpp"
 #include "fonts/sf_pro_display_medium.h"
+
 #include "tools/tools.hpp"
+#include "tools/json.hpp"
+
+#include "zapret/zapret.hpp"
 #include "data.hpp"
+#include "zapret/zapret_imp.hpp"
 
 #include "icons/youtube.hpp"
 #include "icons/discord.hpp"
@@ -64,6 +68,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         RelaunchAsAdmin(lpCmdLine);
         return 0;
     }
+#else
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
 #endif
 
     HANDLE hMutexOnce;
@@ -197,13 +204,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 0;
     }
 
-    Zapret* system_service = new Zapret("cf-ech");
+    SharedZapret* cf_ech = new SharedZapret("cf-ech", { "youtube" }, "shared_youtube_service");
 
     vars::services =
     {
-        new Zapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"], youtube_texture),
+        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"], youtube_texture, {"cf-ech"}, "shared_youtube_service"),
         new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"], discord_texture),
         new Zapret(ds_width, ds_height, "7tv", "7tv", vars::json_settings["services"]["7tv"], _7tv_texture),
+        cf_ech,
     };
 
     bool failed_ver_check = false;
@@ -219,11 +227,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if (!failed_ver_check)
     {
-        if (strstr(lpCmdLine, "/autostart") && vars::bTray_start == false)
-            ::ShowWindow(g_hWnd, nCmdShow);
-        else if (strstr(lpCmdLine, "/autostart") && vars::bTray_start == true)
-            CreateTrayIcon();
-        else
+        if (!(strstr(lpCmdLine, "/autostart") && vars::bTray_start == true))
             ::ShowWindow(g_hWnd, nCmdShow);
     }
     else
@@ -232,15 +236,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         MessageBoxA(g_hWnd, "Не удалось проверить версию", window::window_name, MB_OK);
     }
 
+    CreateTrayIcon();
+
     ::UpdateWindow(g_hWnd);
 
     tools::killAll();
 
-    system_service->startProcces();
+    if (vars::bUnlock_ech == true)
+        cf_ech->active = true;
 
     for (auto& s : vars::services)
     {
-        if (s->active && !s->isRunning())
+        if (s->active)
             s->startProcces();
     }
 
@@ -312,7 +319,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             if (ImGui::Button("_", ImVec2(20, window::header_size)))
             {
                 ShowWindow(g_hWnd, SW_HIDE);
-                CreateTrayIcon();
             }
 
             ImGui::SameLine();
@@ -323,7 +329,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 else
                 {
                     ShowWindow(g_hWnd, SW_HIDE);
-                    CreateTrayIcon();
                 }
             }                
 
@@ -374,6 +379,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 for (int i = 0, num = 0; i < vars::services.size(); i++, num++)
                 {
                     Zapret* service = vars::services[i];
+                    if (service->hide)
+                        continue;
+
                     ImVec2 text_scale = ImGui::CalcTextSize(service->name.c_str());
 
                     if (i > 0)
@@ -475,6 +483,21 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         vars::json_settings["tray_start"] = vars::bTray_start;
                     tools::updateSettings(vars::json_settings);
                 }
+
+                if (ImGui::Checkbox(u8"Разблокировать протокол Cloudflare ECH", &vars::bUnlock_ech))
+                {
+                    cf_ech->active = vars::bUnlock_ech;
+                    if (vars::bUnlock_ech)
+                        cf_ech->startProcces();
+                    else
+                        cf_ech->terminate();
+
+                    vars::json_settings["unlock_ech"] = vars::bUnlock_ech;
+                    tools::updateSettings(vars::json_settings);
+                }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Если Вы не знаете что такое Cloudflare, то не стоит выключать.\nРазблокирует протокол ECH у Cloudflare, который включен всегда на бесплатном тарифе\nиз-за чего много обычных не забаненных сайтов не загружаются");
 
                 if (ImGui::Combo(u8"Провайдер", &vars::provider, tools::convertMapToCharArray(vars::providers).data(), vars::providers.size()))
                 {
@@ -587,12 +610,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
     }
 
-    for (auto& s : vars::services)
-    {
-        s->terminate();
-    }
-
-    system_service->terminate();
+    tools::killAll();
 
     // Cleanup
     ImGui_ImplDX11_Shutdown();

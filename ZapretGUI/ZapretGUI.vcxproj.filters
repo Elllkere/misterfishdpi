@@ -31,6 +31,9 @@
     <Filter Include="main\render\icons">
       <UniqueIdentifier>{4a3fa575-e568-4ac4-b186-fd338a188fd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="main\zapret">
+      <UniqueIdentifier>{e894e1cf-f121-4798-8a65-223ad9e453bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui\src\imgui.cpp">
@@ -109,6 +112,12 @@
     </ClInclude>
     <ClInclude Include="icons\7tv.hpp">
       <Filter>main\render\icons</Filter>
+    </ClInclude>
+    <ClInclude Include="zapret\zapret.hpp">
+      <Filter>main\zapret</Filter>
+    </ClInclude>
+    <ClInclude Include="zapret\zapret_imp.hpp">
+      <Filter>main\zapret</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

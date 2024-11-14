@@ -5,6 +5,8 @@
 #include <comdef.h>
 #include <filesystem>
 #include <TlHelp32.h>
+#include <set>
+#include <map>
 
 #pragma comment(lib, "taskschd.lib")
 #pragma comment(lib, "comsupp.lib")
@@ -42,6 +44,21 @@ namespace tools
         mem->memory[mem->size] = 0;
 
         return realsize;
+    }
+
+    std::vector<std::string> split(const std::string& input, const std::string& delimiter)
+    {
+        std::vector<std::string> tokens;
+        size_t startPos = 0;
+        size_t endPos;
+
+        while ((endPos = input.find(delimiter, startPos)) != std::string::npos) {
+            tokens.push_back(input.substr(startPos, endPos - startPos));
+            startPos = endPos + delimiter.length();
+        }
+        tokens.push_back(input.substr(startPos));
+
+        return tokens;
     }
 
     bool request(const std::string& url, const std::string& post_data, std::string* answer)
@@ -105,6 +122,22 @@ namespace tools
     bool request(const std::string& url, std::string* answer)
     {
         return request(url, "", answer);
+    }
+
+    void getDomains(const std::string& path, std::set<std::string>& domains)
+    {
+        std::ifstream file(path);
+        if (!file.is_open())
+        {
+            MessageBoxA(0, std::format("Ошибка запуска процесса: {}", GetLastError()).c_str(), 0, 0);
+            return;
+        }
+
+        std::string line;
+        while (std::getline(file, line))
+            domains.insert(line);
+
+        file.close();
     }
 
     void killAll()

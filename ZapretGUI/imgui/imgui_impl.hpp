@@ -1,5 +1,11 @@
 #pragma once
 
+#ifndef d3d11
+#pragma comment(lib,"d3d11.lib")
+#include <d3d11.h>
+#define d3d11 1
+#endif
+
 #include "src/imgui.h"
 #include "src/imgui_impl_win32.h"
 #include "src/imgui_impl_dx11.h"
@@ -192,11 +198,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             case WM_LBUTTONDOWN:
             {
-                // ƒвойной клик по иконке в трее Ч восстановление окна
                 ShowWindow(g_hWnd, SW_RESTORE);
                 SetForegroundWindow(g_hWnd);
-
-                DestroyTrayIcon();
 
                 break;
             }
@@ -227,8 +230,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             ShowWindow(g_hWnd, SW_RESTORE);
             SetForegroundWindow(g_hWnd);
-
-            DestroyTrayIcon();
             break;
         }
         break;
