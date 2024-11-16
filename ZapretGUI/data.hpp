@@ -15,7 +15,9 @@ namespace vars
         {
             {"youtube", false},
             {"discord", false},
-            {"7tv", false}
+            {"7tv", false},
+            {"proton", false},
+            {"pornhub", false}
         }}
     };
 
@@ -25,6 +27,8 @@ namespace vars
         {"cf-ech", "list-cf-ech.txt"},
         {"discord", "list-discord.txt|list-discord-ip.txt"},
         {"7tv", "list-7tv.txt"},
+        {"proton", "list-proton.txt"},
+        {"pornhub", "list-ph.txt"},
     };
 
     int provider = 0;
@@ -56,7 +60,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-    std::string version = "v1.8.0";
+    std::string version = "v1.9.0";
 
     void init()
     {

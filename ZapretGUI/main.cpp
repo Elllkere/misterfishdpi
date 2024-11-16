@@ -21,6 +21,8 @@
 #include "icons/youtube.hpp"
 #include "icons/discord.hpp"
 #include "icons/7tv.hpp"
+#include "icons/ph.hpp"
+#include "icons/proton.hpp"
 
 int page = 0;
 
@@ -204,13 +206,36 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 0;
     }
 
-    SharedZapret* cf_ech = new SharedZapret("cf-ech", { "youtube" }, "shared_youtube_service");
+    int proton_width = 0;
+    int proton_height = 0;
+    ID3D11ShaderResourceView* proton_texture = NULL;
+    if (!LoadTextureFromMemory(proton_data, sizeof(proton_data), &proton_texture, &proton_width, &proton_height))
+    {
+        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        ::DestroyWindow(g_hWnd);
+        return 0;
+    }
+
+    int ph_width = 0;
+    int ph_height = 0;
+    ID3D11ShaderResourceView* ph_texture = NULL;
+    if (!LoadTextureFromMemory(ph_data, sizeof(ph_data), &ph_texture, &ph_width, &ph_height))
+    {
+        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        ::DestroyWindow(g_hWnd);
+        return 0;
+    }
+
+    std::vector<std::string> sharing_youtube_service = { "cf-ech", "pornhub", "proton", "youtube" };
+    SharedZapret* cf_ech = new SharedZapret("cf-ech", sharing_youtube_service, "shared_youtube_service");
 
     vars::services =
     {
-        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"], youtube_texture, {"cf-ech"}, "shared_youtube_service"),
+        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"], youtube_texture, sharing_youtube_service, "shared_youtube_service"),
         new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"], discord_texture),
         new Zapret(ds_width, ds_height, "7tv", "7tv", vars::json_settings["services"]["7tv"], _7tv_texture),
+        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", vars::json_settings["services"]["proton"], proton_texture, sharing_youtube_service, "shared_youtube_service"),
+        new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", vars::json_settings["services"]["pornhub"], ph_texture, sharing_youtube_service, "shared_youtube_service"),
         cf_ech,
     };
 

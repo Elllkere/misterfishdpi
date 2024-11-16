@@ -113,6 +113,10 @@ public:
     //for non interactive
     SharedZapret(const std::string& id_name, std::vector<std::string> shared_with, const std::string& shared_id) : Zapret(id_name)
     {
+        auto it = std::find(shared_with.begin(), shared_with.end(), id_name);
+        if (it != shared_with.end())
+            shared_with.erase(it);
+
         this->shared_with = shared_with;
         this->shared_id = shared_id;
         this->hide = true;
@@ -120,6 +124,10 @@ public:
 
     SharedZapret(int width, int height, const std::string& name, const std::string& id_name, bool active, ID3D11ShaderResourceView* texture, std::vector<std::string> shared_with, const std::string& shared_id) : Zapret(width, height, name, id_name, active, texture)
     {
+        auto it = std::find(shared_with.begin(), shared_with.end(), id_name);
+        if (it != shared_with.end())
+            shared_with.erase(it);
+
         this->shared_with = shared_with;
         this->shared_id = shared_id;
     }
