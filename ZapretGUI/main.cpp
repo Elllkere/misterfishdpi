@@ -231,11 +231,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     vars::services =
     {
-        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"], youtube_texture, sharing_youtube_service, "shared_youtube_service"),
-        new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"], discord_texture),
-        new Zapret(ds_width, ds_height, "7tv", "7tv", vars::json_settings["services"]["7tv"], _7tv_texture),
-        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", vars::json_settings["services"]["proton"], proton_texture, sharing_youtube_service, "shared_youtube_service"),
-        new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", vars::json_settings["services"]["pornhub"], ph_texture, sharing_youtube_service, "shared_youtube_service"),
+        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"]["active"], vars::json_settings["services"]["youtube"]["hotkey"], youtube_texture, sharing_youtube_service, "shared_youtube_service"),
+        new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"]["active"], vars::json_settings["services"]["discord"]["hotkey"], discord_texture),
+        new Zapret(ds_width, ds_height, "7tv", "7tv", vars::json_settings["services"]["7tv"]["active"], vars::json_settings["services"]["7tv"]["hotkey"], _7tv_texture),
+        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", vars::json_settings["services"]["proton"]["active"], vars::json_settings["services"]["proton"]["hotkey"], proton_texture, sharing_youtube_service, "shared_youtube_service"),
+        new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", vars::json_settings["services"]["pornhub"]["active"], vars::json_settings["services"]["pornhub"]["hotkey"], ph_texture, sharing_youtube_service, "shared_youtube_service"),
         cf_ech,
     };
 
@@ -252,7 +252,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if (!failed_ver_check)
     {
-        if (!(strstr(lpCmdLine, "/autostart") && vars::bTray_start == true))
+        if (strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "/verysilent"))
+        {
+            vars::json_settings["start_version_check"] = vars::bStart_v_check = false;
+            tools::updateSettings(vars::json_settings);
+        }
+        else if (!(strstr(lpCmdLine, "/autostart") && vars::bTray_start == true))
             ::ShowWindow(g_hWnd, nCmdShow);
     }
     else
@@ -261,7 +266,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         MessageBoxA(g_hWnd, "Не удалось проверить версию", window::window_name, MB_OK);
     }
 
-    CreateTrayIcon();
+    if (!strstr(lpCmdLine, "/verysilent"))
+        CreateTrayIcon();
 
     ::UpdateWindow(g_hWnd);
 
@@ -292,6 +298,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
         if (quit)
             break;
+
+        if (vars::bHotkeys)
+        {
+            for (auto& services : vars::services)
+            {
+                if (services->hotkey != 0)
+                    if (GetAsyncKeyState(services->hotkey) & 1)
+                        services->toggleActive();
+            }
+        }
 
         // Handle window being minimized or screen locked
         if (g_SwapChainOccluded && g_pSwapChain->Present(0, DXGI_PRESENT_TEST) == DXGI_STATUS_OCCLUDED)
@@ -422,20 +438,59 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                     ImGui::SetCursorPosY(start.y);
 
-                    if (ImGui::ImageButton(service->name.c_str(), service->texture, ImVec2(service->width, service->height)))
+                    if (ImGui::ImageButton(service->id_name.c_str(), service->texture, ImVec2(service->width, service->height)))
                     {
-                        if (service->active && !service->isRunning())
-                            service->active = 1;
-                        else
-                            service->active ^= 1;
+                        service->toggleActive();
+                    }
 
-                        vars::json_settings["services"][service->id_name] = service->active;
-                        tools::updateSettings(vars::json_settings);
+                    if (vars::bHotkeys)
+                    {
+                        bool open_key_bind = false;
+                        if (ImGui::BeginPopupContextItem((std::string("##pop_") + service->id_name).c_str()))
+                        {
+                            if (ImGui::MenuItem(u8"Задать клавишу"))
+                            {
+                                open_key_bind = true;
+                            }
 
-                        if (service->active)
-                            service->startProcces();
-                        else
-                            service->terminate();
+                            ImGui::MenuItem((u8"Клавиша: " + std::string(tools::getKeyName(service->hotkey))).c_str(), 0, false, false);
+
+                            ImGui::EndPopup();
+                        }
+
+                        if (open_key_bind)
+                            ImGui::OpenPopup((std::string("##key_") + service->id_name).c_str());;
+
+                        if (ImGui::BeginPopup((std::string("##key_") + service->id_name).c_str(), ImGuiWindowFlags_AlwaysAutoResize))
+                        {
+                            ImGui::Text(u8"Нажмите любую клавишу...");
+
+                            for (int i = 3; i <= 0xFE; i++)
+                            {
+                                if (ImGui::IsKeyPressed((ImGuiKey)i) && i != ImGuiKey_MouseLeft && i != ImGuiKey_MouseRight)
+                                {
+                                    vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = i;
+                                    tools::updateSettings(vars::json_settings);
+
+                                    ImGui::CloseCurrentPopup();
+
+                                    tools::resetKeysQueue();
+                                }
+                            }
+
+                            if (ImGui::Button(u8"Сбросить"))
+                            {
+                                vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = 0;
+                                tools::updateSettings(vars::json_settings);
+
+                                ImGui::CloseCurrentPopup();
+                            }
+
+                            if (ImGui::Button(u8"Отмена"))
+                                ImGui::CloseCurrentPopup();
+
+                            ImGui::EndPopup();
+                        }
                     }
 
                     if (ImGui::IsItemHovered())
@@ -473,8 +528,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Checkbox(u8"Автозапуск с windows", &vars::bWin_start))
                 {
                     vars::json_settings["win_start"] = vars::bWin_start;
-                    vars::json_settings["tray_start"] = false;
-                    vars::bTray_start = false;
+                    vars::json_settings["tray_start"] = vars::bTray_start = false;
                     tools::updateSettings(vars::json_settings);
 
                     switch (vars::auto_start)
@@ -523,6 +577,17 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip(u8"Если Вы не знаете что такое Cloudflare, то не стоит выключать.\nРазблокирует протокол ECH у Cloudflare, который включен всегда на бесплатном тарифе\nиз-за чего много обычных не забаненных сайтов не загружаются");
+
+                if (ImGui::Checkbox(u8"Горячие клавиши", &vars::bHotkeys))
+                {
+                    vars::json_settings["hotkeys"] = vars::bHotkeys;
+                    tools::updateSettings(vars::json_settings);
+
+                    tools::resetKeysQueue();
+                }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Для установки клавиши нужно нажать ПКМ по сервису");
 
                 if (ImGui::Combo(u8"Провайдер", &vars::provider, tools::convertMapToCharArray(vars::providers).data(), vars::providers.size()))
                 {

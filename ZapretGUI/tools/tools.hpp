@@ -486,6 +486,26 @@ namespace tools
         return false;
     }
 
+    void resetKeysQueue()
+    {
+        for (int key = 0x03; key < 0xFE; ++key)
+            GetAsyncKeyState(key);
+    }
+
+    std::string getKeyName(int key)
+    {
+        if (key == 0)
+            return "None";
+
+        char name[128];
+        if (GetKeyNameText(MapVirtualKey(key, MAPVK_VK_TO_VSC) << 16, name, sizeof(name)) > 0) 
+        {
+            return std::string(name);
+        }
+
+        return "Unknown";
+    }
+
     bool updateSettings(const json& settings)
     {
         std::ofstream ofs(std::filesystem::current_path().string() + "\\settings.json");
@@ -500,21 +520,40 @@ namespace tools
         return true;
     }
 
-    bool recursiveSeachSettings(json& base, const json& updates)
+    bool recursiveSeachSettings(json& base, const json& updates, bool check_old = false)
     {
         bool flag_update = false;
 
-        for (auto& [key, value] : updates.items()) 
+        if (!check_old)
         {
-            if (base.find(key) == base.end()) 
+            for (auto& [key, value] : updates.items())
             {
-                base[key] = value;
-                flag_update = true;
-            }
-            else if (value.is_object() && base[key].is_object()) 
-            {
-                if (recursiveSeachSettings(base[key], value))
+                if (base.find(key) == base.end() || base[key].type_name() != value.type_name())
+                {
+                    base[key] = value;
                     flag_update = true;
+                }
+                else if (value.is_object() && base[key].is_object())
+                {
+                    if (recursiveSeachSettings(base[key], value, check_old))
+                        flag_update = true;
+                }
+            }
+        }
+        else
+        {
+            for (auto& [key, value] : base.items())
+            {
+                if (updates.find(key) == updates.end())
+                {
+                    base.erase(key);
+                    flag_update = true;
+                }
+                else if (value.is_object() && updates[key].is_object())
+                {
+                    if (recursiveSeachSettings(value, updates[key], check_old))
+                        flag_update = true;
+                }
             }
         }
 
@@ -537,18 +576,10 @@ namespace tools
             ifs.close();
         }
 
-        bool flag_update = false;
 
-        for (auto& [key, value] : n.items())
-        {
-            if (settings.find(key) == settings.end())
-            {
-                settings[key] = value;
-                flag_update = true;
-            }
-        }
-
-        if (recursiveSeachSettings(settings, n))
+        bool bNew = recursiveSeachSettings(settings, n);
+        bool bOld = recursiveSeachSettings(settings, n, true);
+        if (bNew || bOld)
             updateSettings(settings);
 
         return settings;

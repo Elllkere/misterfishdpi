@@ -207,7 +207,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
                 POINT pt;
                 GetCursorPos(&pt);
-                SetForegroundWindow(g_hWnd);
+
                 ShowTrayContextMenu(g_hWnd, pt);
                 PostMessage(g_hWnd, WM_NULL, 0, 0);  // avoid lost focus bug
 

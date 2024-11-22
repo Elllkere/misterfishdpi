@@ -75,6 +75,7 @@ public:
     int height = 0;
     std::string name;
     std::string id_name;
+    int hotkey = 0;
     bool active = false;
     bool hide = false;
     ID3D11ShaderResourceView* texture = NULL;
@@ -87,7 +88,7 @@ public:
         this->hide = true;
     }
 
-    Zapret(int width, int height, const std::string& name, const std::string& id_name, bool active, ID3D11ShaderResourceView* texture)
+    Zapret(int width, int height, const std::string& name, const std::string& id_name, bool active, int hotkey, ID3D11ShaderResourceView* texture)
     {
         this->width = width;
         this->height = height;
@@ -95,7 +96,10 @@ public:
         this->id_name = id_name;
         this->active = active;
         this->texture = texture;
+        this->hotkey = hotkey;
     }
+
+    void toggleActive();
 
     virtual bool isRunning();
     virtual void terminate();
@@ -122,7 +126,7 @@ public:
         this->hide = true;
     }
 
-    SharedZapret(int width, int height, const std::string& name, const std::string& id_name, bool active, ID3D11ShaderResourceView* texture, std::vector<std::string> shared_with, const std::string& shared_id) : Zapret(width, height, name, id_name, active, texture)
+    SharedZapret(int width, int height, const std::string& name, const std::string& id_name, bool active, int hotkey, ID3D11ShaderResourceView* texture, std::vector<std::string> shared_with, const std::string& shared_id) : Zapret(width, height, name, id_name, active, hotkey, texture)
     {
         auto it = std::find(shared_with.begin(), shared_with.end(), id_name);
         if (it != shared_with.end())

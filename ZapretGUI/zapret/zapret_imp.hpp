@@ -229,6 +229,22 @@ bool SharedZapret::isRunning()
     return false;
 }
 
+void Zapret::toggleActive()
+{
+    if (active && !isRunning())
+        active = 1;
+    else
+        active ^= 1;
+
+    vars::json_settings["services"][id_name]["active"] = active;
+    tools::updateSettings(vars::json_settings);
+
+    if (active)
+        startProcces();
+    else
+        terminate();
+}
+
 bool Zapret::isRunning()
 {
     if (prc == nullptr)
