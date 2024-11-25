@@ -69,7 +69,8 @@ namespace vars
     {
         {0, u8"Другой"},
         {1, u8"Ростелеком"},
-        {2, u8"МТС"}
+        {2, u8"МТС"},
+        {3, "Lovit"}
     };
 
     std::map<int, std::string> auto_starts =
@@ -84,7 +85,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-    std::string version = "v1.10.0";
+    std::string version = "v1.11.0";
 
     void init()
     {
