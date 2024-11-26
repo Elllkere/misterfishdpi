@@ -47,6 +47,7 @@ namespace vars
 
     json services_txt = {
         {"shared_youtube_service", "list-youtube-service.txt"},
+        {"shared_7tv_service", "list-7tv-service.txt"},
         {"youtube", "list-youtube.txt"},
         {"cf-ech", "list-cf-ech.txt"},
         {"discord", "list-discord.txt|list-discord-ip.txt"},
@@ -85,7 +86,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-    std::string version = "v1.11.1";
+    std::string version = "v1.11.2";
 
     void init()
     {

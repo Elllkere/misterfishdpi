@@ -226,14 +226,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 0;
     }
 
-    std::vector<std::string> sharing_youtube_service = { "cf-ech", "pornhub", "proton", "youtube" };
-    SharedZapret* cf_ech = new SharedZapret("cf-ech", sharing_youtube_service, "shared_youtube_service");
+    std::vector<std::string> sharing_youtube_service = { "pornhub", "proton", "youtube" };
+    std::vector<std::string> sharing_7tv_service = { "cf-ech", "7tv" };
+    SharedZapret* cf_ech = new SharedZapret("cf-ech", sharing_7tv_service, "shared_7tv_service");
 
     vars::services =
     {
         new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"]["active"], vars::json_settings["services"]["youtube"]["hotkey"], youtube_texture, sharing_youtube_service, "shared_youtube_service"),
         new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"]["active"], vars::json_settings["services"]["discord"]["hotkey"], discord_texture),
-        new Zapret(ds_width, ds_height, "7tv", "7tv", vars::json_settings["services"]["7tv"]["active"], vars::json_settings["services"]["7tv"]["hotkey"], _7tv_texture),
+        new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", vars::json_settings["services"]["7tv"]["active"], vars::json_settings["services"]["7tv"]["hotkey"], _7tv_texture, sharing_7tv_service, "shared_7tv_service"),
         new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", vars::json_settings["services"]["proton"]["active"], vars::json_settings["services"]["proton"]["hotkey"], proton_texture, sharing_youtube_service, "shared_youtube_service"),
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", vars::json_settings["services"]["pornhub"]["active"], vars::json_settings["services"]["pornhub"]["hotkey"], ph_texture, sharing_youtube_service, "shared_youtube_service"),
         cf_ech,

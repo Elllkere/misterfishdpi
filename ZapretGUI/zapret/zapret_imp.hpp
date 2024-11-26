@@ -335,7 +335,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --new ", cur_path, discord);
         args += std::format("--filter-udp=50000-50100 --ipset=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, discord_ip, cur_path);
     }
-    else if (id_name == "7tv")
+    else if (id_name == "shared_7tv_service")
     {
         args = std::format("--wf-tcp=443 --wf-udp=443 --filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-ttl=3 --new ", cur_path, txt);
         args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6", cur_path, txt);
