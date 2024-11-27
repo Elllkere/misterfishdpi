@@ -129,8 +129,21 @@ namespace tools
         std::ifstream file(path);
         if (!file.is_open())
         {
-            MessageBoxA(0, std::format("Ошибка запуска процесса: {}", GetLastError()).c_str(), 0, 0);
-            return;
+            std::ofstream createFile(path);
+            if (!createFile)
+            {
+                MessageBoxA(0, std::format("Ошибка запуска процесса: {}", GetLastError()).c_str(), 0, 0);
+                return;
+            }
+
+            createFile.close();
+            file.open(path);
+
+            if (!file.is_open())
+            {
+                MessageBoxA(0, std::format("Ошибка запуска процесса 2: {}", GetLastError()).c_str(), 0, 0);
+                return;
+            }
         }
 
         std::string line;
