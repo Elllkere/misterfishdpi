@@ -45,17 +45,6 @@ namespace vars
         }}
     };
 
-    json services_txt = {
-        {"shared_youtube_service", "list-youtube-service.txt"},
-        {"shared_7tv_service", "list-7tv-service.txt"},
-        {"youtube", "list-youtube.txt"},
-        {"cf-ech", "list-cf-ech.txt"},
-        {"discord", "list-discord.txt|list-discord-ip.txt"},
-        {"7tv", "list-7tv.txt"},
-        {"proton", "list-proton.txt"},
-        {"pornhub", "list-ph.txt"},
-    };
-
     int provider = 0;
     int auto_start = 0;
     int x_method = 0;

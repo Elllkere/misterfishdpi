@@ -14,11 +14,11 @@ void SharedZapret::terminate()
 
     elements.push_back({ {"id_name", id_name}, {"txt", txt}, {"active", false} });
 
-    for (auto& service : shared_with)
+    for (auto& service : this->info->shared_ids)
     {
         txt = "";
-        getArgs(service, txt, cur_path, true);
-        elements.push_back({ {"id_name", service}, {"txt", txt}, {"active", false} });
+        getArgs(service.first, txt, cur_path, true);
+        elements.push_back({ {"id_name", service.first}, {"txt", txt}, {"active", false} });
     }
 
     json j = elements;
@@ -54,7 +54,7 @@ void SharedZapret::terminate()
         tools::getDomains(std::format("{}\\{}", cur_path, std::string(elem["txt"])), domains[elem["id_name"]]);
     }
 
-    tools::getDomains(std::format("{}\\{}", cur_path, std::string(vars::services_txt[shared_id])), domains_used);
+    //tools::getDomains(std::format("{}\\{}", cur_path, std::string(vars::services_txt[shared_id])), domains_used);
 
     for (auto& elem : j)
     {
@@ -81,7 +81,7 @@ void SharedZapret::terminate()
         }
     }
 
-    std::ofstream service_file(std::format("{}\\{}", cur_path, std::string(vars::services_txt[shared_id])));
+    std::ofstream service_file(std::format("{}\\{}", cur_path, this->info->shared_txt));
     if (service_file.is_open())
     {
         for (auto it = domains_used.begin(); it != domains_used.end(); ++it)
@@ -100,6 +100,12 @@ void SharedZapret::terminate()
         Zapret::terminate();
 }
 
+void SharedZapret::restart()
+{
+    Zapret::terminate();
+    startProcces();
+}
+
 void SharedZapret::startProcces(const std::string& _id_name)
 {
     std::string args = "";
@@ -112,11 +118,11 @@ void SharedZapret::startProcces(const std::string& _id_name)
 
     elements.push_back({ {"id_name", id_name}, {"txt", txt}, {"active", false} });
 
-    for (auto& service : shared_with)
+    for (auto& service : this->info->shared_ids)
     {
         txt = "";
-        getArgs(service, txt, cur_path, true);
-        elements.push_back({ {"id_name", service}, {"txt", txt}, {"active", false} });
+        getArgs(service.first, txt, cur_path, true);
+        elements.push_back({ {"id_name", service.first}, {"txt", txt}, {"active", false} });
     }
 
     json j = elements;
@@ -152,7 +158,7 @@ void SharedZapret::startProcces(const std::string& _id_name)
         tools::getDomains(std::format("{}\\{}", cur_path, std::string(elem["txt"])), domains[elem["id_name"]]);
     }
 
-    tools::getDomains(std::format("{}\\{}", cur_path, std::string(vars::services_txt[shared_id])), domains_used);
+    //tools::getDomains(std::format("{}\\{}", cur_path, std::string(vars::services_txt[shared_id])), domains_used);
 
     for (auto& elem : j)
     {
@@ -179,7 +185,7 @@ void SharedZapret::startProcces(const std::string& _id_name)
         }
     }
 
-    std::ofstream service_file(std::format("{}\\{}", cur_path, std::string(vars::services_txt[shared_id])));
+    std::ofstream service_file(std::format("{}\\{}", cur_path, this->info->shared_txt));
     if (service_file.is_open())
     {
         for (auto it = domains_used.begin(); it != domains_used.end(); ++it)
@@ -195,14 +201,14 @@ void SharedZapret::startProcces(const std::string& _id_name)
         MessageBoxA(0, std::format("Ошибка запуска процесса: {}", GetLastError()).c_str(), 0, 0);
 
     if (!isRunning())
-        Zapret::startProcces(shared_id);
+        Zapret::startProcces(this->info->shared_id);
 }
 
 bool SharedZapret::isOnlyOneRunning() const
 {
     for (auto& service : vars::services)
     {
-        if (std::find(shared_with.begin(), shared_with.end(), service->id_name) != shared_with.end() && service->isRunning())
+        if (this->info->shared_ids.find(service->id_name) != this->info->shared_ids.end() && service->isRunning())
             return false;
     }
 
@@ -219,7 +225,7 @@ bool SharedZapret::isRunning()
 
     for (auto& service : vars::services)
     {
-        if (std::find(shared_with.begin(), shared_with.end(), service->id_name) != shared_with.end())
+        if (this->info->shared_ids.find(service->id_name) != this->info->shared_ids.end())
         {
             if (static_cast<Zapret*>(service)->Zapret::isRunning())
                 return true;
@@ -269,6 +275,12 @@ void Zapret::startProcces(const std::string& id_name)
     prc = new Process(cur_path + "\\winws.exe", args);
 }
 
+void Zapret::restart()
+{
+    terminate();
+    startProcces();
+}
+
 void Zapret::terminate()
 {
     if (prc == nullptr)
@@ -279,13 +291,19 @@ void Zapret::terminate()
 
 void Zapret::getArgs(const std::string& id_name, std::string& args, const std::string& cur_path, bool hostlist)
 {
+    std::string txt = "";
+
+    SharedZapret* shared = static_cast<SharedZapret*>(this);
+    if (shared)
+        txt = shared->info->shared_txt;
+    else
+        txt = this->txt;
+
     if (hostlist)
     {
-        args = vars::services_txt[id_name];
+        args = txt;
         return;
     }
-
-    std::string txt = vars::services_txt[id_name];
 
     if (id_name == "shared_youtube_service")
     {
@@ -327,7 +345,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     }
     else if (id_name == "discord")
     {
-        std::string full = vars::services_txt[id_name];
+        std::string full = this->txt;
         auto spl = tools::split(full, "|");
 
         std::string discord = spl[0].data();
@@ -340,7 +358,16 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     }
     else if (id_name == "shared_7tv_service")
     {
-        args = std::format("--wf-tcp=443 --wf-udp=443 --filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-ttl=3 --new ", cur_path, txt);
-        args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6", cur_path, txt);
+        args = std::format("--wf-tcp=443 --wf-udp=443 ");
+        if (vars::provider == 1)
+        {
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=6 --dpi-desync-split-pos=midsld --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, txt, cur_path);
+        }
+        else
+        {
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-ttl=3 --new ", cur_path, txt);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6", cur_path, txt);
+        }
     }
 }

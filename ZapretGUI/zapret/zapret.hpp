@@ -68,6 +68,26 @@ private:
     DWORD processID = 0;
 };
 
+class ZapretServiceInfo
+{
+public:
+    std::string shared_id;
+    std::map<std::string/*id*/, std::string/*txt*/> shared_ids;
+    std::string shared_txt;
+
+    ZapretServiceInfo() {}
+
+    ZapretServiceInfo(const std::string& shared_id, std::map<std::string, std::string> shared_ids, const std::string& shared_txt)
+    {
+        if (shared_ids.find(shared_id) != shared_ids.end())
+            shared_ids.erase(shared_id);
+
+        this->shared_id = shared_id;
+        this->shared_ids = shared_ids;
+        this->shared_txt = shared_txt;
+    }
+};
+
 class Zapret
 {
 public:
@@ -75,6 +95,7 @@ public:
     int height = 0;
     std::string name;
     std::string id_name;
+    std::string txt;
     int hotkey = 0;
     bool active = false;
     bool hide = false;
@@ -82,13 +103,14 @@ public:
     Process* prc = nullptr;
 
     //for non interactive
-    Zapret(const std::string& id_name)
+    Zapret(const std::string& id_name, const std::string& txt)
     {
         this->id_name = id_name;
         this->hide = true;
+        this->txt = txt;
     }
 
-    Zapret(int width, int height, const std::string& name, const std::string& id_name, bool active, int hotkey, ID3D11ShaderResourceView* texture)
+    Zapret(int width, int height, const std::string& name, const std::string& id_name, bool active, int hotkey, ID3D11ShaderResourceView* texture, const std::string& txt)
     {
         this->width = width;
         this->height = height;
@@ -97,11 +119,13 @@ public:
         this->active = active;
         this->texture = texture;
         this->hotkey = hotkey;
+        this->txt = txt;
     }
 
     void toggleActive();
 
     virtual bool isRunning();
+    virtual void restart();
     virtual void terminate();
     virtual void startProcces(const std::string& id_name = "");
 
@@ -111,33 +135,23 @@ public:
 class SharedZapret : public Zapret
 {
 public:
-    std::vector<std::string> shared_with;
-    std::string shared_id;
+    ZapretServiceInfo* info;
 
     //for non interactive
-    SharedZapret(const std::string& id_name, std::vector<std::string> shared_with, const std::string& shared_id) : Zapret(id_name)
+    SharedZapret(const std::string& id_name, ZapretServiceInfo* info) : Zapret(id_name, info->shared_txt)
     {
-        auto it = std::find(shared_with.begin(), shared_with.end(), id_name);
-        if (it != shared_with.end())
-            shared_with.erase(it);
-
-        this->shared_with = shared_with;
-        this->shared_id = shared_id;
         this->hide = true;
+        this->info = info;
     }
 
-    SharedZapret(int width, int height, const std::string& name, const std::string& id_name, bool active, int hotkey, ID3D11ShaderResourceView* texture, std::vector<std::string> shared_with, const std::string& shared_id) : Zapret(width, height, name, id_name, active, hotkey, texture)
+    SharedZapret(int width, int height, const std::string& name, const std::string& id_name, bool active, int hotkey, ID3D11ShaderResourceView* texture, ZapretServiceInfo* info) : Zapret(width, height, name, id_name, active, hotkey, texture, info->shared_txt)
     {
-        auto it = std::find(shared_with.begin(), shared_with.end(), id_name);
-        if (it != shared_with.end())
-            shared_with.erase(it);
-
-        this->shared_with = shared_with;
-        this->shared_id = shared_id;
+        this->info = info;
     }
 
     bool isOnlyOneRunning() const;
     bool isRunning() override;
+    void restart() override;
     void terminate() override;
     void startProcces(const std::string& id_name = "") override;
 };
