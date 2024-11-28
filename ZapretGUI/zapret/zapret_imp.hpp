@@ -270,7 +270,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         auto spl = tools::split(full, "|");
 
         std::string discord = spl[0].data();
-        std::string discord_ip = std::string("\\") + spl[1].data();
+        std::string discord_ip = std::string("lists\\") + spl[1].data();
 
         args = std::format("--wf-tcp=443 --wf-udp=443,50000-50100 ");
         args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=4 --new ", cur_path, discord);
