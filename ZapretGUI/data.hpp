@@ -41,6 +41,18 @@ namespace vars
             {
                 {"active", false},
                 {"hotkey", 0}
+            }},
+        
+            {"patreon",
+            {
+                {"active", false},
+                {"hotkey", 0}
+            }},
+        
+            {"grammarly",
+            {
+                {"active", false},
+                {"hotkey", 0}
             }}
         }}
     };
@@ -86,7 +98,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-    std::string version = "v1.11.3";
+    std::string version = "v1.12.0";
 
     void init()
     {

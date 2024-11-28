@@ -32,6 +32,8 @@
     <ClInclude Include="data.hpp" />
     <ClInclude Include="icons\7tv.hpp" />
     <ClInclude Include="icons\discord.hpp" />
+    <ClInclude Include="icons\grammarly.hpp" />
+    <ClInclude Include="icons\patreon.hpp" />
     <ClInclude Include="icons\ph.hpp" />
     <ClInclude Include="icons\proton.hpp" />
     <ClInclude Include="icons\youtube.hpp" />

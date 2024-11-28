@@ -23,6 +23,8 @@
 #include "icons/7tv.hpp"
 #include "icons/ph.hpp"
 #include "icons/proton.hpp"
+#include "icons/patreon.hpp"
+#include "icons/grammarly.hpp"
 
 int page = 0;
 
@@ -225,20 +227,60 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         ::DestroyWindow(g_hWnd);
         return 0;
     }
+    
+    int patreon_width = 0;
+    int patreon_height = 0;
+    ID3D11ShaderResourceView* patreon_texture = NULL;
+    if (!LoadTextureFromMemory(patreon_data, sizeof(patreon_data), &patreon_texture, &patreon_width, &patreon_height))
+    {
+        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        ::DestroyWindow(g_hWnd);
+        return 0;
+    }
+    
+    int grammarly_width = 0;
+    int grammarly_height = 0;
+    ID3D11ShaderResourceView* grammarly_texture = NULL;
+    if (!LoadTextureFromMemory(grammarly_data, sizeof(grammarly_data), &grammarly_texture, &grammarly_width, &grammarly_height))
+    {
+        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        ::DestroyWindow(g_hWnd);
+        return 0;
+    }
 
-    std::vector<std::string> sharing_youtube_service = { "pornhub", "proton", "youtube" };
-    std::vector<std::string> sharing_7tv_service = { "cf-ech", "7tv" };
-    SharedZapret* cf_ech = new SharedZapret("cf-ech", sharing_7tv_service, "shared_7tv_service");
+    std::map<std::string, std::string> shared_youtube =
+    {
+        {"cf-ech", "list-cf-ech.txt"},
+        {"pornhub", "list-ph.txt"},
+        {"proton", "list-proton.txt"},
+        {"youtube", "list-youtube.txt"},
+        {"patreon", "list-patreon.txt"},
+    };
+    
+    std::map<std::string, std::string> shared_7tv =
+    {
+        {"7tv", "list-7tv.txt"},
+        {"grammarly", "list-grammarly.txt"},
+    };
+
+    ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
+    ZapretServiceInfo* shared_service_7tv = new ZapretServiceInfo{ "shared_service_7tv", shared_7tv, "list-7tv-service.txt" };
+    SharedZapret* cf_ech = new SharedZapret("cf-ech", shared_service_youtube);
 
     vars::services =
     {
-        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"]["active"], vars::json_settings["services"]["youtube"]["hotkey"], youtube_texture, sharing_youtube_service, "shared_youtube_service"),
-        new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"]["active"], vars::json_settings["services"]["discord"]["hotkey"], discord_texture),
-        new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", vars::json_settings["services"]["7tv"]["active"], vars::json_settings["services"]["7tv"]["hotkey"], _7tv_texture, sharing_7tv_service, "shared_7tv_service"),
-        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", vars::json_settings["services"]["proton"]["active"], vars::json_settings["services"]["proton"]["hotkey"], proton_texture, sharing_youtube_service, "shared_youtube_service"),
-        new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", vars::json_settings["services"]["pornhub"]["active"], vars::json_settings["services"]["pornhub"]["hotkey"], ph_texture, sharing_youtube_service, "shared_youtube_service"),
+        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"]["active"], vars::json_settings["services"]["youtube"]["hotkey"], youtube_texture, shared_service_youtube),
+        new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"]["active"], vars::json_settings["services"]["discord"]["hotkey"], discord_texture, "list-discord.txt|list-discord-ip.txt"),
+        new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", vars::json_settings["services"]["7tv"]["active"], vars::json_settings["services"]["7tv"]["hotkey"], _7tv_texture, shared_service_7tv),
+        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", vars::json_settings["services"]["proton"]["active"], vars::json_settings["services"]["proton"]["hotkey"], proton_texture, shared_service_youtube),
+        new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", vars::json_settings["services"]["pornhub"]["active"], vars::json_settings["services"]["pornhub"]["hotkey"], ph_texture, shared_service_youtube),
+        new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", vars::json_settings["services"]["patreon"]["active"], vars::json_settings["services"]["patreon"]["hotkey"], patreon_texture, shared_service_youtube),
+        new SharedZapret(grammarly_width, grammarly_height, "Grammarly", "grammarly", vars::json_settings["services"]["grammarly"]["active"], vars::json_settings["services"]["grammarly"]["hotkey"], grammarly_texture, shared_service_7tv),
         cf_ech,
     };
+
+    delete shared_service_youtube;
+    delete shared_service_7tv;
 
     bool failed_ver_check = false;
     if (vars::bStart_v_check)
@@ -264,6 +306,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     else
     {
         ::ShowWindow(g_hWnd, nCmdShow);
+        ::UpdateWindow(g_hWnd);
         MessageBoxA(g_hWnd, "Не удалось проверить версию", window::window_name, MB_OK);
     }
 
@@ -280,7 +323,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     for (auto& s : vars::services)
     {
         if (s->active)
-            s->startProcces();
+            s->start();
     }
 
     // Main loop
@@ -568,7 +611,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 {
                     cf_ech->active = vars::bUnlock_ech;
                     if (vars::bUnlock_ech)
-                        cf_ech->startProcces();
+                        cf_ech->start();
                     else
                         cf_ech->terminate();
 
@@ -599,8 +642,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     {
                         if (s->active)
                         {
-                            s->terminate();
-                            s->startProcces();
+                            s->restart();
                         }
                     }
                 }
@@ -656,7 +698,20 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
 
                 if (ImGui::Button(u8"Завершить все обходы", ImVec2(200, 30)))
+                {
                     tools::killAll();
+
+                    bool cf_prev = cf_ech->active;
+
+                    for (auto& service : vars::services)
+                        service->active = false;
+
+                    if (cf_prev)
+                    {
+                        cf_ech->active = true;
+                        cf_ech->start();
+                    }
+                }
 
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip(u8"Завершит все прошлые и нынешние процессы zapret");

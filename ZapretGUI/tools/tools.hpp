@@ -539,8 +539,15 @@ namespace tools
 
         if (!check_old)
         {
-            for (auto& [key, value] : updates.items())
+            std::vector<std::string> keys;
+            for (const auto& [key, value] : updates.items()) 
             {
+                keys.push_back(key);
+            }
+
+            for (const auto& key : keys)
+            {
+                const auto& value = updates[key];
                 if (base.find(key) == base.end() || base[key].type_name() != value.type_name())
                 {
                     base[key] = value;
@@ -555,11 +562,14 @@ namespace tools
         }
         else
         {
-            for (auto& [key, value] : base.items())
+            std::vector<std::string> keys_to_erase;
+
+            auto items = base.items();
+            for (const auto& [key, value] : items)
             {
                 if (updates.find(key) == updates.end())
                 {
-                    base.erase(key);
+                    keys_to_erase.push_back(key);
                     flag_update = true;
                 }
                 else if (value.is_object() && updates[key].is_object())
@@ -567,6 +577,11 @@ namespace tools
                     if (recursiveSeachSettings(value, updates[key], check_old))
                         flag_update = true;
                 }
+            }
+
+            for (const auto& key : keys_to_erase) 
+            {
+                base.erase(key);
             }
         }
 

@@ -125,6 +125,12 @@
     <ClInclude Include="icons\proton.hpp">
       <Filter>main\render\icons</Filter>
     </ClInclude>
+    <ClInclude Include="icons\patreon.hpp">
+      <Filter>main\render\icons</Filter>
+    </ClInclude>
+    <ClInclude Include="icons\grammarly.hpp">
+      <Filter>main\render\icons</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
