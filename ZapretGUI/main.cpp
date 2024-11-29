@@ -250,7 +250,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     std::map<std::string, std::string> shared_youtube =
     {
-        {"cf-ech", "list-cf-ech.txt"},
         {"pornhub", "list-ph.txt"},
         {"proton", "list-proton.txt"},
         {"youtube", "list-youtube.txt"},
@@ -265,7 +264,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
     ZapretServiceInfo* shared_service_7tv = new ZapretServiceInfo{ "shared_service_7tv", shared_7tv, "list-7tv-service.txt" };
-    SharedZapret* cf_ech = new SharedZapret("cf-ech", shared_service_youtube);
+    Zapret* cf_ech = new Zapret("cf-ech", "list-cf-ech.txt");
 
     vars::services =
     {
