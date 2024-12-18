@@ -222,13 +222,13 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
     if (id_name == "shared_service_youtube")
     {
-        if (vars::provider < 2)
+        if (vars::provider < providers_list::PROVIDER_MTS)
         {
             args = std::format("--wf-tcp=80,443 --wf-udp=443 ");
             args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt);
 
-            if (vars::provider == 0)
+            if (vars::provider == providers_list::PROVIDER_OTHER)
             {
                 args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=8 --new ", cur_path, txt);
                 args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=1 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
@@ -240,14 +240,14 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
                 args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-fooling=badseq --dpi-desync-split-pos=1,midsld --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
             }
         }
-        else if (vars::provider == 2)
+        else if (vars::provider == providers_list::PROVIDER_MTS)
         {
             args = std::format("--wf-tcp=80,443 --wf-udp=443 ");
             args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
         }
-        else if (vars::provider == 3)
+        else if (vars::provider == providers_list::PROVIDER_LOVIT)
         {
             args = std::format("--wf-tcp=80,443 --wf-udp=443 ");
             args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=5 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
@@ -273,7 +273,10 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         std::string discord_ip = std::string("lists\\") + spl[1].data();
 
         args = std::format("--wf-tcp=443 --wf-udp=443,50000-50100 ");
-        args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=4 --new ", cur_path, discord);
+        if (vars::provider == providers_list::PROVIDER_ROST)
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=7 --new ", cur_path, discord);
+        else
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=4 --new ", cur_path, discord);
         args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --new ", cur_path, discord);
         args += std::format("--filter-udp=50000-50100 --ipset=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, discord_ip, cur_path);
     }

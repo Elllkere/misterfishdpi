@@ -1,5 +1,13 @@
 #pragma once
 
+typedef enum _providers_list
+{
+    PROVIDER_OTHER          = 0,
+    PROVIDER_ROST           = 1,
+    PROVIDER_MTS            = 2,
+    PROVIDER_LOVIT          = 3
+} providers_list;
+
 namespace vars
 {
     json json_settings = {
@@ -80,10 +88,10 @@ namespace vars
     std::vector<Zapret*> services;
     std::map<int, std::string> providers =
     {
-        {0, u8"Другой"},
-        {1, u8"Ростелеком"},
-        {2, u8"МТС"},
-        {3, "Lovit"}
+        {providers_list::PROVIDER_OTHER, u8"Другой"},
+        {providers_list::PROVIDER_ROST, u8"Ростелеком"},
+        {providers_list::PROVIDER_MTS, u8"МТС"},
+        {providers_list::PROVIDER_LOVIT, "Lovit"}
     };
 
     std::map<int, std::string> auto_starts =
@@ -98,7 +106,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-    std::string version = "v1.12.2";
+    std::string version = "v1.12.5";
 
     void init()
     {
