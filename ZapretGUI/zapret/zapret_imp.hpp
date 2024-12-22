@@ -231,6 +231,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
             if (vars::provider == providers_list::PROVIDER_OTHER)
             {
                 args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=8 --new ", cur_path, txt);
+                args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-split-pos=midsld --dpi-desync-repeats=6 --dpi-desync-fooling=badseq,md5sig --new ", cur_path, txt);
                 args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=1 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
             }
             else
