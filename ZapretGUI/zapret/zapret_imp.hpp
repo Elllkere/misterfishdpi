@@ -276,7 +276,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         args = std::format("--wf-tcp=443 --wf-udp=443,50000-50100 ");
         if (vars::provider == providers_list::PROVIDER_ROST)
         {
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=5 --new ", cur_path, discord);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=disorder2 --dpi-desync-split-pos=1,sniext+1,host+1,midsld-2,midsld,midsld+2,endhost-1 --new ", cur_path, discord);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=md5sig --new ", cur_path, discord);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=datanoack --new ", cur_path, discord);
         }
