@@ -14,6 +14,7 @@ namespace vars
         {"win_start", false},
         {"tray_start", false},
         {"start_version_check", true},
+        {"auto_update", true},
         {"unlock_ech", true},
         {"hotkeys", false},
         {"provider", 0},
@@ -82,6 +83,7 @@ namespace vars
     bool bWin_start = false;
     bool bTray_start = false;
     bool bStart_v_check = false;
+    bool bAuto_update = false;
     bool bUnlock_ech = true;
     bool bHotkeys = true;
 
@@ -106,7 +108,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-    std::string version = "v1.12.9";
+    std::string version = "v1.13.0";
 
     void init()
     {
@@ -118,6 +120,7 @@ namespace vars
         bWin_start = json_settings["win_start"];
         bTray_start = json_settings["tray_start"];
         bStart_v_check = json_settings["start_version_check"];
+        bAuto_update = json_settings["auto_update"];
         bUnlock_ech = json_settings["unlock_ech"];
         bHotkeys = json_settings["hotkeys"];
     }

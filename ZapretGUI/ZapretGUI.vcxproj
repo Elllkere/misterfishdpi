@@ -19,6 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\minizip\ioapi.c" />
+    <ClCompile Include="..\minizip\iowin32.c" />
+    <ClCompile Include="..\minizip\miniunz.c" />
+    <ClCompile Include="..\minizip\mztools.c" />
+    <ClCompile Include="..\minizip\unzip.c" />
+    <ClCompile Include="..\zlib\adler32.c" />
+    <ClCompile Include="..\zlib\compress.c" />
+    <ClCompile Include="..\zlib\crc32.c" />
+    <ClCompile Include="..\zlib\deflate.c" />
+    <ClCompile Include="..\zlib\gzclose.c" />
+    <ClCompile Include="..\zlib\gzlib.c" />
+    <ClCompile Include="..\zlib\gzread.c" />
+    <ClCompile Include="..\zlib\gzwrite.c" />
+    <ClCompile Include="..\zlib\infback.c" />
+    <ClCompile Include="..\zlib\inffast.c" />
+    <ClCompile Include="..\zlib\inflate.c" />
+    <ClCompile Include="..\zlib\inftrees.c" />
+    <ClCompile Include="..\zlib\trees.c" />
+    <ClCompile Include="..\zlib\uncompr.c" />
+    <ClCompile Include="..\zlib\zutil.c" />
     <ClCompile Include="imgui\src\imgui.cpp" />
     <ClCompile Include="imgui\src\imgui_demo.cpp" />
     <ClCompile Include="imgui\src\imgui_draw.cpp" />
@@ -32,8 +52,6 @@
     <ClInclude Include="data.hpp" />
     <ClInclude Include="icons\7tv.hpp" />
     <ClInclude Include="icons\discord.hpp" />
-    <ClInclude Include="icons\grammarly.hpp" />
-    <ClInclude Include="icons\patreon.hpp" />
     <ClInclude Include="icons\ph.hpp" />
     <ClInclude Include="icons\proton.hpp" />
     <ClInclude Include="icons\youtube.hpp" />
@@ -110,13 +128,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>MisterFish</TargetName>
-    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Debug\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Debug\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\petrov.ms\Desktop\misterfishdpi_src\minizip;C:\Users\petrov.ms\Desktop\misterfishdpi_src\zlib;C:\Users\petrov.ms\Desktop\misterfishdpi_src\curl\x64\Debug\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\petrov.ms\Desktop\misterfishdpi_src\curl\x64\Debug\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>MisterFish</TargetName>
-    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\petrov.ms\Desktop\misterfishdpi_src\zlib;C:\Users\petrov.ms\Desktop\misterfishdpi_src\minizip;C:\Users\petrov.ms\Desktop\misterfishdpi_src\curl\x64\Release\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\petrov.ms\Desktop\misterfishdpi_src\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

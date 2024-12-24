@@ -6,6 +6,12 @@
 #include <set>
 #include <vector>
 
+#include <minizip/unzip.h>
+
+#include <wininet.h>
+#pragma comment(lib, "Urlmon.lib")
+#pragma comment(lib, "Wininet.lib")
+
 #include "resource.h"
 
 #include "imgui/imgui_impl.hpp"
@@ -28,7 +34,89 @@
 
 int page = 0;
 
-bool IsRunAsAdmin() {
+bool extractFile(const std::string& zipFilePath, const std::string& outputDir) 
+{
+    bool result = true;
+
+    unzFile zipFile = unzOpen(zipFilePath.c_str());
+    if (zipFile == nullptr) 
+    {
+        MessageBoxA(0, "Не удалось открыть архив", 0, 0);
+        return false;
+    }
+
+    if (unzGoToFirstFile(zipFile) != UNZ_OK) 
+    {
+        MessageBoxA(0, "Не удалось найти первый файл", 0, 0);
+        unzClose(zipFile);
+        return false;
+    }
+
+    do {
+        char fileName[256];
+        unz_file_info fileInfo;
+
+        if (unzGetCurrentFileInfo(zipFile, &fileInfo, fileName, sizeof(fileName), nullptr, 0, nullptr, 0) != UNZ_OK) 
+        {
+            MessageBoxA(0, "Не удалось получить файл", 0, 0);
+
+            result = false;
+            break;
+        }
+
+        if (unzOpenCurrentFile(zipFile) != UNZ_OK) 
+        {
+            MessageBoxA(0, "Не удалось открыть файл", 0, 0);
+
+            result = false;
+            break;
+        }
+
+        std::vector<char> buffer(fileInfo.uncompressed_size);
+        int bytesRead = unzReadCurrentFile(zipFile, buffer.data(), buffer.size());
+
+        if (bytesRead < 0) 
+        {
+            MessageBoxA(0, "Не удалось прочитать файл", 0, 0);
+            unzCloseCurrentFile(zipFile);
+
+            result = false;
+            break;
+        }
+
+        std::string outputPath = outputDir + "/" + fileName;
+        if (fileName[strlen(fileName) - 1] == '/')
+        {
+            std::filesystem::create_directory(outputPath);
+        }
+        else
+        {
+            std::ofstream outputFile(outputPath, std::ios::binary);
+
+            if (!outputFile.is_open())
+            {
+                MessageBoxA(0, ("Не удалось разархивировать файл " + outputPath).c_str(), 0, 0);
+                unzCloseCurrentFile(zipFile);
+
+                result = false;
+                break;
+            }
+
+            outputFile.write(buffer.data(), bytesRead);
+            outputFile.close();
+        }
+
+        unzCloseCurrentFile(zipFile);
+
+    } while (unzGoToNextFile(zipFile) == UNZ_OK);
+
+    unzClose(zipFile);
+
+    return result;
+}
+
+bool IsRunAsAdmin() 
+{
     BOOL isAdmin = FALSE;
     PSID adminGroup = NULL;
 
@@ -44,13 +132,14 @@ bool IsRunAsAdmin() {
     return isAdmin == TRUE;
 }
 
-void RelaunchAsAdmin(LPSTR lpCmdLine) 
+void relaunch(LPSTR lpCmdLine, bool admin = true) 
 {
     char exePath[MAX_PATH];
     GetModuleFileName(NULL, exePath, MAX_PATH);
 
     SHELLEXECUTEINFO sei = { sizeof(SHELLEXECUTEINFO) };
-    sei.lpVerb = "runas";
+    if (admin)
+        sei.lpVerb = "runas";
     if (strlen(lpCmdLine) > 0)
         sei.lpParameters = lpCmdLine;
     sei.lpFile = exePath;
@@ -61,6 +150,38 @@ void RelaunchAsAdmin(LPSTR lpCmdLine)
     }
 }
 
+void update(const std::string& version, const LPSTR& lpCmdLine)
+{
+    std::string path = std::filesystem::current_path().string() + "/new.zip";
+
+    DeleteUrlCacheEntry(std::format("https://github.com/Elllkere/misterfishdpi/releases/download/{}/MisterFish-{}-x64.zip", version, version).c_str());
+    HRESULT res = URLDownloadToFile(NULL, std::format("https://github.com/Elllkere/misterfishdpi/releases/download/{}/MisterFish-{}-x64.zip", version, version).c_str(), path.c_str(), 0, NULL);
+
+    if (res == INET_E_DOWNLOAD_FAILURE) 
+    {
+        MessageBoxA(0, "Не удалось найти ссылку на новую версию", 0, 0);
+        return;
+    }
+    else if (res != S_OK)
+    {
+        MessageBoxA(0, std::format("Не удалось скачать новую версию: {}", res).c_str(), 0, 0);
+        return;
+    }
+
+    tools::killAll();
+    system("sc stop WinDivert");
+
+    rename("MisterFish.exe", "MisterFish.exe.old");
+    extractFile(path, std::filesystem::current_path().string());
+    remove(path.c_str());
+    if (strlen(lpCmdLine) <= 0)
+        relaunch((LPSTR)"/waitupdate");
+    else
+        relaunch((lpCmdLine + std::string(" /waitupdate")).data());
+
+    exit(0);
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     tools::setWorkingDirectoryToExecutablePath();
@@ -69,13 +190,20 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #ifndef _DEBUG
     if (!IsRunAsAdmin())
     {
-        RelaunchAsAdmin(lpCmdLine);
+        relaunch(lpCmdLine);
         return 0;
     }
 #else
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
 #endif
+
+    std::string old_file = std::filesystem::current_path().string() + "/MisterFish.exe.old";
+    if (std::filesystem::exists(old_file))
+        remove(old_file.c_str());
+
+    if (strstr(lpCmdLine, "/waitupdate"))
+        Sleep(10 * 1000);
 
     HANDLE hMutexOnce;
     {
@@ -290,7 +418,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         if (!result || answer.empty())
             failed_ver_check = true;
         else if (answer != vars::version)
-            MessageBoxA(0, "Вышла новая версия, скачать можно в настройках", window::window_name, MB_OK);
+        {
+            if (!vars::bAuto_update)
+                MessageBoxA(0, "Вышла новая версия, скачать можно в настройках", window::window_name, MB_OK);
+#ifndef _DEBUG
+            else
+                update(answer, lpCmdLine);
+#endif
+        }
     }
 
     if (!failed_ver_check)
@@ -298,6 +433,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         if (strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "/verysilent"))
         {
             vars::json_settings["start_version_check"] = vars::bStart_v_check = false;
+            vars::json_settings["auto_update"] = vars::bAuto_update = false;
             tools::updateSettings(vars::json_settings);
         }
         else if (!(strstr(lpCmdLine, "/autostart") && vars::bTray_start == true))
@@ -566,6 +702,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Checkbox(u8"Проверка версии при запуске", &vars::bStart_v_check))
                 {
                     vars::json_settings["start_version_check"] = vars::bStart_v_check;
+                    vars::json_settings["auto_update"] = vars::bAuto_update = false;
+                    tools::updateSettings(vars::json_settings);
+                }
+                
+                if (ImGui::Checkbox(u8"Автоматическое обновление", &vars::bAuto_update))
+                {
+                    vars::json_settings["auto_update"] = vars::bAuto_update;
                     tools::updateSettings(vars::json_settings);
                 }
 
@@ -727,7 +870,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         if (answer == vars::version)
                             MessageBoxA(g_hWnd, "Версия актуальна", window::window_name, MB_OK);
                         else
-                            system("start https://github.com/Elllkere/misterfishdpi/releases/latest");
+                        {
+                            if (vars::bAuto_update)
+                                update(answer, lpCmdLine);
+                            else
+                                system("start https://github.com/Elllkere/misterfishdpi/releases/latest");
+                        }
                     }
                 }
 

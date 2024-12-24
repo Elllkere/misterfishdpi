@@ -25,7 +25,7 @@ namespace tools
         size_t size;
     };
 
-    static size_t _writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp)
+    static size_t _write_mem_callback(void* contents, size_t size, size_t nmemb, void* userp)
     {
         size_t realsize = size * nmemb;
         struct MemoryStruct* mem = (struct MemoryStruct*)userp;
@@ -79,7 +79,7 @@ namespace tools
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
             /* send all data to this function  */
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _writeMemoryCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _write_mem_callback);
 
             /* we pass our 'chunk' struct to the callback function */
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
