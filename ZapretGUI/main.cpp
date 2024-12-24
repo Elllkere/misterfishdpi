@@ -708,6 +708,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 
                 if (ImGui::Checkbox(u8"Автоматическое обновление", &vars::bAuto_update))
                 {
+                    if (!vars::bStart_v_check)
+                        vars::bAuto_update = false;
+
                     vars::json_settings["auto_update"] = vars::bAuto_update;
                     tools::updateSettings(vars::json_settings);
                 }
@@ -745,8 +748,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 {
                     if (!vars::bWin_start)
                         vars::bTray_start = false;
-                    else
-                        vars::json_settings["tray_start"] = vars::bTray_start;
+
+                    vars::json_settings["tray_start"] = vars::bTray_start;
                     tools::updateSettings(vars::json_settings);
                 }
 

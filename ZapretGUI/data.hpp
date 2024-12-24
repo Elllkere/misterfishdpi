@@ -117,10 +117,16 @@ namespace vars
         provider = json_settings["provider"];
         auto_start = json_settings["auto_start"];
         x_method = json_settings["x_method"];
+
         bWin_start = json_settings["win_start"];
         bTray_start = json_settings["tray_start"];
+
         bStart_v_check = json_settings["start_version_check"];
-        bAuto_update = json_settings["auto_update"];
+        if (!bStart_v_check)
+            bAuto_update = json_settings["auto_update"] = false;
+        else
+            bAuto_update = json_settings["auto_update"];
+
         bUnlock_ech = json_settings["unlock_ech"];
         bHotkeys = json_settings["hotkeys"];
     }
