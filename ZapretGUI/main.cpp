@@ -198,12 +198,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     freopen("CONOUT$", "w", stdout);
 #endif
 
-    std::string old_file = std::filesystem::current_path().string() + "/MisterFish.exe.old";
+    if (strstr(lpCmdLine, "/waitupdate") || strstr(lpCmdLine, "/autostart"))
+        Sleep(5 * 1000);
+
+    std::string old_file = std::filesystem::current_path().string() + "\\MisterFish.exe.old";
     if (std::filesystem::exists(old_file))
         remove(old_file.c_str());
-
-    if (strstr(lpCmdLine, "/waitupdate"))
-        Sleep(10 * 1000);
 
     HANDLE hMutexOnce;
     {
