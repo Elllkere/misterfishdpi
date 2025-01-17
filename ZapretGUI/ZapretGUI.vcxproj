@@ -128,13 +128,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>MisterFish</TargetName>
-    <IncludePath>C:\Users\petrov.ms\Desktop\misterfishdpi_src\minizip;C:\Users\petrov.ms\Desktop\misterfishdpi_src\zlib;C:\Users\petrov.ms\Desktop\misterfishdpi_src\curl\x64\Debug\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\petrov.ms\Desktop\misterfishdpi_src\curl\x64\Debug\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\minizip;C:\Coding\MVS\C++\ZapretGUI\zlib;C:\Coding\MVS\C++\ZapretGUI\curl\x64\Debug\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Debug\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>MisterFish</TargetName>
-    <IncludePath>C:\Users\petrov.ms\Desktop\misterfishdpi_src\zlib;C:\Users\petrov.ms\Desktop\misterfishdpi_src\minizip;C:\Users\petrov.ms\Desktop\misterfishdpi_src\curl\x64\Release\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\petrov.ms\Desktop\misterfishdpi_src\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\zlib;C:\Coding\MVS\C++\ZapretGUI\minizip;C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
