@@ -182,6 +182,32 @@ void update(const std::string& version, const LPSTR& lpCmdLine)
     exit(0);
 }
 
+HANDLE hMutexOnce;
+
+void cleanup()
+{
+    tools::killAll();
+    DestroyTrayIcon();
+    system("sc stop WinDivert");
+
+    if (hMutexOnce)
+    {
+        ReleaseMutex(hMutexOnce);
+        CloseHandle(hMutexOnce);
+    }
+}
+
+BOOL WINAPI ConsoleHandler(DWORD signal) 
+{
+    if (signal == CTRL_CLOSE_EVENT) 
+    {
+        cleanup();
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     tools::setWorkingDirectoryToExecutablePath();
@@ -205,7 +231,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if (std::filesystem::exists(old_file))
         remove(old_file.c_str());
 
-    HANDLE hMutexOnce;
     {
         char mutex_name[128];
         snprintf(mutex_name, sizeof(mutex_name), "Global\\misterfish");
@@ -415,7 +440,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     {
         std::string answer;
         bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer);
-        if (!result || answer.empty())
+        if (!result || (answer.empty() || answer.size() > vars::version.size() + 10))
             failed_ver_check = true;
         else if (answer != vars::version)
         {
@@ -428,16 +453,21 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
     }
 
+    bool console = strstr(lpCmdLine, "/console");
+
     if (!failed_ver_check)
     {
-        if (strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "/verysilent"))
+        if (strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "/verysilent") || console)
         {
             vars::json_settings["start_version_check"] = vars::bStart_v_check = false;
             vars::json_settings["auto_update"] = vars::bAuto_update = false;
             tools::updateSettings(vars::json_settings);
         }
         else if (!(strstr(lpCmdLine, "/autostart") && vars::bTray_start == true))
+        {
             ::ShowWindow(g_hWnd, nCmdShow);
+            ::UpdateWindow(g_hWnd);
+        }
     }
     else
     {
@@ -449,7 +479,22 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if (!strstr(lpCmdLine, "/verysilent"))
         CreateTrayIcon();
 
-    ::UpdateWindow(g_hWnd);
+    if (console)
+    {
+        AllocConsole();
+        freopen("CONOUT$", "w", stdout);
+
+        setlocale(LC_ALL, "Rus");
+        SetConsoleOutputCP(1251);
+        SetConsoleCP(1251);
+
+        if (!SetConsoleCtrlHandler(ConsoleHandler, TRUE)) 
+        {
+            std::cerr << "Ошибка установки обработчика консоли!" << std::endl;
+            ::Sleep(3000);
+            return 1;
+        }
+    }
 
     tools::killAll();
 
@@ -459,7 +504,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     for (auto& s : vars::services)
     {
         if (s->active)
+        {
             s->start();
+            if (console && !s->name.empty())
+                printf("запуск %s обхода\n", s->name.c_str());
+        }
     }
 
     // Main loop
@@ -487,6 +536,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     if (GetAsyncKeyState(services->hotkey) & 1)
                         services->toggleActive();
             }
+        }
+
+        if (strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "/verysilent") || console)
+        {
+            ::Sleep(10);
+            continue;
         }
 
         // Handle window being minimized or screen locked
@@ -907,8 +962,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
     }
 
-    tools::killAll();
-
     // Cleanup
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
@@ -918,15 +971,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ::DestroyWindow(g_hWnd);
     ::UnregisterClass(wc.lpszClassName, wc.hInstance);
 
-    DestroyTrayIcon();
-
-    system("sc stop WinDivert");
-
-    if (hMutexOnce)
-    {
-        ReleaseMutex(hMutexOnce);
-        CloseHandle(hMutexOnce);
-    }
+    cleanup();
 
     return 0;
 }
