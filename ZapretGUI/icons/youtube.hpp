@@ -1,5 +1,4 @@
-/* C:\Coding\MVS\C++\Projects\ZapretGUI\ZapretGUI\icons\youtube.png (14.10.2024 3:41:28)
-   StartOffset(d): 00000000, EndOffset(d): 00003186, Length(d): 00003187 */
+#pragma once
 
 unsigned char youtube_data[3187] = {
 	0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,

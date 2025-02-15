@@ -269,7 +269,7 @@ namespace tools
             IExecAction* pExecAction = NULL;
             hr = pAction->QueryInterface(IID_IExecAction, (void**)&pExecAction);
             pExecAction->put_Path(_bstr_t(exePath));
-            pExecAction->put_Arguments(_bstr_t("/autostart"));
+            pExecAction->put_Arguments(_bstr_t("-autostart"));
             pExecAction->Release();
             pAction->Release();
             pActionCollection->Release();
@@ -434,7 +434,7 @@ namespace tools
         {
             char path[MAX_PATH];
             GetModuleFileName(NULL, path, MAX_PATH);
-            const char* appPath = std::format("\"{}\" /autostart", path).c_str();
+            const char* appPath = std::format("\"{}\" -autostart", path).c_str();
 
             RegSetValueEx(hKey, window::window_name, 0, REG_SZ, (BYTE*)appPath, strlen(appPath) + 1);
             RegCloseKey(hKey);

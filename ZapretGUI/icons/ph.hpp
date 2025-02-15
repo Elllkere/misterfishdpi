@@ -1,6 +1,4 @@
 #pragma once
-/* C:\Coding\MVS\C++\Projects\ZapretGUI\ZapretGUI\icons\ph.png (17.11.2024 2:11:41)
-   StartOffset(d): 00000000, EndOffset(d): 00007285, Length(d): 00007286 */
 
 unsigned char ph_data[7286] = {
 	0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,

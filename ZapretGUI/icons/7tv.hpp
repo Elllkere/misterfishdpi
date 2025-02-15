@@ -1,5 +1,4 @@
-/* C:\Coding\MVS\C++\Projects\ZapretGUI\ZapretGUI\icons\7tv.png (17.10.2024 2:22:59)
-   StartOffset(d): 00000000, EndOffset(d): 00003559, Length(d): 00003560 */
+#pragma once
 
 unsigned char _7tv_data[3560] = {
 	0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,

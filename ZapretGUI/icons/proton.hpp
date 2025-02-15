@@ -1,6 +1,4 @@
 #pragma once
-/* C:\Coding\MVS\C++\Projects\ZapretGUI\ZapretGUI\icons\proton.png (17.11.2024 2:17:18)
-   StartOffset(d): 00000000, EndOffset(d): 00004385, Length(d): 00004386 */
 
 unsigned char proton_data[4386] = {
 	0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,

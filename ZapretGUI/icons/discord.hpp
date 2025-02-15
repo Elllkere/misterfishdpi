@@ -1,5 +1,4 @@
-/* C:\Coding\MVS\C++\Projects\ZapretGUI\ZapretGUI\icons\discord.png (14.10.2024 3:34:56)
-   StartOffset(d): 00000000, EndOffset(d): 00009898, Length(d): 00009899 */
+#pragma once
 
 unsigned char discord_data[9899] = {
 	0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,

@@ -30,7 +30,9 @@
 #include "icons/ph.hpp"
 #include "icons/proton.hpp"
 #include "icons/patreon.hpp"
-#include "icons/grammarly.hpp"
+#include "icons/tempmail.hpp"
+#include "icons/thatpervert.hpp"
+#include "icons/bestchange.hpp"
 
 int page = 0;
 
@@ -224,8 +226,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     freopen("CONOUT$", "w", stdout);
 #endif
 
-    if (strstr(lpCmdLine, "/waitupdate") || strstr(lpCmdLine, "/autostart"))
+    if (strstr(lpCmdLine, "/waitupdate") || strstr(lpCmdLine, "-waitupdate"))
         Sleep(5 * 1000);
+    else if (strstr(lpCmdLine, "/autostart") || strstr(lpCmdLine, "-autostart"))
+        Sleep(vars::start_delay * 1000);
 
     std::string old_file = std::filesystem::current_path().string() + "\\MisterFish.exe.old";
     if (std::filesystem::exists(old_file))
@@ -391,10 +395,30 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 0;
     }
     
-    int grammarly_width = 0;
-    int grammarly_height = 0;
-    ID3D11ShaderResourceView* grammarly_texture = NULL;
-    if (!LoadTextureFromMemory(grammarly_data, sizeof(grammarly_data), &grammarly_texture, &grammarly_width, &grammarly_height))
+    int tempmail_width = 0;
+    int tempmail_height = 0;
+    ID3D11ShaderResourceView* tempmail_texture = NULL;
+    if (!LoadTextureFromMemory(tempmail_data, sizeof(tempmail_data), &tempmail_texture, &tempmail_width, &tempmail_height))
+    {
+        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        ::DestroyWindow(g_hWnd);
+        return 0;
+    }
+    
+    int thatpervert_width = 0;
+    int thatpervert_height = 0;
+    ID3D11ShaderResourceView* thatpervert_texture = NULL;
+    if (!LoadTextureFromMemory(thatpervert_data, sizeof(thatpervert_data), &thatpervert_texture, &thatpervert_width, &thatpervert_height))
+    {
+        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        ::DestroyWindow(g_hWnd);
+        return 0;
+    }
+    
+    int bestchange_width = 0;
+    int bestchange_height = 0;
+    ID3D11ShaderResourceView* bestchange_texture = NULL;
+    if (!LoadTextureFromMemory(bestchange_data, sizeof(bestchange_data), &bestchange_texture, &bestchange_width, &bestchange_height))
     {
         MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
         ::DestroyWindow(g_hWnd);
@@ -413,7 +437,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     {
         {"7tv", "list-7tv.txt"},
         {"cf-ech", "list-cf-ech.txt"},
-        {"grammarly", "list-grammarly.txt"},
+        {"tempmail", "list-tempmail.txt"},
+        {"thatpervert", "list-thatpervert.txt"},
+        {"bestchange", "list-bestchange.txt"},
     };
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
@@ -428,7 +454,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", vars::json_settings["services"]["proton"]["active"], vars::json_settings["services"]["proton"]["hotkey"], proton_texture, shared_service_youtube),
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", vars::json_settings["services"]["pornhub"]["active"], vars::json_settings["services"]["pornhub"]["hotkey"], ph_texture, shared_service_youtube),
         new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", vars::json_settings["services"]["patreon"]["active"], vars::json_settings["services"]["patreon"]["hotkey"], patreon_texture, shared_service_youtube),
-        new SharedZapret(grammarly_width, grammarly_height, "Grammarly", "grammarly", vars::json_settings["services"]["grammarly"]["active"], vars::json_settings["services"]["grammarly"]["hotkey"], grammarly_texture, shared_service_7tv),
+        new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", vars::json_settings["services"]["tempmail"]["active"], vars::json_settings["services"]["tempmail"]["hotkey"], tempmail_texture, shared_service_7tv),
+        new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", vars::json_settings["services"]["thatpervert"]["active"], vars::json_settings["services"]["thatpervert"]["hotkey"], thatpervert_texture, shared_service_7tv),
+        new SharedZapret(bestchange_width, bestchange_height, "bestchange.ru", "bestchange", vars::json_settings["services"]["bestchange"]["active"], vars::json_settings["services"]["bestchange"]["hotkey"], bestchange_texture, shared_service_7tv),
         cf_ech,
     };
 
@@ -453,17 +481,19 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
     }
 
-    bool console = strstr(lpCmdLine, "/console");
+    bool console = strstr(lpCmdLine, "/console") || strstr(lpCmdLine, "-console");
+    bool silent = strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "-silent");
+    bool very_silent = strstr(lpCmdLine, "/verysilent") || strstr(lpCmdLine, "-verysilent");
 
     if (!failed_ver_check)
     {
-        if (strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "/verysilent") || console)
+        if (silent || very_silent || console)
         {
             vars::json_settings["start_version_check"] = vars::bStart_v_check = false;
             vars::json_settings["auto_update"] = vars::bAuto_update = false;
             tools::updateSettings(vars::json_settings);
         }
-        else if (!(strstr(lpCmdLine, "/autostart") && vars::bTray_start == true))
+        else if (!((strstr(lpCmdLine, "/autostart") || strstr(lpCmdLine, "-autostart")) && vars::bTray_start == true))
         {
             ::ShowWindow(g_hWnd, nCmdShow);
             ::UpdateWindow(g_hWnd);
@@ -476,7 +506,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         MessageBoxA(g_hWnd, "Не удалось проверить версию", window::window_name, MB_OK);
     }
 
-    if (!strstr(lpCmdLine, "/verysilent"))
+    if (!very_silent)
         CreateTrayIcon();
 
     if (console)
@@ -538,7 +568,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             }
         }
 
-        if (strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "/verysilent") || console)
+        if (silent || very_silent|| console)
         {
             ::Sleep(10);
             continue;
@@ -753,6 +783,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(45, 45, 45).Value);
                 ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(45, 45, 45).Value);
                 ImGui::PushStyleColor(ImGuiCol_CheckMark, ImColor(10, 10, 10).Value);
+                ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(10, 10, 10).Value);
+                ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(25, 25, 25).Value);
 
                 if (ImGui::Checkbox(u8"Проверка версии при запуске", &vars::bStart_v_check))
                 {
@@ -894,6 +926,19 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip(u8"Что делать при нажатии на Х");
 
+                ImGui::PushItemWidth(349);
+
+                if (ImGui::SliderInt(u8"Задержка автозапуска", &vars::start_delay, 1, 120))
+                {
+                    vars::json_settings["start_delay"] = vars::start_delay;
+                    tools::updateSettings(vars::json_settings);
+                }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Задержка перед запуском приложения при включенном автозапуске\n(для того чтобы интернет успел подключится)\nв секундах\nCTRL+клик \\ Tab чтобы активировать ввод");
+
+                ImGui::PopItemWidth();
+
                 ImGui::PushStyleColor(ImGuiCol_Button, ImColor(40, 40, 40).Value);
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(45, 45, 45).Value);
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
@@ -921,7 +966,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 {
                     std::string answer;
                     bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer);
-                    if (!result || answer.empty())
+                    if (!result || (answer.empty() || answer.size() > vars::version.size() + 10))
                         MessageBoxA(g_hWnd, "Не удалось проверить версию", window::window_name, MB_OK);
                     else
                     {
@@ -941,7 +986,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     system("start https://github.com/Elllkere/misterfishdpi/");
 
                 ImGui::PopStyleColor(3);
-                ImGui::PopStyleColor(4);
+                ImGui::PopStyleColor(6);
             }
         }
         ImGui::EndChild();

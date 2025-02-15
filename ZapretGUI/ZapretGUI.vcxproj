@@ -51,9 +51,12 @@
   <ItemGroup>
     <ClInclude Include="data.hpp" />
     <ClInclude Include="icons\7tv.hpp" />
+    <ClInclude Include="icons\bestchange.hpp" />
     <ClInclude Include="icons\discord.hpp" />
     <ClInclude Include="icons\ph.hpp" />
     <ClInclude Include="icons\proton.hpp" />
+    <ClInclude Include="icons\tempmail.hpp" />
+    <ClInclude Include="icons\thatpervert.hpp" />
     <ClInclude Include="icons\youtube.hpp" />
     <ClInclude Include="imgui\imgui_impl.hpp" />
     <ClInclude Include="imgui\src\imconfig.h" />

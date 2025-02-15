@@ -20,6 +20,7 @@ namespace vars
         {"provider", 0},
         {"auto_start", 0},
         {"x_method", 0},
+        {"start_delay", 5},
         {"services",
         {
             {"youtube",
@@ -58,7 +59,19 @@ namespace vars
                 {"hotkey", 0}
             }},
         
-            {"grammarly",
+            {"tempmail",
+            {
+                {"active", false},
+                {"hotkey", 0}
+            }},
+
+            {"thatpervert",
+            {
+                {"active", false},
+                {"hotkey", 0}
+            }},
+
+            {"bestchange",
             {
                 {"active", false},
                 {"hotkey", 0}
@@ -66,20 +79,11 @@ namespace vars
         }}
     };
 
-    json services_txt = {
-        {"shared_youtube_service", "list-youtube-service.txt"},
-        {"shared_7tv_service", "list-7tv-service.txt"},
-        {"youtube", "list-youtube.txt"},
-        {"cf-ech", "list-cf-ech.txt"},
-        {"discord", "list-discord.txt|list-discord-ip.txt"},
-        {"7tv", "list-7tv.txt"},
-        {"proton", "list-proton.txt"},
-        {"pornhub", "list-ph.txt"},
-    };
-
     int provider = 0;
     int auto_start = 0;
     int x_method = 0;
+    //sec
+    int start_delay = 5;
     bool bWin_start = false;
     bool bTray_start = false;
     bool bStart_v_check = false;
@@ -108,7 +112,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-    std::string version = "v1.14.0";
+    std::string version = "v1.15.0";
 
     void init()
     {
@@ -117,6 +121,7 @@ namespace vars
         provider = json_settings["provider"];
         auto_start = json_settings["auto_start"];
         x_method = json_settings["x_method"];
+        start_delay = json_settings["start_delay"];
 
         bWin_start = json_settings["win_start"];
         bTray_start = json_settings["tray_start"];
