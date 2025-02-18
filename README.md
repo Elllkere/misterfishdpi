@@ -56,3 +56,4 @@ https://www.youtube.com/watch?v=I7JVD-wo3cI
 ## Credits & Contributors
 * [bol-van](https://github.com/bol-van/), creator of original [zapret](https://github.com/bol-van/zapret/) repository.
 * [ocornut](https://github.com/ocornut/), creator of original [ImGui](https://github.com/ocornut/imgui) repository.
+* [mohabouje](https://github.com/mohabouje/), creator of original [WinToast](https://github.com/mohabouje/WinToast) repository.
