@@ -18,8 +18,25 @@
 
 using json = nlohmann::json;
 
+namespace vars
+{
+    extern std::string version;
+}
+
 namespace tools
 {
+    class WinToastHandlerExample : public WinToastLib::IWinToastHandler
+    {
+    public:
+        WinToastHandlerExample() {}
+        // Public interfaces
+        void toastActivated() const override {}
+        void toastActivated(int actionIndex) const override {}
+        void toastActivated(const char* response) const override {}
+        void toastDismissed(WinToastDismissalReason state) const override {}
+        void toastFailed() const override {}
+    };
+
     struct MemoryStruct {
         char* memory;
         size_t size;
@@ -44,6 +61,68 @@ namespace tools
         mem->memory[mem->size] = 0;
 
         return realsize;
+    }
+
+    std::wstring to_wstring(const std::string& str) 
+    {
+        if (str.empty()) return L"";
+
+        int size_needed = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), nullptr, 0);
+        std::wstring wstr(size_needed, 0);
+        MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), &wstr[0], size_needed);
+        return wstr;
+    }
+    
+    void sendNotif(const std::string& head, const std::string& body = "", bool messagebox = false, bool messagebox_on_fail = true)
+    {
+        if (messagebox)
+        {
+            MessageBoxA(0, head.c_str(), window::window_name, MB_OK);
+            return;
+        }
+
+        using namespace WinToastLib;
+
+        if (!WinToast::isCompatible()) 
+        {
+            if (messagebox_on_fail)
+                MessageBoxA(0, head.c_str(), window::window_name, MB_OK);
+
+            return;
+        }
+
+        if (!window::toast_init)
+        {
+            std::string app = window::window_name;
+            WinToast::instance()->setAppName(std::wstring(app.begin(), app.end()));
+            const auto aumi = WinToast::configureAUMI(L"elllkere", L"misterfishdpi", std::wstring(), std::wstring(vars::version.begin(), vars::version.end()));
+            WinToast::instance()->setAppUserModelId(aumi);
+
+            if (!WinToast::instance()->initialize())
+            {
+                if (messagebox_on_fail)
+                    MessageBoxA(0, head.c_str(), window::window_name, MB_OK);
+
+                return;
+            }
+
+            window::toast_init = true;
+        }
+
+        WinToastTemplate templ = WinToastTemplate(WinToastTemplate::Text02);
+        templ.setTextField(to_wstring(head), WinToastTemplate::FirstLine);
+        if (!body.empty())
+            templ.setTextField(to_wstring(body), WinToastTemplate::SecondLine);
+
+        WinToast::WinToastError error;
+        const auto toast_id = WinToast::instance()->showToast(templ, new WinToastHandlerExample(), &error);
+        if (toast_id < 0) 
+        {
+            if (messagebox_on_fail)
+                MessageBoxA(0, head.c_str(), window::window_name, MB_OK);
+
+            MessageBoxA(0, std::format("Error: Could not launch toast notification - {}", (int)error).c_str(), window::window_name, MB_OK);
+        }
     }
 
     std::vector<std::string> split(const std::string& input, const std::string& delimiter)

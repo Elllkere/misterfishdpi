@@ -112,7 +112,7 @@ namespace vars
         {1, u8"Свернуть"},
     };
 
-    std::string version = "v1.15.0";
+    std::string version = "v25.0218.1751";
 
     void init()
     {

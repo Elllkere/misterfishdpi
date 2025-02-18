@@ -8,6 +8,8 @@
 
 #include <minizip/unzip.h>
 
+#include <wintoastlib.h>
+
 #include <wininet.h>
 #pragma comment(lib, "Urlmon.lib")
 #pragma comment(lib, "Wininet.lib")
@@ -43,13 +45,13 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
     unzFile zipFile = unzOpen(zipFilePath.c_str());
     if (zipFile == nullptr) 
     {
-        MessageBoxA(0, "Не удалось открыть архив", 0, 0);
+        tools::sendNotif(u8"Не удалось открыть архив", "", true);
         return false;
     }
 
     if (unzGoToFirstFile(zipFile) != UNZ_OK) 
     {
-        MessageBoxA(0, "Не удалось найти первый файл", 0, 0);
+        tools::sendNotif(u8"Не удалось найти первый файл", "", true);
         unzClose(zipFile);
         return false;
     }
@@ -60,7 +62,7 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
 
         if (unzGetCurrentFileInfo(zipFile, &fileInfo, fileName, sizeof(fileName), nullptr, 0, nullptr, 0) != UNZ_OK) 
         {
-            MessageBoxA(0, "Не удалось получить файл", 0, 0);
+            tools::sendNotif(u8"Не удалось получить файл", "", true);
 
             result = false;
             break;
@@ -68,7 +70,7 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
 
         if (unzOpenCurrentFile(zipFile) != UNZ_OK) 
         {
-            MessageBoxA(0, "Не удалось открыть файл", 0, 0);
+            tools::sendNotif(u8"Не удалось открыть файл", "", true);
 
             result = false;
             break;
@@ -79,7 +81,7 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
 
         if (bytesRead < 0) 
         {
-            MessageBoxA(0, "Не удалось прочитать файл", 0, 0);
+            tools::sendNotif(u8"Не удалось прочитать файл", "", true);
             unzCloseCurrentFile(zipFile);
 
             result = false;
@@ -97,7 +99,7 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
 
             if (!outputFile.is_open())
             {
-                MessageBoxA(0, ("Не удалось разархивировать файл " + outputPath).c_str(), 0, 0);
+                tools::sendNotif(u8"Не удалось разархивировать файл", "", true);
                 unzCloseCurrentFile(zipFile);
 
                 result = false;
@@ -147,9 +149,8 @@ void relaunch(LPSTR lpCmdLine, bool admin = true)
     sei.lpFile = exePath;
     sei.nShow = SW_SHOWNORMAL;
 
-    if (!ShellExecuteEx(&sei)) {
+    if (!ShellExecuteEx(&sei))
         MessageBox(NULL, "Не удалось перезапустить приложение с правами администратора.", "Ошибка", MB_OK | MB_ICONERROR);
-    }
 }
 
 void update(const std::string& version, const LPSTR& lpCmdLine)
@@ -161,12 +162,12 @@ void update(const std::string& version, const LPSTR& lpCmdLine)
 
     if (res == INET_E_DOWNLOAD_FAILURE) 
     {
-        MessageBoxA(0, "Не удалось найти ссылку на новую версию", 0, 0);
+        tools::sendNotif(u8"Не удалось найти ссылку на новую версию");
         return;
     }
     else if (res != S_OK)
     {
-        MessageBoxA(0, std::format("Не удалось скачать новую версию: {}", res).c_str(), 0, 0);
+        tools::sendNotif(std::format(u8"Не удалось скачать новую версию: {}", res));
         return;
     }
 
@@ -227,7 +228,17 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #endif
 
     if (strstr(lpCmdLine, "/waitupdate") || strstr(lpCmdLine, "-waitupdate"))
+    {
         Sleep(5 * 1000);
+        std::string answer;
+        bool result = tools::request("https://elllkere.top/misterfish/update.txt", &answer);
+
+        if (result && !answer.empty())
+        {
+            answer += u8"\nбольше информации на github";
+            tools::sendNotif(std::format(u8"Обновление {}", vars::version), answer, false, false);
+        }
+    }
     else if (strstr(lpCmdLine, "/autostart") || strstr(lpCmdLine, "-autostart"))
         Sleep(vars::start_delay * 1000);
 
@@ -340,7 +351,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* youtube_texture = NULL;
     if (!LoadTextureFromMemory(youtube_data, sizeof(youtube_data), &youtube_texture, &yt_width, &yt_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -350,7 +361,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* discord_texture = NULL;
     if (!LoadTextureFromMemory(discord_data, sizeof(discord_data), &discord_texture, &ds_width, &ds_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -360,7 +371,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* _7tv_texture = NULL;
     if (!LoadTextureFromMemory(_7tv_data, sizeof(_7tv_data), &_7tv_texture, &_7tv_width, &_7tv_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -370,7 +381,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* proton_texture = NULL;
     if (!LoadTextureFromMemory(proton_data, sizeof(proton_data), &proton_texture, &proton_width, &proton_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -380,7 +391,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* ph_texture = NULL;
     if (!LoadTextureFromMemory(ph_data, sizeof(ph_data), &ph_texture, &ph_width, &ph_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -390,7 +401,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* patreon_texture = NULL;
     if (!LoadTextureFromMemory(patreon_data, sizeof(patreon_data), &patreon_texture, &patreon_width, &patreon_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -400,7 +411,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* tempmail_texture = NULL;
     if (!LoadTextureFromMemory(tempmail_data, sizeof(tempmail_data), &tempmail_texture, &tempmail_width, &tempmail_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -410,7 +421,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* thatpervert_texture = NULL;
     if (!LoadTextureFromMemory(thatpervert_data, sizeof(thatpervert_data), &thatpervert_texture, &thatpervert_width, &thatpervert_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -420,7 +431,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* bestchange_texture = NULL;
     if (!LoadTextureFromMemory(bestchange_data, sizeof(bestchange_data), &bestchange_texture, &bestchange_width, &bestchange_height))
     {
-        MessageBoxA(0, "Ошибка загрузки тектсуры", 0, 0);
+        tools::sendNotif(u8"Ошибка загрузки текстуры");
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -473,10 +484,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         else if (answer != vars::version)
         {
             if (!vars::bAuto_update)
-                MessageBoxA(0, "Вышла новая версия, скачать можно в настройках", window::window_name, MB_OK);
+                tools::sendNotif(u8"Вышла новая версия, скачать можно в настройках");
 #ifndef _DEBUG
             else
+            {
+                tools::sendNotif(u8"Вышла новая версия", u8"Программа обновляется в фоне", false, false);
                 update(answer, lpCmdLine);
+            }
 #endif
         }
     }
@@ -503,7 +517,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     {
         ::ShowWindow(g_hWnd, nCmdShow);
         ::UpdateWindow(g_hWnd);
-        MessageBoxA(g_hWnd, "Не удалось проверить версию", window::window_name, MB_OK);
+
+        tools::sendNotif(u8"Не удалось проверить версию");
     }
 
     if (!very_silent)
@@ -967,21 +982,27 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     std::string answer;
                     bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer);
                     if (!result || (answer.empty() || answer.size() > vars::version.size() + 10))
-                        MessageBoxA(g_hWnd, "Не удалось проверить версию", window::window_name, MB_OK);
+                        tools::sendNotif(u8"Не удалось проверить версию");
                     else
                     {
                         if (answer == vars::version)
-                            MessageBoxA(g_hWnd, "Версия актуальна", window::window_name, MB_OK);
+                            tools::sendNotif(u8"Версия актуальна");
                         else
                         {
                             if (vars::bAuto_update)
+                            {
+                                tools::sendNotif(u8"Вышла новая версия", u8"Программа обновляется в фоне", false, false);
                                 update(answer, lpCmdLine);
+                            }
                             else
+                            {
+                                tools::sendNotif(u8"Вышла новая версия", "", false, false);
                                 system("start https://github.com/Elllkere/misterfishdpi/releases/latest");
+                            }
                         }
                     }
                 }
-
+                
                 if (ImGui::Button("GitHub", ImVec2(200, 30)))
                     system("start https://github.com/Elllkere/misterfishdpi/");
 

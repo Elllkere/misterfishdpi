@@ -24,6 +24,7 @@
     <ClCompile Include="..\minizip\miniunz.c" />
     <ClCompile Include="..\minizip\mztools.c" />
     <ClCompile Include="..\minizip\unzip.c" />
+    <ClCompile Include="..\wintoast\wintoastlib.cpp" />
     <ClCompile Include="..\zlib\adler32.c" />
     <ClCompile Include="..\zlib\compress.c" />
     <ClCompile Include="..\zlib\crc32.c" />
@@ -49,6 +50,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\wintoast\wintoastlib.h" />
     <ClInclude Include="data.hpp" />
     <ClInclude Include="icons\7tv.hpp" />
     <ClInclude Include="icons\bestchange.hpp" />
@@ -136,7 +138,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>MisterFish</TargetName>
-    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\zlib;C:\Coding\MVS\C++\ZapretGUI\minizip;C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\zlib;C:\Coding\MVS\C++\ZapretGUI\minizip;C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\include;C:\Coding\MVS\C++\ZapretGUI\wintoast;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

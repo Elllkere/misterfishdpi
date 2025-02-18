@@ -33,6 +33,7 @@ namespace window
     float right_padding = 0;
     LPCSTR class_name = "MisterFish";
     LPCSTR window_name = "MisterFish DPI";
+    bool toast_init = false;
 
     std::map<int, ImFont*> font;
 }
