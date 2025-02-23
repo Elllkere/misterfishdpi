@@ -162,12 +162,12 @@ void update(const std::string& version, const LPSTR& lpCmdLine)
 
     if (res == INET_E_DOWNLOAD_FAILURE) 
     {
-        tools::sendNotif(u8"Не удалось найти ссылку на новую версию");
+        tools::sendNotif(u8"Не удалось найти ссылку на новую версию", "", vars::notif != 0);
         return;
     }
     else if (res != S_OK)
     {
-        tools::sendNotif(std::format(u8"Не удалось скачать новую версию: {}", res));
+        tools::sendNotif(std::format(u8"Не удалось скачать новую версию: {}", res), "", vars::notif != 0);
         return;
     }
 
@@ -233,7 +233,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         std::string answer;
         bool result = tools::request("https://elllkere.top/misterfish/update.txt", &answer);
 
-        if (result && !answer.empty())
+        if (result && !answer.empty() && !strstr(answer.c_str(), "error"))
         {
             answer += u8"\nбольше информации на github";
             tools::sendNotif(std::format(u8"Обновление {}", vars::version), answer, false, false);
@@ -351,7 +351,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* youtube_texture = NULL;
     if (!LoadTextureFromMemory(youtube_data, sizeof(youtube_data), &youtube_texture, &yt_width, &yt_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -361,7 +361,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* discord_texture = NULL;
     if (!LoadTextureFromMemory(discord_data, sizeof(discord_data), &discord_texture, &ds_width, &ds_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -371,7 +371,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* _7tv_texture = NULL;
     if (!LoadTextureFromMemory(_7tv_data, sizeof(_7tv_data), &_7tv_texture, &_7tv_width, &_7tv_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -381,7 +381,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* proton_texture = NULL;
     if (!LoadTextureFromMemory(proton_data, sizeof(proton_data), &proton_texture, &proton_width, &proton_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -391,7 +391,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* ph_texture = NULL;
     if (!LoadTextureFromMemory(ph_data, sizeof(ph_data), &ph_texture, &ph_width, &ph_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -401,7 +401,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* patreon_texture = NULL;
     if (!LoadTextureFromMemory(patreon_data, sizeof(patreon_data), &patreon_texture, &patreon_width, &patreon_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -411,7 +411,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* tempmail_texture = NULL;
     if (!LoadTextureFromMemory(tempmail_data, sizeof(tempmail_data), &tempmail_texture, &tempmail_width, &tempmail_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -421,7 +421,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* thatpervert_texture = NULL;
     if (!LoadTextureFromMemory(thatpervert_data, sizeof(thatpervert_data), &thatpervert_texture, &thatpervert_width, &thatpervert_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -431,7 +431,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ID3D11ShaderResourceView* bestchange_texture = NULL;
     if (!LoadTextureFromMemory(bestchange_data, sizeof(bestchange_data), &bestchange_texture, &bestchange_width, &bestchange_height))
     {
-        tools::sendNotif(u8"Ошибка загрузки текстуры");
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
         ::DestroyWindow(g_hWnd);
         return 0;
     }
@@ -478,13 +478,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if (vars::bStart_v_check)
     {
         std::string answer;
-        bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer);
-        if (!result || (answer.empty() || answer.size() > vars::version.size() + 10))
+        bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer, true);
+        if (!result || (answer.empty() || strstr(answer.c_str(), "error")))
             failed_ver_check = true;
         else if (answer != vars::version)
         {
             if (!vars::bAuto_update)
-                tools::sendNotif(u8"Вышла новая версия, скачать можно в настройках");
+                tools::sendNotif(u8"Вышла новая версия, скачать можно в настройках", "", vars::notif != 0);
 #ifndef _DEBUG
             else
             {
@@ -518,7 +518,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         ::ShowWindow(g_hWnd, nCmdShow);
         ::UpdateWindow(g_hWnd);
 
-        tools::sendNotif(u8"Не удалось проверить версию");
+        tools::sendNotif(u8"Не удалось проверить версию", "", vars::notif != 0);
     }
 
     if (!very_silent)
@@ -618,6 +618,42 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             return 0;
         }
 
+        //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(24.0f, 24.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.f);
+        if(ImGui::BeginPopupModal("###note", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove))
+        {
+            ImGui::SetNextWindowSize(ImGui::GetContentRegionAvail());
+            
+            std::string text = u8"Это ваш первый запуск программы, это сообщение будет показано только 1 раз.\n";
+            text += u8"Пожалуйста посетите раздел настройки и выберите нужного для себя провайдера,\n";
+            text += u8"если вашего провайдера в списке нет и с выбранным 'другой' сервисы все равно не работают,\n";
+            text += u8"то вы можете попробовать других провайдеров, возможно их настройки подойдут для вашего.\n";
+            text += u8"Если с никаким провайдером не работают сервисы тогда можно создать issue на github";
+
+            ImGui::Text(text.c_str());
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImColor(40, 40, 40).Value);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(45, 45, 45).Value);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
+
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (ImGui::GetContentRegionAvail().x / 2.f) - (ImGui::CalcTextSize("OK").x / 2));
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20);
+            if (ImGui::Button("OK"))
+            {
+                vars::json_settings["first_note"] = vars::bFirst_note = true;
+                tools::updateSettings(vars::json_settings);
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::PopStyleColor(3);
+
+            ImGui::EndPopup();
+        }
+        ImGui::PopStyleVar();
+
+        if (!vars::bFirst_note)
+            ImGui::OpenPopup("###note");
+
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImColor(30, 30, 30).Value); ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
         ImGui::BeginChild("##header", ImVec2(ImGui::GetContentRegionAvail().x, window::header_size));
         {
@@ -663,16 +699,23 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         ImGui::PopStyleColor(); ImGui::PopStyleVar();
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImColor(40, 40, 40).Value);
-        ImGui::PushStyleColor(ImGuiCol_Button, ImColor(40, 40, 40).Value);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(45, 45, 45).Value);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
         ImGui::BeginChild("##left", ImVec2(150, 0));
         {
-            if (ImGui::Button(u8"Сервисы", ImVec2(ImGui::GetContentRegionAvail().x, 30)))
-                page = 0;
+            std::vector<std::string> buttons = { u8"Сервисы", u8"Настройки" };
+            for (int i = 0; i < buttons.size(); i++)
+            {
+                if (page == i)
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImColor(50, 50, 50).Value);
+                else
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImColor(40, 40, 40).Value);
 
-            if (ImGui::Button(u8"Настройки", ImVec2(ImGui::GetContentRegionAvail().x, 30)))
-                page = 1;
+                if (ImGui::Button(buttons[i].c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 30)))
+                    page = i;
+
+                ImGui::PopStyleColor();
+            }
 
             ImVec2 prev_cursor = ImGui::GetCursorPos();
 
@@ -683,7 +726,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
         }
         ImGui::EndChild();
-        ImGui::PopStyleColor(4);
+        ImGui::PopStyleColor(3);
 
         ImGui::SameLine();
 
@@ -941,6 +984,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip(u8"Что делать при нажатии на Х");
 
+                if (ImGui::Combo(u8"Тип уведомлений", &vars::notif, tools::convertMapToCharArray(vars::notifs).data(), vars::notifs.size()))
+                {
+                    vars::json_settings["notif"] = vars::notif;
+                    tools::updateSettings(vars::json_settings);
+                }
+
                 ImGui::PushItemWidth(349);
 
                 if (ImGui::SliderInt(u8"Задержка автозапуска", &vars::start_delay, 1, 120))
@@ -980,13 +1029,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Button(u8"Проверить версию", ImVec2(200, 30)))
                 {
                     std::string answer;
-                    bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer);
-                    if (!result || (answer.empty() || answer.size() > vars::version.size() + 10))
-                        tools::sendNotif(u8"Не удалось проверить версию");
+                    bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer, true);
+                    if (!result || (answer.empty() || strstr(answer.c_str(), "error")))
+                        tools::sendNotif(u8"Не удалось проверить версию", "", vars::notif != 0);
                     else
                     {
                         if (answer == vars::version)
-                            tools::sendNotif(u8"Версия актуальна");
+                            tools::sendNotif(u8"Версия актуальна", "", vars::notif != 0);
                         else
                         {
                             if (vars::bAuto_update)

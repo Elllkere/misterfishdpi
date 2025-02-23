@@ -77,7 +77,8 @@ namespace tools
     {
         if (messagebox)
         {
-            MessageBoxA(0, head.c_str(), window::window_name, MB_OK);
+            std::string name = window::window_name;
+            MessageBoxW(0, to_wstring(head).c_str(), std::wstring(name.begin(), name.end()).c_str(), MB_OK);
             return;
         }
 
@@ -86,7 +87,7 @@ namespace tools
         if (!WinToast::isCompatible()) 
         {
             if (messagebox_on_fail)
-                MessageBoxA(0, head.c_str(), window::window_name, MB_OK);
+                sendNotif(head, body, true, false);
 
             return;
         }
@@ -101,7 +102,7 @@ namespace tools
             if (!WinToast::instance()->initialize())
             {
                 if (messagebox_on_fail)
-                    MessageBoxA(0, head.c_str(), window::window_name, MB_OK);
+                    sendNotif(head, body, true, false);
 
                 return;
             }
@@ -119,7 +120,7 @@ namespace tools
         if (toast_id < 0) 
         {
             if (messagebox_on_fail)
-                MessageBoxA(0, head.c_str(), window::window_name, MB_OK);
+                sendNotif(head, body, true, false);
 
             MessageBoxA(0, std::format("Error: Could not launch toast notification - {}", (int)error).c_str(), window::window_name, MB_OK);
         }
@@ -140,7 +141,7 @@ namespace tools
         return tokens;
     }
 
-    bool request(const std::string& url, const std::string& post_data, std::string* answer)
+    bool request(const std::string& url, const std::string& post_data, std::string* answer, bool timeout_check = false)
     {
         bool result = false; 
 
@@ -175,6 +176,10 @@ namespace tools
                 curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(postthis));
             }
 
+            /* Set timeout for the entire request */
+            if (timeout_check)
+                curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
+
             /* Perform the request, res gets the return code */
             res = curl_easy_perform(curl);
             /* Check for errors */
@@ -198,9 +203,9 @@ namespace tools
         return result;
     }
 
-    bool request(const std::string& url, std::string* answer)
+    bool request(const std::string& url, std::string* answer, bool timeout_check = false)
     {
-        return request(url, "", answer);
+        return request(url, "", answer, timeout_check);
     }
 
     void getDomains(const std::string& path, std::set<std::string>& domains)

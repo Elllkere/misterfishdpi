@@ -133,7 +133,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>MisterFish</TargetName>
-    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\minizip;C:\Coding\MVS\C++\ZapretGUI\zlib;C:\Coding\MVS\C++\ZapretGUI\curl\x64\Debug\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\minizip;C:\Coding\MVS\C++\ZapretGUI\zlib;C:\Coding\MVS\C++\ZapretGUI\wintoast;C:\Coding\MVS\C++\ZapretGUI\curl\x64\Debug\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Debug\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

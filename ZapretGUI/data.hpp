@@ -11,6 +11,7 @@ typedef enum _providers_list
 namespace vars
 {
     json json_settings = {
+        {"first_note", false},
         {"win_start", false},
         {"tray_start", false},
         {"start_version_check", true},
@@ -20,6 +21,7 @@ namespace vars
         {"provider", 0},
         {"auto_start", 0},
         {"x_method", 0},
+        {"notif", 0},
         {"start_delay", 5},
         {"services",
         {
@@ -82,8 +84,10 @@ namespace vars
     int provider = 0;
     int auto_start = 0;
     int x_method = 0;
+    int notif = 0;
     //sec
     int start_delay = 5;
+    bool bFirst_note = false;
     bool bWin_start = false;
     bool bTray_start = false;
     bool bStart_v_check = false;
@@ -111,8 +115,14 @@ namespace vars
         {0, u8"Закрыть"},
         {1, u8"Свернуть"},
     };
+    
+    std::map<int, std::string> notifs =
+    {
+        {0, u8"Windows уведомления"},
+        {1, u8"Messagebox"},
+    };
 
-    std::string version = "v25.0218.1751";
+    std::string version = "v25.0223.1755";
 
     void init()
     {
@@ -121,8 +131,10 @@ namespace vars
         provider = json_settings["provider"];
         auto_start = json_settings["auto_start"];
         x_method = json_settings["x_method"];
+        notif = json_settings["notif"];
         start_delay = json_settings["start_delay"];
 
+        bFirst_note = json_settings["first_note"];
         bWin_start = json_settings["win_start"];
         bTray_start = json_settings["tray_start"];
 
