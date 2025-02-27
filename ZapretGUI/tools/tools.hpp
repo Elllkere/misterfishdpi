@@ -271,6 +271,67 @@ namespace tools
             CloseHandle(hSnapshot);
     }
 
+    bool createUserStartup()
+    {
+        bool result = true;
+
+        CoInitialize(NULL);
+        IShellLink* pShellLink = NULL;
+        HRESULT hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (void**)&pShellLink);
+        if (SUCCEEDED(hres))
+        {
+            char startupPath[MAX_PATH];
+            ZeroMemory(startupPath, MAX_PATH);
+
+            if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_STARTUP, NULL, 0, startupPath)))
+            {
+                std::string targetPath = std::filesystem::current_path().string() + "/MisterFish.exe";
+                std::string shortcutPath = startupPath + std::string("\\MisterFishDPI.lnk");
+                pShellLink->SetPath(targetPath.c_str());
+
+                IPersistFile* pPersistFile;
+                hres = pShellLink->QueryInterface(IID_IPersistFile, (void**)&pPersistFile);
+                if (SUCCEEDED(hres))
+                {
+                    hres = pPersistFile->Save(_bstr_t(shortcutPath.c_str()), TRUE);
+                    pPersistFile->Release();
+                }
+                else result = false;
+            }
+            else result = false;
+
+            pShellLink->Release();
+        }
+        else result = false;
+
+        CoUninitialize();
+
+        return result;
+    }
+
+    bool existUserStartup()
+    {
+        char startupPath[MAX_PATH];
+        ZeroMemory(startupPath, MAX_PATH);
+
+        if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_STARTUP, NULL, 0, startupPath)))
+            return std::filesystem::exists(startupPath + std::string("\\MisterFishDPI.lnk"));
+        else return false;
+    }
+
+    void deleteUserStartup()
+    {
+        char startupPath[MAX_PATH];
+        ZeroMemory(startupPath, MAX_PATH);
+
+        if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_STARTUP, NULL, 0, startupPath)))
+        {
+            std::string shortcutPath = startupPath + std::string("\\MisterFishDPI.lnk");
+
+            remove(shortcutPath.c_str());
+        }
+    }
+
     void createTaskSchedulerEntry() 
     {
         HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);

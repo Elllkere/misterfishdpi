@@ -53,6 +53,7 @@
     <ClInclude Include="..\wintoast\wintoastlib.h" />
     <ClInclude Include="data.hpp" />
     <ClInclude Include="icons\7tv.hpp" />
+    <ClInclude Include="icons\avatar.hpp" />
     <ClInclude Include="icons\bestchange.hpp" />
     <ClInclude Include="icons\discord.hpp" />
     <ClInclude Include="icons\ph.hpp" />

@@ -27,7 +27,7 @@ static HWND                     g_hWnd = nullptr;
 
 namespace window
 {
-    UINT g_Width = 750, g_Height = 500;
+    UINT g_Width = 750, g_Height = 550;
     UINT header_size = 27;
     float top_padding = 0;
     float right_padding = 0;

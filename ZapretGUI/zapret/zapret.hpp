@@ -1,5 +1,10 @@
 #pragma once
 
+namespace vars
+{
+    extern json json_settings;
+}
+
 class Process {
 public:
 
@@ -96,6 +101,7 @@ public:
     int hotkey = 0;
     bool active = false;
     bool hide = false;
+    bool panel_hide = false;
     ID3D11ShaderResourceView* texture = NULL;
     Process* prc = nullptr;
 
@@ -107,16 +113,17 @@ public:
         this->txt = "lists\\" + txt;
     }
 
-    Zapret(int width, int height, const std::string& name, const std::string& id_name, bool active, int hotkey, ID3D11ShaderResourceView* texture, const std::string& txt)
+    Zapret(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture, const std::string& txt)
     {
         this->width = width;
         this->height = height;
         this->name = name;
         this->id_name = id_name;
-        this->active = active;
+        this->active = vars::json_settings["services"][id_name]["active"];
         this->texture = texture;
-        this->hotkey = hotkey;
+        this->hotkey = vars::json_settings["services"][id_name]["hotkey"];
         this->txt = "lists\\" + txt;
+        this->panel_hide = vars::json_settings["services"][id_name]["hide"];
     }
 
     void toggleActive();
@@ -144,7 +151,7 @@ public:
         this->info = info;
     }
 
-    SharedZapret(int width, int height, const std::string& name, const std::string& id_name, bool active, int hotkey, ID3D11ShaderResourceView* texture, ZapretServiceInfo* _info) : Zapret(width, height, name, id_name, active, hotkey, texture, _info->shared_ids.find(id_name)->second)
+    SharedZapret(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture, ZapretServiceInfo* _info) : Zapret(width, height, name, id_name, texture, _info->shared_ids.find(id_name)->second)
     {
         ZapretServiceInfo* info = new ZapretServiceInfo(*_info);
         if (info->shared_ids.find(id_name) != info->shared_ids.end())

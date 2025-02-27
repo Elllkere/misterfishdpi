@@ -15,9 +15,11 @@ namespace vars
         {"win_start", false},
         {"tray_start", false},
         {"start_version_check", true},
+        {"update_notify", true},
         {"auto_update", true},
         {"unlock_ech", true},
         {"hotkeys", false},
+        {"show_hide", false},
         {"provider", 0},
         {"auto_start", 0},
         {"x_method", 0},
@@ -28,54 +30,70 @@ namespace vars
             {"youtube",
             {
                 {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }},
         
             {"discord",
             {
                 {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }},
         
             {"7tv",
             {
                 {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }},
         
             {"proton",
             {
                 {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }},
         
             {"pornhub",
             {
                 {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }},
         
             {"patreon",
             {
                 {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }},
         
             {"tempmail",
             {
                 {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }},
 
             {"thatpervert",
             {
                 {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }},
 
             {"bestchange",
             {
                 {"active", false},
+                {"hide", false},
+                {"hotkey", 0}
+            }},
+
+            {"custom",
+            {
+                {"active", false},
+                {"hide", false},
                 {"hotkey", 0}
             }}
         }}
@@ -90,10 +108,12 @@ namespace vars
     bool bFirst_note = false;
     bool bWin_start = false;
     bool bTray_start = false;
-    bool bStart_v_check = false;
+    bool bStart_ver_check = false;
+    bool bNotify_changes = false;
     bool bAuto_update = false;
     bool bUnlock_ech = true;
     bool bHotkeys = true;
+    bool bShow_hide = true;
 
     std::vector<Zapret*> services;
     std::map<int, std::string> providers =
@@ -108,6 +128,7 @@ namespace vars
     {
         {0, u8"Планировщик задач (с вкл. UAC)"},
         {1, u8"Реестр (с выкл. UAC)"},
+        {2, u8"Пользовательский"},
     };
 
     std::map<int, std::string> x_methods =
@@ -138,13 +159,20 @@ namespace vars
         bWin_start = json_settings["win_start"];
         bTray_start = json_settings["tray_start"];
 
-        bStart_v_check = json_settings["start_version_check"];
-        if (!bStart_v_check)
+        bStart_ver_check = json_settings["start_version_check"];
+        if (!bStart_ver_check)
+        {
             bAuto_update = json_settings["auto_update"] = false;
+            bNotify_changes = json_settings["update_notify"] = false;
+        }
         else
+        {
             bAuto_update = json_settings["auto_update"];
+            bNotify_changes = json_settings["update_notify"];
+        }
 
         bUnlock_ech = json_settings["unlock_ech"];
         bHotkeys = json_settings["hotkeys"];
+        bShow_hide = json_settings["show_hide"];
     }
 }

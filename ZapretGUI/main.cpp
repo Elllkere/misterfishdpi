@@ -35,6 +35,7 @@
 #include "icons/tempmail.hpp"
 #include "icons/thatpervert.hpp"
 #include "icons/bestchange.hpp"
+#include "icons/avatar.hpp"
 
 int page = 0;
 
@@ -230,13 +231,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if (strstr(lpCmdLine, "/waitupdate") || strstr(lpCmdLine, "-waitupdate"))
     {
         Sleep(5 * 1000);
-        std::string answer;
-        bool result = tools::request("https://elllkere.top/misterfish/update.txt", &answer);
-
-        if (result && !answer.empty() && !strstr(answer.c_str(), "error"))
+        if (vars::bNotify_changes && vars::notif == 0)
         {
-            answer += u8"\nбольше информации на github";
-            tools::sendNotif(std::format(u8"Обновление {}", vars::version), answer, false, false);
+            std::string answer;
+            bool result = tools::request("https://elllkere.top/misterfish/update.txt", &answer);
+
+            if (result && !answer.empty() && !strstr(answer.c_str(), "error"))
+            {
+                answer += u8"\nбольше информации на github";
+                tools::sendNotif(std::format(u8"Обновление {}", vars::version), answer, false, false);
+            }
         }
     }
     else if (strstr(lpCmdLine, "/autostart") || strstr(lpCmdLine, "-autostart"))
@@ -436,12 +440,23 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 0;
     }
 
+    int custom_width = 0;
+    int custom_height = 0;
+    ID3D11ShaderResourceView* custom_texture = NULL;
+    if (!LoadTextureFromMemory(custom_data, sizeof(custom_data), &custom_texture, &custom_width, &custom_height))
+    {
+        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
+        ::DestroyWindow(g_hWnd);
+        return 0;
+    }
+
     std::map<std::string, std::string> shared_youtube =
     {
         {"pornhub", "list-ph.txt"},
         {"proton", "list-proton.txt"},
         {"youtube", "list-youtube.txt"},
         {"patreon", "list-patreon.txt"},
+        {"custom", "..\\list-custom.txt"}
     };
     
     std::map<std::string, std::string> shared_7tv =
@@ -450,7 +465,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {"cf-ech", "list-cf-ech.txt"},
         {"tempmail", "list-tempmail.txt"},
         {"thatpervert", "list-thatpervert.txt"},
-        {"bestchange", "list-bestchange.txt"},
+        {"bestchange", "list-bestchange.txt"}
     };
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
@@ -459,15 +474,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     vars::services =
     {
-        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", vars::json_settings["services"]["youtube"]["active"], vars::json_settings["services"]["youtube"]["hotkey"], youtube_texture, shared_service_youtube),
-        new Zapret(ds_width, ds_height, "Discord", "discord", vars::json_settings["services"]["discord"]["active"], vars::json_settings["services"]["discord"]["hotkey"], discord_texture, "list-discord.txt|list-discord-ip.txt"),
-        new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", vars::json_settings["services"]["7tv"]["active"], vars::json_settings["services"]["7tv"]["hotkey"], _7tv_texture, shared_service_7tv),
-        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", vars::json_settings["services"]["proton"]["active"], vars::json_settings["services"]["proton"]["hotkey"], proton_texture, shared_service_youtube),
-        new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", vars::json_settings["services"]["pornhub"]["active"], vars::json_settings["services"]["pornhub"]["hotkey"], ph_texture, shared_service_youtube),
-        new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", vars::json_settings["services"]["patreon"]["active"], vars::json_settings["services"]["patreon"]["hotkey"], patreon_texture, shared_service_youtube),
-        new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", vars::json_settings["services"]["tempmail"]["active"], vars::json_settings["services"]["tempmail"]["hotkey"], tempmail_texture, shared_service_7tv),
-        new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", vars::json_settings["services"]["thatpervert"]["active"], vars::json_settings["services"]["thatpervert"]["hotkey"], thatpervert_texture, shared_service_7tv),
-        new SharedZapret(bestchange_width, bestchange_height, "bestchange.ru", "bestchange", vars::json_settings["services"]["bestchange"]["active"], vars::json_settings["services"]["bestchange"]["hotkey"], bestchange_texture, shared_service_7tv),
+        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", youtube_texture, shared_service_youtube),
+        new Zapret(ds_width, ds_height, "Discord", "discord", discord_texture, "list-discord.txt|list-discord-ip.txt"),
+        new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", _7tv_texture, shared_service_7tv),
+        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", proton_texture, shared_service_youtube),
+        new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", ph_texture, shared_service_youtube),
+        new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_youtube),
+        new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_7tv),
+        new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_7tv),
+        new SharedZapret(bestchange_width, bestchange_height, "bestchange.ru", "bestchange", bestchange_texture, shared_service_7tv),
+        new SharedZapret(custom_width, custom_height, u8"свой список", "custom", custom_texture, shared_service_youtube),
         cf_ech,
     };
 
@@ -475,7 +491,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     delete shared_service_7tv;
 
     bool failed_ver_check = false;
-    if (vars::bStart_v_check)
+    if (vars::bStart_ver_check)
     {
         std::string answer;
         bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer, true);
@@ -503,7 +519,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     {
         if (silent || very_silent || console)
         {
-            vars::json_settings["start_version_check"] = vars::bStart_v_check = false;
+            vars::json_settings["start_version_check"] = vars::bStart_ver_check = false;
             vars::json_settings["auto_update"] = vars::bAuto_update = false;
             tools::updateSettings(vars::json_settings);
         }
@@ -740,36 +756,47 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             case 0:
             {
                 ImVec2 start = ImGui::GetCursorPos();
-                for (int i = 0, num = 0; i < vars::services.size(); i++, num++)
+                for (int i = 0, showed = 0; i < vars::services.size(); i++)
                 {
                     Zapret* service = vars::services[i];
                     if (service->hide)
+                        continue;
+
+                    if (service->panel_hide && !vars::bShow_hide)
                         continue;
 
                     ImVec2 text_scale = ImGui::CalcTextSize(service->name.c_str());
 
                     if (i > 0)
                     {
-                        if (i % 5 == 0)
+                        if (showed == 5)
                         {
                             start.y += service->height + text_scale.y + style.FramePadding.y + 20;
-                            num = 0;
+                            showed = 0;
                         }
 
-                        ImGui::SetCursorPosX(start.x + (service->width + style.FramePadding.x + 10) * num);
+                        ImGui::SetCursorPosX(start.x + (service->width + style.FramePadding.x + 10) * showed);
                     }
 
                     ImGui::SetCursorPosY(start.y);
 
-                    if (ImGui::ImageButton(service->id_name.c_str(), service->texture, ImVec2(service->width, service->height)))
+                    ImVec4 tint = service->panel_hide ? ImVec4(1, 1, 1, .15) : ImVec4(1, 1, 1, 1);
+                    if (ImGui::ImageButton(service->id_name.c_str(), service->texture, ImVec2(service->width, service->height), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tint))
                     {
                         service->toggleActive();
                     }
 
-                    if (vars::bHotkeys)
+                    bool open_key_bind = false;
+                    if (ImGui::BeginPopupContextItem((std::string("##pop_") + service->id_name).c_str()))
                     {
-                        bool open_key_bind = false;
-                        if (ImGui::BeginPopupContextItem((std::string("##pop_") + service->id_name).c_str()))
+                        bool hided = service->panel_hide;
+                        if (ImGui::MenuItem(hided ? u8"Показать" : u8"Скрыть"))
+                        {
+                            service->panel_hide = vars::json_settings["services"][service->id_name]["hide"] = !hided;
+                            tools::updateSettings(vars::json_settings);
+                        }
+
+                        if (vars::bHotkeys)
                         {
                             if (ImGui::MenuItem(u8"Задать клавишу"))
                             {
@@ -777,61 +804,66 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                             }
 
                             ImGui::MenuItem((u8"Клавиша: " + std::string(tools::getKeyName(service->hotkey))).c_str(), 0, false, false);
-
-                            ImGui::EndPopup();
                         }
+                        ImGui::EndPopup();
+                    }
 
-                        if (open_key_bind)
-                            ImGui::OpenPopup((std::string("##key_") + service->id_name).c_str());;
+                    if (open_key_bind)
+                        ImGui::OpenPopup((std::string("##key_") + service->id_name).c_str());;
 
-                        if (ImGui::BeginPopup((std::string("##key_") + service->id_name).c_str(), ImGuiWindowFlags_AlwaysAutoResize))
+                    if (ImGui::BeginPopup((std::string("##key_") + service->id_name).c_str(), ImGuiWindowFlags_AlwaysAutoResize))
+                    {
+                        ImGui::Text(u8"Нажмите любую клавишу...");
+
+                        for (int i = 3; i <= 0xFE; i++)
                         {
-                            ImGui::Text(u8"Нажмите любую клавишу...");
-
-                            for (int i = 3; i <= 0xFE; i++)
+                            if (ImGui::IsKeyPressed((ImGuiKey)i) && i != ImGuiKey_MouseLeft && i != ImGuiKey_MouseRight)
                             {
-                                if (ImGui::IsKeyPressed((ImGuiKey)i) && i != ImGuiKey_MouseLeft && i != ImGuiKey_MouseRight)
-                                {
-                                    vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = i;
-                                    tools::updateSettings(vars::json_settings);
-
-                                    ImGui::CloseCurrentPopup();
-
-                                    tools::resetKeysQueue();
-                                }
-                            }
-
-                            if (ImGui::Button(u8"Сбросить"))
-                            {
-                                vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = 0;
+                                vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = i;
                                 tools::updateSettings(vars::json_settings);
 
                                 ImGui::CloseCurrentPopup();
+
+                                tools::resetKeysQueue();
                             }
-
-                            if (ImGui::Button(u8"Отмена"))
-                                ImGui::CloseCurrentPopup();
-
-                            ImGui::EndPopup();
                         }
+
+                        if (ImGui::Button(u8"Сбросить"))
+                        {
+                            vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = 0;
+                            tools::updateSettings(vars::json_settings);
+
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        if (ImGui::Button(u8"Отмена"))
+                            ImGui::CloseCurrentPopup();
+
+                        ImGui::EndPopup();
                     }
 
                     if (ImGui::IsItemHovered())
                     {
                         ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-                        ImGui::SetTooltip(service->isRunning() ? u8"Выключить" : u8"Включить");
+                        std::string status = service->isRunning() ? u8"Выключить" : u8"Включить";
+                        if (service->id_name == "custom")
+                            status += u8"\n(URL добавлять в list-custom.txt)";
+
+                        ImGui::SetTooltip(status.c_str());
                     }
 
-                    ImGui::SetCursorPosX((start.x + service->width + style.FramePadding.x + 10) * num + start.x + style.FramePadding.x + service->width / 2 - text_scale.x / 2);
+                    ImGui::SetCursorPosX((start.x + service->width + style.FramePadding.x + 10) * showed + start.x + style.FramePadding.x + service->width / 2 - text_scale.x / 2);
 
+                    int alpha = service->panel_hide ? 100 : 255;
                     if (service->isRunning())
-                        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 255, 100, 255));
+                        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 255, 100, alpha));
                     else
-                        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(120, 120, 120, 255));
+                        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(120, 120, 120, alpha));
 
                     ImGui::Text(service->name.c_str());
 
                     ImGui::PopStyleColor();
+                    showed++;
                 }
 
                 break;
@@ -844,16 +876,28 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(10, 10, 10).Value);
                 ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(25, 25, 25).Value);
 
-                if (ImGui::Checkbox(u8"Проверка версии при запуске", &vars::bStart_v_check))
+                if (ImGui::Checkbox(u8"Проверка версии при запуске", &vars::bStart_ver_check))
                 {
-                    vars::json_settings["start_version_check"] = vars::bStart_v_check;
+                    vars::json_settings["start_version_check"] = vars::bStart_ver_check;
                     vars::json_settings["auto_update"] = vars::bAuto_update = false;
                     tools::updateSettings(vars::json_settings);
                 }
                 
+                if (ImGui::Checkbox(u8"Уведомлять об изменениях", &vars::bNotify_changes))
+                {
+                    if (!vars::bStart_ver_check)
+                        vars::bNotify_changes = false;
+
+                    vars::json_settings["notify_update"] = vars::bNotify_changes;
+                    tools::updateSettings(vars::json_settings);
+                }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Будет работать только при типе уведомления - Windows уведомления");
+
                 if (ImGui::Checkbox(u8"Автоматическое обновление", &vars::bAuto_update))
                 {
-                    if (!vars::bStart_v_check)
+                    if (!vars::bStart_ver_check)
                         vars::bAuto_update = false;
 
                     vars::json_settings["auto_update"] = vars::bAuto_update;
@@ -921,6 +965,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::resetKeysQueue();
                 }
 
+                if (ImGui::Checkbox(u8"Показать скрытые сервисы", &vars::bShow_hide))
+                {
+                    vars::json_settings["show_hide"] = vars::bShow_hide;
+                    tools::updateSettings(vars::json_settings);
+                }
+
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip(u8"Для установки клавиши нужно нажать ПКМ по сервису");
 
@@ -946,22 +996,43 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         {
                         case 0:
                         {
-                            if (!tools::existTaskSchedulerEntry())
-                                tools::createTaskSchedulerEntry();
-
                             if (tools::isInStartup())
                                 tools::removeFromStartup();
+
+                            if (tools::existUserStartup())
+                                tools::deleteUserStartup();
+
+                            if (!tools::existTaskSchedulerEntry())
+                                tools::createTaskSchedulerEntry();
+                            
 
                             break;
                         }
                         
                         case 1:
                         {
-                            if (!tools::isInStartup())
-                                tools::addToStartup();
+                            if (tools::existUserStartup())
+                                tools::deleteUserStartup();
 
                             if (tools::existTaskSchedulerEntry())
                                 tools::deleteTaskSchedulerEntry();
+
+                            if (!tools::isInStartup())
+                                tools::addToStartup();
+
+                            break;
+                        }
+
+                        case 2:
+                        {
+                            if (tools::isInStartup())
+                                tools::removeFromStartup();
+
+                            if (tools::existTaskSchedulerEntry())
+                                tools::deleteTaskSchedulerEntry();
+
+                            if (!tools::existUserStartup())
+                                tools::createUserStartup();
 
                             break;
                         }
@@ -973,7 +1044,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"UAC - контроль учетных записей\n(окошко с подтверждением при запуске программы)");
+                    ImGui::SetTooltip(u8"UAC - контроль учетных записей\n(окошко с подтверждением при запуске программы)\nПользовательский - запускает только когда вход выполнит конкретный пользователь");
 
                 if (ImGui::Combo(u8"Действие при Х", &vars::x_method, tools::convertMapToCharArray(vars::x_methods).data(), vars::x_methods.size()))
                 {

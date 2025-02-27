@@ -209,6 +209,9 @@
     <ClInclude Include="..\wintoast\wintoastlib.h">
       <Filter>wintoast</Filter>
     </ClInclude>
+    <ClInclude Include="icons\avatar.hpp">
+      <Filter>main\render\icons</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
