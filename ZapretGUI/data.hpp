@@ -83,13 +83,6 @@ namespace vars
                 {"hotkey", 0}
             }},
 
-            {"bestchange",
-            {
-                {"active", false},
-                {"hide", false},
-                {"hotkey", 0}
-            }},
-
             {"custom",
             {
                 {"active", false},
@@ -143,7 +136,7 @@ namespace vars
         {1, u8"Messagebox"},
     };
 
-    std::string version = "v25.0223.1755";
+    std::string version = "v25.0307.0202";
 
     void init()
     {

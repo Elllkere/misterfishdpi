@@ -34,7 +34,6 @@
 #include "icons/patreon.hpp"
 #include "icons/tempmail.hpp"
 #include "icons/thatpervert.hpp"
-#include "icons/bestchange.hpp"
 #include "icons/avatar.hpp"
 
 int page = 0;
@@ -429,16 +428,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         ::DestroyWindow(g_hWnd);
         return 0;
     }
-    
-    int bestchange_width = 0;
-    int bestchange_height = 0;
-    ID3D11ShaderResourceView* bestchange_texture = NULL;
-    if (!LoadTextureFromMemory(bestchange_data, sizeof(bestchange_data), &bestchange_texture, &bestchange_width, &bestchange_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
 
     int custom_width = 0;
     int custom_height = 0;
@@ -465,7 +454,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {"cf-ech", "list-cf-ech.txt"},
         {"tempmail", "list-tempmail.txt"},
         {"thatpervert", "list-thatpervert.txt"},
-        {"bestchange", "list-bestchange.txt"}
     };
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
@@ -482,7 +470,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_youtube),
         new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_7tv),
         new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_7tv),
-        new SharedZapret(bestchange_width, bestchange_height, "bestchange.ru", "bestchange", bestchange_texture, shared_service_7tv),
         new SharedZapret(custom_width, custom_height, u8"свой список", "custom", custom_texture, shared_service_youtube),
         cf_ech,
     };
