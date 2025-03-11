@@ -1,6 +1,10 @@
 # MisterFish DPI
 Обход блокировок РКН через [zapret](https://github.com/bol-van/zapret/) Windows
 
+![image](https://github.com/user-attachments/assets/3c63054e-a5af-4b7e-b13a-62efb74e4935)
+
+![image](https://github.com/user-attachments/assets/772bdbad-6f0b-4852-b23f-2f26aded3274)
+
 > [!IMPORTANT]
 > Я не являюсь разработчиком дурения DPI, я лишь разработал интерфейс для удобного управления оригинального zapret (с добавлеием пресетов настроек)
 
