@@ -545,9 +545,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     tools::killAll();
 
-    if (vars::bUnlock_ech == true)
-        cf_ech->active = true;
-
     for (auto& s : vars::services)
     {
         if (s->active)
@@ -557,6 +554,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 printf("запуск %s обхода\n", s->name.c_str());
         }
     }
+
+    if (vars::bUnlock_ech == true)
+        cf_ech->active = true;
 
     // Main loop
     bool quit = false;
