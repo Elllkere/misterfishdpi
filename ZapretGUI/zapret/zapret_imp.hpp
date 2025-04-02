@@ -287,10 +287,28 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         std::string ech = spl[0].data();
         std::string ech_ip = std::string("lists\\") + spl[1].data();
 
+        std::string targetName = "discord";
+        auto it = std::find_if(vars::services.begin(), vars::services.end(),
+            [&targetName](const Zapret* p) {
+                return p->id_name == targetName;
+            });
+
+        if (it == vars::services.end())
+        {
+            tools::sendNotif(u8"Не удалось найти сервис discord. Разблокирование CF-ech отменено", "", vars::notif != 0);
+            return;
+        }
+
+        Zapret* discord_srvc = *it;
+        auto spl_dis = tools::split(discord_srvc->txt, "|");
+
+        std::string discord = spl[0].data();
+        std::string discord_ip = std::string("lists\\") + spl[1].data();
+
         args = std::format("--wf-tcp=80,443 ");
         args += std::format("--hostlist=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, ech);
-        args += std::format("--filter-tcp=80 --ipset=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, ech_ip);
-        args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, ech_ip, cur_path);
+        args += std::format("--filter-tcp=80 --hostlist-exclude=\"{}\\{}\" --ipset-exclude=\"{}\\{}\" --ipset=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, discord, cur_path, discord_ip, cur_path, ech_ip);
+        args += std::format("--filter-tcp=443 --hostlist-exclude=\"{}\\{}\" --ipset-exclude=\"{}\\{}\" --ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, discord, cur_path, discord_ip, cur_path, ech_ip, cur_path);
     }
     else if (id_name == "discord")
     {
