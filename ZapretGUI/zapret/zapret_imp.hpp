@@ -329,7 +329,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         else
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=4 --new ", cur_path, discord);
 
-        args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --new ", cur_path, discord);
+        args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=7 --new ", cur_path, discord);
         args += std::format("--filter-udp=50000-50100 --ipset=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, discord_ip, cur_path);
     }
 }
