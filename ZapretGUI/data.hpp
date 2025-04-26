@@ -241,7 +241,7 @@ namespace vars
         {1, u8"Messagebox"},
     };
 
-    std::string version = "v25.0405.1936";
+    std::string version = "v25.0426.1603";
 
     void init()
     {
