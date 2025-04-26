@@ -19,12 +19,21 @@
 #include "imgui/imgui_impl.hpp"
 #include "fonts/sf_pro_display_medium.h"
 
+extern void cleanup();
+extern BOOL WINAPI ConsoleHandler(DWORD signal);
+namespace vars
+{
+    extern bool console_mode;
+}
+
 #include "tools/tools.hpp"
 #include "tools/json.hpp"
 
 #include "zapret/zapret.hpp"
 #include "data.hpp"
 #include "zapret/zapret_imp.hpp"
+#include "singbox/singbox.hpp"
+#include "singbox/singbox_imp.hpp"
 
 #include "icons/youtube.hpp"
 #include "icons/discord.hpp"
@@ -35,6 +44,10 @@
 #include "icons/tempmail.hpp"
 #include "icons/thatpervert.hpp"
 #include "icons/avatar.hpp"
+#include "icons/spotify.hpp"
+#include "icons/chatgpt.hpp"
+#include "icons/gemini.hpp"
+#include "icons/grok.hpp"
 
 int page = 0;
 
@@ -172,6 +185,7 @@ void update(const std::string& version, const LPSTR& lpCmdLine)
     }
 
     tools::killAll();
+    tools::sendStop("sing-box.exe");
     system("sc stop WinDivert");
 
     rename("MisterFish.exe", "MisterFish.exe.old");
@@ -190,6 +204,7 @@ HANDLE hMutexOnce;
 void cleanup()
 {
     tools::killAll();
+    tools::sendStop("sing-box.exe");
     DestroyTrayIcon();
     system("sc stop WinDivert");
 
@@ -202,13 +217,15 @@ void cleanup()
 
 BOOL WINAPI ConsoleHandler(DWORD signal) 
 {
-    if (signal == CTRL_CLOSE_EVENT) 
+    switch (signal)
     {
+    case CTRL_C_EVENT:
+    case CTRL_BREAK_EVENT:
         cleanup();
         return TRUE;
+    default:
+        return FALSE;
     }
-
-    return FALSE;
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -267,7 +284,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {
             vars::json_settings["win_start"] = vars::bWin_start = false;
             vars::json_settings["tray_start"] = vars::bTray_start = false;
-            tools::updateSettings(vars::json_settings);
+            tools::updateSettings(vars::json_settings, vars::json_setting_name);
         }
     }
 
@@ -349,95 +366,19 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    int yt_width = 0;
-    int yt_height = 0;
-    ID3D11ShaderResourceView* youtube_texture = NULL;
-    if (!LoadTextureFromMemory(youtube_data, sizeof(youtube_data), &youtube_texture, &yt_width, &yt_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
-
-    int ds_width = 0;
-    int ds_height = 0;
-    ID3D11ShaderResourceView* discord_texture = NULL;
-    if (!LoadTextureFromMemory(discord_data, sizeof(discord_data), &discord_texture, &ds_width, &ds_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
-
-    int _7tv_width = 0;
-    int _7tv_height = 0;
-    ID3D11ShaderResourceView* _7tv_texture = NULL;
-    if (!LoadTextureFromMemory(_7tv_data, sizeof(_7tv_data), &_7tv_texture, &_7tv_width, &_7tv_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
-
-    int proton_width = 0;
-    int proton_height = 0;
-    ID3D11ShaderResourceView* proton_texture = NULL;
-    if (!LoadTextureFromMemory(proton_data, sizeof(proton_data), &proton_texture, &proton_width, &proton_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
-
-    int ph_width = 0;
-    int ph_height = 0;
-    ID3D11ShaderResourceView* ph_texture = NULL;
-    if (!LoadTextureFromMemory(ph_data, sizeof(ph_data), &ph_texture, &ph_width, &ph_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
-    
-    int patreon_width = 0;
-    int patreon_height = 0;
-    ID3D11ShaderResourceView* patreon_texture = NULL;
-    if (!LoadTextureFromMemory(patreon_data, sizeof(patreon_data), &patreon_texture, &patreon_width, &patreon_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
-    
-    int tempmail_width = 0;
-    int tempmail_height = 0;
-    ID3D11ShaderResourceView* tempmail_texture = NULL;
-    if (!LoadTextureFromMemory(tempmail_data, sizeof(tempmail_data), &tempmail_texture, &tempmail_width, &tempmail_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
-    
-    int thatpervert_width = 0;
-    int thatpervert_height = 0;
-    ID3D11ShaderResourceView* thatpervert_texture = NULL;
-    if (!LoadTextureFromMemory(thatpervert_data, sizeof(thatpervert_data), &thatpervert_texture, &thatpervert_width, &thatpervert_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
-
-    int custom_width = 0;
-    int custom_height = 0;
-    ID3D11ShaderResourceView* custom_texture = NULL;
-    if (!LoadTextureFromMemory(custom_data, sizeof(custom_data), &custom_texture, &custom_width, &custom_height))
-    {
-        tools::sendNotif(u8"Ошибка загрузки текстуры", "", vars::notif != 0);
-        ::DestroyWindow(g_hWnd);
-        return 0;
-    }
+    LOAD_TEXTURE(youtube);
+    LOAD_TEXTURE(discord);
+    LOAD_TEXTURE(_7tv);
+    LOAD_TEXTURE(proton);
+    LOAD_TEXTURE(ph);
+    LOAD_TEXTURE(patreon);
+    LOAD_TEXTURE(tempmail);
+    LOAD_TEXTURE(thatpervert);
+    LOAD_TEXTURE(spotify);
+    LOAD_TEXTURE(chatgpt);
+    LOAD_TEXTURE(grok);
+    LOAD_TEXTURE(gemini);
+    LOAD_TEXTURE(custom);
 
     std::map<std::string, std::string> shared_youtube =
     {
@@ -461,8 +402,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     vars::services =
     {
-        new SharedZapret(yt_width, yt_height, "Youtube", "youtube", youtube_texture, shared_service_youtube),
-        new Zapret(ds_width, ds_height, "Discord", "discord", discord_texture, "list-discord.txt|list-discord-ip.txt"),
+        new SharedZapret(youtube_width, youtube_height, "Youtube", "youtube", youtube_texture, shared_service_youtube),
+        new Zapret(discord_width, discord_height, "Discord", "discord", discord_texture, "list-discord.txt|list-discord-ip.txt"),
         new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", _7tv_texture, shared_service_7tv),
         new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", proton_texture, shared_service_youtube),
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", ph_texture, shared_service_youtube),
@@ -470,6 +411,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_7tv),
         new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_7tv),
         new SharedZapret(custom_width, custom_height, u8"свой список", "custom", custom_texture, shared_service_youtube),
+        new Singbox(spotify_width, spotify_height, u8"Spotify API\n(discord музыка)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
+        new Singbox(chatgpt_width, chatgpt_height, u8"ChatGPT", "chatgpt", chatgpt_texture, "domain_keyword", json::array({"openai.com", "chatgpt.com"})),
+        new Singbox(gemini_width, gemini_height, u8"Gemini", "gemini", gemini_texture, "domain_keyword", json::array({"gemini.google.com"})),
+        new Singbox(grok_width, grok_height, u8"Grok", "grok", grok_texture, "domain_keyword", json::array({"grok.com", "x.ai"})),
         cf_ech,
     };
 
@@ -497,17 +442,17 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
     }
 
-    bool console = strstr(lpCmdLine, "/console") || strstr(lpCmdLine, "-console");
+    vars::console_mode = strstr(lpCmdLine, "/console") || strstr(lpCmdLine, "-console");
     bool silent = strstr(lpCmdLine, "/silent") || strstr(lpCmdLine, "-silent");
     bool very_silent = strstr(lpCmdLine, "/verysilent") || strstr(lpCmdLine, "-verysilent");
 
     if (!failed_ver_check)
     {
-        if (silent || very_silent || console)
+        if (silent || very_silent || vars::console_mode)
         {
             vars::json_settings["start_version_check"] = vars::bStart_ver_check = false;
             vars::json_settings["auto_update"] = vars::bAuto_update = false;
-            tools::updateSettings(vars::json_settings);
+            tools::updateSettings(vars::json_settings, vars::json_setting_name);
         }
         else if (!((strstr(lpCmdLine, "/autostart") || strstr(lpCmdLine, "-autostart")) && vars::bTray_start == true))
         {
@@ -526,34 +471,52 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if (!very_silent)
         CreateTrayIcon();
 
-    if (console)
+    if (vars::console_mode)
     {
-        AllocConsole();
-        freopen("CONOUT$", "w", stdout);
-
-        setlocale(LC_ALL, "Rus");
-        SetConsoleOutputCP(1251);
-        SetConsoleCP(1251);
-
-        if (!SetConsoleCtrlHandler(ConsoleHandler, TRUE)) 
-        {
-            std::cerr << "Ошибка установки обработчика консоли!" << std::endl;
-            ::Sleep(3000);
-            return 1;
-        }
+        int result = tools::setupConsole();
+        if (result != 0)
+            return result;
     }
 
     tools::killAll();
+    tools::sendStop("sing-box.exe");
 
     if (vars::bUnlock_ech == true)
         cf_ech->active = true;
+
+    int singbox_count = 0;
+    for (auto& s : vars::services)
+    {
+        if (s->active)
+        {
+            Singbox* singbox = dynamic_cast<Singbox*>(s);
+            if (singbox)
+                singbox_count++;
+        }
+    }
 
     for (auto& s : vars::services)
     {
         if (s->active)
         {
-            s->start();
-            if (console && !s->name.empty())
+            Singbox* singbox = dynamic_cast<Singbox*>(s);
+            if (singbox && (vars::proxy_ip == "" || vars::proxy_port == "0" || vars::proxy_port == ""))
+                continue;
+
+            if (singbox)
+            {
+                static int singbox_i = 0;
+                singbox_i++;
+
+                if (singbox_i == singbox_count)
+                    s->start();
+                else
+                    singbox->writeRule();
+            }
+            else
+                s->start();
+
+            if (vars::console_mode && !s->name.empty())
                 printf("запуск %s обхода\n", s->name.c_str());
         }
     }
@@ -585,7 +548,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             }
         }
 
-        if (silent || very_silent|| console)
+        if (silent || very_silent|| vars::console_mode)
         {
             ::Sleep(10);
             continue;
@@ -643,7 +606,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             if (ImGui::Button("OK"))
             {
                 vars::json_settings["first_note"] = vars::bFirst_note = true;
-                tools::updateSettings(vars::json_settings);
+                tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 ImGui::CloseCurrentPopup();
             }
 
@@ -705,7 +668,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
         ImGui::BeginChild("##left", ImVec2(150, 0));
         {
-            std::vector<std::string> buttons = { u8"Сервисы", u8"Настройки" };
+            std::vector<std::string> buttons = { u8"Сервисы", u8"Настройки", "SingBox"};
             for (int i = 0; i < buttons.size(); i++)
             {
                 if (page == i)
@@ -751,25 +714,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     if (service->panel_hide && !vars::bShow_hide)
                         continue;
 
-                    ImVec2 text_scale = ImGui::CalcTextSize(service->name.c_str());
+                    ImGui::BeginGroup();
 
-                    if (i > 0)
-                    {
-                        if (showed == 5)
-                        {
-                            start.y += service->height + text_scale.y + style.FramePadding.y + 20;
-                            showed = 0;
-                        }
-
-                        ImGui::SetCursorPosX(start.x + (service->width + style.FramePadding.x + 10) * showed);
-                    }
-
-                    ImGui::SetCursorPosY(start.y);
+                    ImVec2 imageSize(service->width, service->height);
 
                     ImVec4 tint = service->panel_hide ? ImVec4(1, 1, 1, .15) : ImVec4(1, 1, 1, 1);
-                    if (ImGui::ImageButton(service->id_name.c_str(), service->texture, ImVec2(service->width, service->height), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tint))
+                    if (ImGui::ImageButton(service->id_name.c_str(), service->texture, imageSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tint))
                     {
-                        service->toggleActive();
+                        Singbox* singbox = dynamic_cast<Singbox*>(service);
+                        if (!service->active && singbox && (vars::proxy_ip == "" || vars::proxy_port == ""))
+                            tools::sendNotif(u8"Задайте данные прокси в разделе Singbox", "", true);
+                        else 
+                            service->toggleActive();
                     }
 
                     bool open_key_bind = false;
@@ -779,7 +735,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         if (ImGui::MenuItem(hided ? u8"Показать" : u8"Скрыть"))
                         {
                             service->panel_hide = vars::json_settings["services"][service->id_name]["hide"] = !hided;
-                            tools::updateSettings(vars::json_settings);
+                            tools::updateSettings(vars::json_settings, vars::json_setting_name);
                         }
 
                         if (vars::bHotkeys)
@@ -806,7 +762,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                             if (ImGui::IsKeyPressed((ImGuiKey)i) && i != ImGuiKey_MouseLeft && i != ImGuiKey_MouseRight)
                             {
                                 vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = i;
-                                tools::updateSettings(vars::json_settings);
+                                tools::updateSettings(vars::json_settings, vars::json_setting_name);
 
                                 ImGui::CloseCurrentPopup();
 
@@ -817,7 +773,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         if (ImGui::Button(u8"Сбросить"))
                         {
                             vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = 0;
-                            tools::updateSettings(vars::json_settings);
+                            tools::updateSettings(vars::json_settings, vars::json_setting_name);
 
                             ImGui::CloseCurrentPopup();
                         }
@@ -838,23 +794,49 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         ImGui::SetTooltip(status.c_str());
                     }
 
-                    ImGui::SetCursorPosX((start.x + service->width + style.FramePadding.x + 10) * showed + start.x + style.FramePadding.x + service->width / 2 - text_scale.x / 2);
-
                     int alpha = service->panel_hide ? 100 : 255;
                     if (service->isRunning())
                         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 255, 100, alpha));
                     else
                         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(120, 120, 120, alpha));
 
-                    ImGui::Text(service->name.c_str());
+                    const char* lineStart = service->name.c_str();
+                    while (*lineStart)
+                    {
+                        const char* lineEnd = lineStart;
+                        while (*lineEnd != '\n' && *lineEnd != '\0')
+                            lineEnd++;
+
+                        ImVec2 lineSize = ImGui::CalcTextSize(lineStart, lineEnd);
+
+                        float textOffsetX = (imageSize.x - lineSize.x) * 0.5f;
+                        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textOffsetX + style.FramePadding.x);
+
+                        ImGui::TextUnformatted(lineStart, lineEnd);
+
+                        lineStart = (*lineEnd == '\n') ? lineEnd + 1 : lineEnd;
+                    }
 
                     ImGui::PopStyleColor();
+
+                    ImGui::EndGroup();
+
                     showed++;
+
+                    if (showed == 5)
+                    {
+                        showed = 0;
+                        ImGui::NewLine();
+                    }
+                    else
+                        ImGui::SameLine();
                 }
 
                 break;
             }
+
             case 1:
+            {
                 ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(40, 40, 40).Value);
                 ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(45, 45, 45).Value);
                 ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(45, 45, 45).Value);
@@ -866,16 +848,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 {
                     vars::json_settings["start_version_check"] = vars::bStart_ver_check;
                     vars::json_settings["auto_update"] = vars::bAuto_update = false;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
-                
+
                 if (ImGui::Checkbox(u8"Уведомлять об изменениях", &vars::bNotify_changes))
                 {
                     if (!vars::bStart_ver_check)
                         vars::bNotify_changes = false;
 
                     vars::json_settings["notify_update"] = vars::bNotify_changes;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
@@ -887,14 +869,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         vars::bAuto_update = false;
 
                     vars::json_settings["auto_update"] = vars::bAuto_update;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::Checkbox(u8"Автозапуск с windows", &vars::bWin_start))
                 {
                     vars::json_settings["win_start"] = vars::bWin_start;
                     vars::json_settings["tray_start"] = vars::bTray_start = false;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
 
                     switch (vars::auto_start)
                     {
@@ -925,7 +907,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         vars::bTray_start = false;
 
                     vars::json_settings["tray_start"] = vars::bTray_start;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::Checkbox(u8"Разблокировать протокол Cloudflare ECH", &vars::bUnlock_ech))
@@ -937,7 +919,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         cf_ech->terminate();
 
                     vars::json_settings["unlock_ech"] = vars::bUnlock_ech;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
@@ -946,7 +928,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Checkbox(u8"Горячие клавиши", &vars::bHotkeys))
                 {
                     vars::json_settings["hotkeys"] = vars::bHotkeys;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
 
                     tools::resetKeysQueue();
                 }
@@ -954,7 +936,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Checkbox(u8"Показать скрытые сервисы", &vars::bShow_hide))
                 {
                     vars::json_settings["show_hide"] = vars::bShow_hide;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
@@ -963,7 +945,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Combo(u8"Провайдер", &vars::provider, tools::convertMapToCharArray(vars::providers).data(), vars::providers.size()))
                 {
                     vars::json_settings["provider"] = vars::provider;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
 
                     for (auto& s : vars::services)
                     {
@@ -990,11 +972,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                             if (!tools::existTaskSchedulerEntry())
                                 tools::createTaskSchedulerEntry();
-                            
+
 
                             break;
                         }
-                        
+
                         case 1:
                         {
                             if (tools::existUserStartup())
@@ -1026,7 +1008,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     }
 
                     vars::json_settings["auto_start"] = vars::auto_start;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
@@ -1035,7 +1017,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Combo(u8"Действие при Х", &vars::x_method, tools::convertMapToCharArray(vars::x_methods).data(), vars::x_methods.size()))
                 {
                     vars::json_settings["x_method"] = vars::x_method;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
@@ -1044,7 +1026,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Combo(u8"Тип уведомлений", &vars::notif, tools::convertMapToCharArray(vars::notifs).data(), vars::notifs.size()))
                 {
                     vars::json_settings["notif"] = vars::notif;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 ImGui::PushItemWidth(349);
@@ -1052,7 +1034,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::SliderInt(u8"Задержка автозапуска", &vars::start_delay, 1, 120))
                 {
                     vars::json_settings["start_delay"] = vars::start_delay;
-                    tools::updateSettings(vars::json_settings);
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
@@ -1067,6 +1049,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 if (ImGui::Button(u8"Завершить все обходы", ImVec2(200, 30)))
                 {
                     tools::killAll();
+                    tools::sendStop("sing-box.exe");
 
                     bool cf_prev = cf_ech->active;
 
@@ -1108,12 +1091,77 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         }
                     }
                 }
-                
+
                 if (ImGui::Button("GitHub", ImVec2(200, 30)))
                     system("start https://github.com/Elllkere/misterfishdpi/");
 
                 ImGui::PopStyleColor(3);
                 ImGui::PopStyleColor(6);
+                break;
+            }
+
+            case 2:
+            {
+                ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(40, 40, 40).Value);
+                ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImColor(45, 45, 45).Value);
+                ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImColor(45, 45, 45).Value);
+                ImGui::PushStyleColor(ImGuiCol_CheckMark, ImColor(10, 10, 10).Value);
+                ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(10, 10, 10).Value);
+                ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(25, 25, 25).Value);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImColor(40, 40, 40).Value);
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(45, 45, 45).Value);
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
+
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
+
+                ImGui::PushItemWidth(349);
+
+                bool proxy_ip = ImGui::InputTextWithHint("IP", u8"прокси ip", &vars::proxy_ip);
+                bool proxy_port = ImGui::InputTextWithHint(u8"порт", u8"прокси порт", &vars::proxy_port);
+                bool proxy_user = ImGui::InputTextWithHint(u8"пользователь", u8"необязательно", &vars::proxy_user);
+                bool proxy_password = ImGui::InputTextWithHint(u8"пароль", u8"необязательно", &vars::proxy_password, ImGuiInputTextFlags_Password);
+
+                for (auto& outbound : vars::json_singbox["outbounds"])
+                {
+                    if (outbound.contains("type") && outbound["type"].get<std::string>() == "http")
+                    {
+                        if (proxy_user)
+                            outbound["username"] = vars::proxy_user;
+
+                        if (proxy_password)
+                            outbound["password"] = vars::proxy_password;
+
+                        if (proxy_ip)
+                            outbound["server"] = vars::proxy_ip;
+
+                        if (proxy_port)
+                            outbound["server_port"] = atoi(vars::proxy_port.c_str());
+
+                        if (proxy_user || proxy_password || proxy_ip || proxy_port)
+                            tools::updateSettings(vars::json_singbox, vars::json_singbox_name);
+                    }
+                }
+
+                ImGui::PopItemWidth();
+
+                if (ImGui::Button(u8"Перезагрузить", ImVec2(200, 30)))
+                {
+                    for (const auto& srv : vars::services)
+                    {
+                        if (Singbox* singbox = dynamic_cast<Singbox*>(srv))
+                        {
+                            if (singbox->active)
+                            {
+                                singbox->restart();
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                ImGui::PopStyleColor(9);
+                break;
+            }
             }
         }
         ImGui::EndChild();

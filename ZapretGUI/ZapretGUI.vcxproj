@@ -45,6 +45,7 @@
     <ClCompile Include="imgui\src\imgui_draw.cpp" />
     <ClCompile Include="imgui\src\imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui\src\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\src\imgui_stdlib.cpp" />
     <ClCompile Include="imgui\src\imgui_tables.cpp" />
     <ClCompile Include="imgui\src\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
@@ -55,9 +56,13 @@
     <ClInclude Include="icons\7tv.hpp" />
     <ClInclude Include="icons\avatar.hpp" />
     <ClInclude Include="icons\bestchange.hpp" />
+    <ClInclude Include="icons\chatgpt.hpp" />
     <ClInclude Include="icons\discord.hpp" />
+    <ClInclude Include="icons\gemini.hpp" />
+    <ClInclude Include="icons\grok.hpp" />
     <ClInclude Include="icons\ph.hpp" />
     <ClInclude Include="icons\proton.hpp" />
+    <ClInclude Include="icons\spotify.hpp" />
     <ClInclude Include="icons\tempmail.hpp" />
     <ClInclude Include="icons\thatpervert.hpp" />
     <ClInclude Include="icons\youtube.hpp" />
@@ -67,11 +72,14 @@
     <ClInclude Include="imgui\src\imgui_impl_dx11.h" />
     <ClInclude Include="imgui\src\imgui_impl_win32.h" />
     <ClInclude Include="imgui\src\imgui_internal.h" />
+    <ClInclude Include="imgui\src\imgui_stdlib.h" />
     <ClInclude Include="imgui\src\imstb_rectpack.h" />
     <ClInclude Include="imgui\src\imstb_textedit.h" />
     <ClInclude Include="imgui\src\imstb_truetype.h" />
     <ClInclude Include="imgui\src\stb_image.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="singbox\singbox.hpp" />
+    <ClInclude Include="singbox\singbox_imp.hpp" />
     <ClInclude Include="tools\json.hpp" />
     <ClInclude Include="tools\tools.hpp" />
     <ClInclude Include="zapret\zapret.hpp" />

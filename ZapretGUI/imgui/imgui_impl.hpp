@@ -11,6 +11,7 @@
 #include "src/imgui_impl_dx11.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "src/stb_image.h"
+#include "src/imgui_stdlib.h"
 
 #define WM_TRAYICON (WM_USER + 1)
 #define ID_TRAY_EXIT 1001
@@ -27,7 +28,7 @@ static HWND                     g_hWnd = nullptr;
 
 namespace window
 {
-    UINT g_Width = 750, g_Height = 550;
+    UINT g_Width = 760, g_Height = 550;
     UINT header_size = 27;
     float top_padding = 0;
     float right_padding = 0;
@@ -37,6 +38,16 @@ namespace window
 
     std::map<int, ImFont*> font;
 }
+
+#define LOAD_TEXTURE(name) \
+    int name##_width = 0; \
+    int name##_height = 0; \
+    ID3D11ShaderResourceView* name##_texture = nullptr; \
+    if (!LoadTextureFromMemory(name##_data, sizeof(name##_data), &name##_texture, &name##_width, &name##_height)) { \
+        tools::sendNotif(u8"Ошибка загрузки текстуры " #name, "", vars::notif != 0); \
+        ::DestroyWindow(g_hWnd); \
+        return 0; \
+    }
 
 // Helper functions
 

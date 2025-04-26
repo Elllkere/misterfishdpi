@@ -10,6 +10,9 @@ typedef enum _providers_list
 
 namespace vars
 {
+    std::string json_setting_name = "settings.json";
+    std::string json_singbox_name = "singbox.json";
+
     json json_settings = {
         {"first_note", false},
         {"win_start", false},
@@ -83,6 +86,34 @@ namespace vars
                 {"hotkey", 0}
             }},
 
+            {"spotify",
+            {
+                {"active", false},
+                {"hide", false},
+                {"hotkey", 0}
+            }},
+
+            {"chatgpt",
+            {
+                {"active", false},
+                {"hide", false},
+                {"hotkey", 0}
+            }},
+
+            {"gemini",
+            {
+                {"active", false},
+                {"hide", false},
+                {"hotkey", 0}
+            }},
+
+            {"grok",
+            {
+                {"active", false},
+                {"hide", false},
+                {"hotkey", 0}
+            }},
+
             {"custom",
             {
                 {"active", false},
@@ -90,6 +121,74 @@ namespace vars
                 {"hotkey", 0}
             }}
         }}
+    };
+
+    json json_singbox =
+    {
+        {"log", { {"disabled", true}}},
+        {"dns",
+        {
+            {"servers", json::array({
+                {
+                    {"tag", "local"},
+                    {"address", "local"},
+                    {"detour", "direct"}
+                }
+            })},
+            {"rules", json::array({
+                {
+                    {"server", "local"},
+                    {"outbound", "any"}
+                }
+            })},
+            {"final", "local"}
+        }
+        },
+        {"inbounds", json::array(
+            {
+                {
+                    {"type", "mixed"},
+                    {"tag", "socks"},
+                    {"listen", "127.0.0.1"},
+                    {"listen_port", 10808},
+                    {"set_system_proxy", true}
+                }
+            })
+        },
+        {"outbounds", json::array(
+            {
+                {
+                    {"type", "http"},
+                    {"tag", "proxy"},
+                    {"server", ""},
+                    {"server_port", 0},
+                    {"username", ""},
+                    {"password", ""}
+                },
+                {
+                    {"type", "direct"},
+                    {"tag", "direct"},
+                }
+            })
+        },
+        {"route",
+        {
+            {"rules", json::array({
+                {
+                    {"action", "sniff"}
+                },
+                {
+                    {"protocol", "dns"},
+                    {"action", "hijack-dns"}
+                },
+                {
+                    {"outbound", "direct"},
+                    {"port_range", json::array({"0:65535"})},
+                },
+            })},
+            {"rule_set", json::array()}
+        }
+        }
     };
 
     int provider = 0;
@@ -107,6 +206,12 @@ namespace vars
     bool bUnlock_ech = true;
     bool bHotkeys = true;
     bool bShow_hide = true;
+    bool console_mode = false;
+
+    std::string proxy_user = "";
+    std::string proxy_password = "";
+    std::string proxy_ip = "";
+    std::string proxy_port = "";
 
     std::vector<Zapret*> services;
     std::map<int, std::string> providers =
@@ -140,7 +245,26 @@ namespace vars
 
     void init()
     {
-        json_settings = tools::loadSettings(json_settings);
+        json_settings = tools::loadSettings(json_settings, json_setting_name);
+        json_singbox = tools::loadSettings(json_singbox, json_singbox_name);
+
+        for (auto& outbound : json_singbox["outbounds"]) 
+        {
+            if (outbound.contains("type") && outbound["type"].get<std::string>() == "http") 
+            {
+                if (outbound.contains("username"))
+                    vars::proxy_user = outbound["username"].get<std::string>();
+
+                if (outbound.contains("password"))
+                    vars::proxy_password = outbound["password"].get<std::string>();
+                
+                if (outbound.contains("server"))
+                    vars::proxy_ip = outbound["server"].get<std::string>();
+                
+                if (outbound.contains("server_port"))
+                    vars::proxy_port = std::to_string(outbound["server_port"].get<int>());
+            }
+        }
 
         provider = json_settings["provider"];
         auto_start = json_settings["auto_start"];

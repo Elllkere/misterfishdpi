@@ -43,6 +43,9 @@
     <Filter Include="minizip">
       <UniqueIdentifier>{2af48b12-7e08-4d9e-bcfd-4a17b0a9421d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="main\singbox">
+      <UniqueIdentifier>{3d3244d8-84d2-4b07-9d5d-3d50e2e41e2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui\src\imgui.cpp">
@@ -132,6 +135,9 @@
     <ClCompile Include="..\zlib\uncompr.c">
       <Filter>zlib</Filter>
     </ClCompile>
+    <ClCompile Include="imgui\src\imgui_stdlib.cpp">
+      <Filter>imgui\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tools\json.hpp">
@@ -210,6 +216,27 @@
       <Filter>wintoast</Filter>
     </ClInclude>
     <ClInclude Include="icons\avatar.hpp">
+      <Filter>main\render\icons</Filter>
+    </ClInclude>
+    <ClInclude Include="singbox\singbox.hpp">
+      <Filter>main\singbox</Filter>
+    </ClInclude>
+    <ClInclude Include="singbox\singbox_imp.hpp">
+      <Filter>main\singbox</Filter>
+    </ClInclude>
+    <ClInclude Include="icons\spotify.hpp">
+      <Filter>main\render\icons</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\src\imgui_stdlib.h">
+      <Filter>imgui\src</Filter>
+    </ClInclude>
+    <ClInclude Include="icons\chatgpt.hpp">
+      <Filter>main\render\icons</Filter>
+    </ClInclude>
+    <ClInclude Include="icons\gemini.hpp">
+      <Filter>main\render\icons</Filter>
+    </ClInclude>
+    <ClInclude Include="icons\grok.hpp">
       <Filter>main\render\icons</Filter>
     </ClInclude>
   </ItemGroup>

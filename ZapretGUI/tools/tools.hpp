@@ -237,6 +237,132 @@ namespace tools
         file.close();
     }
 
+    void killProcess(const std::string& name)
+    {
+        PROCESSENTRY32   pe32;
+        HANDLE         hSnapshot = NULL;
+        pe32.dwSize = sizeof(PROCESSENTRY32);
+        hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+        if (Process32First(hSnapshot, &pe32))
+        {
+            do
+            {
+                std::string str = pe32.szExeFile;
+
+                std::transform(str.begin(), str.end(), str.begin(),
+                    [](unsigned char c) { return std::tolower(c); });
+
+
+                if (strcmp(str.c_str(), name.c_str()) == 0)
+                {
+                    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID);
+                    if (hProcess == NULL)
+                        continue;
+
+                    TerminateProcess(hProcess, 0);
+                    CloseHandle(hProcess);
+                }
+
+            } while (Process32Next(hSnapshot, &pe32));
+        }
+
+        if (hSnapshot != INVALID_HANDLE_VALUE)
+            CloseHandle(hSnapshot);
+    }
+
+    int setupConsole()
+    {
+        AllocConsole();
+        freopen("CONOUT$", "w", stdout);
+
+        setlocale(LC_ALL, "Rus");
+        SetConsoleOutputCP(1251);
+        SetConsoleCP(1251);
+
+        if (!SetConsoleCtrlHandler(ConsoleHandler, TRUE))
+        {
+            std::cerr << "Ошибка установки обработчика консоли!" << std::endl;
+            ::Sleep(3000);
+            return 1;
+        }
+
+        return 0;
+    }
+
+    BOOL WINAPI _tempConsoleHndl(DWORD signal)
+    {
+        return false;
+    }
+
+    void sendStop(const std::string& name)
+    {
+        PROCESSENTRY32   pe32;
+        HANDLE         hSnapshot = NULL;
+        pe32.dwSize = sizeof(PROCESSENTRY32);
+        hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+        DWORD pid = 0;
+
+        if (Process32First(hSnapshot, &pe32))
+        {
+            do
+            {
+                std::string str = pe32.szExeFile;
+
+                std::transform(str.begin(), str.end(), str.begin(),
+                    [](unsigned char c) { return std::tolower(c); });
+
+
+                if (strcmp(str.c_str(), name.c_str()) == 0)
+                {
+                    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID);
+                    if (hProcess == NULL)
+                        continue;
+
+                    FreeConsole();
+
+                    if (!AttachConsole(pe32.th32ProcessID))
+                    {
+                        tools::sendNotif(std::format(u8"Неудалось остановить {} 2 {}", name, GetLastError()), "", true);
+                        if (vars::console_mode)
+                            setupConsole();
+
+                        return;
+                    }
+
+                    SetConsoleCtrlHandler(NULL, TRUE);
+
+                    if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0))
+                    {
+                        tools::sendNotif(std::format(u8"Неудалось остановить {} 3 {}", name, GetLastError()), "", true);
+                        FreeConsole();
+                        return;
+                    }
+
+                    FreeConsole();
+
+                    SetConsoleCtrlHandler(_tempConsoleHndl, TRUE);
+
+                    Sleep(50);
+
+                    if (vars::console_mode)
+                        setupConsole();
+                    else
+                        SetConsoleCtrlHandler(NULL, FALSE);
+
+                    CloseHandle(hProcess);
+
+                    break;
+                }
+
+            } while (Process32Next(hSnapshot, &pe32));
+        }
+
+        if (hSnapshot != INVALID_HANDLE_VALUE)
+            CloseHandle(hSnapshot);
+    }
+
     void killAll()
     {
         PROCESSENTRY32   pe32;
@@ -664,9 +790,9 @@ namespace tools
         return "Unknown";
     }
 
-    bool updateSettings(const json& settings)
+    bool updateSettings(const json& settings, const std::string& name)
     {
-        std::ofstream ofs(std::filesystem::current_path().string() + "\\settings.json");
+        std::ofstream ofs(std::filesystem::current_path().string() + "\\" + name);
         if (ofs.is_open())
         {
             ofs << std::setw(4) << settings << std::endl;
@@ -678,30 +804,59 @@ namespace tools
         return true;
     }
 
-    bool recursiveSeachSettings(json& base, const json& updates, bool check_old = false)
+    bool recursiveSeachSettings(json& loaded_settings, const json& base_settings, bool check_old = false)
     {
         bool flag_update = false;
 
         if (!check_old)
         {
             std::vector<std::string> keys;
-            for (const auto& [key, value] : updates.items()) 
+            for (const auto& [key, value] : base_settings.items()) 
             {
                 keys.push_back(key);
             }
 
             for (const auto& key : keys)
             {
-                const auto& value = updates[key];
-                if (base.find(key) == base.end() || base[key].type_name() != value.type_name())
+                const auto& value = base_settings[key];
+                if (loaded_settings.find(key) == loaded_settings.end() || loaded_settings[key].type_name() != value.type_name())
                 {
-                    base[key] = value;
+                    loaded_settings[key] = value;
                     flag_update = true;
                 }
-                else if (value.is_object() && base[key].is_object())
+                else if (value.is_object() && loaded_settings[key].is_object())
                 {
-                    if (recursiveSeachSettings(base[key], value, check_old))
+                    if (recursiveSeachSettings(loaded_settings[key], value, check_old))
                         flag_update = true;
+                }
+                else if (value.is_array() && loaded_settings[key].is_array()) 
+                {
+                    if (value.size() != loaded_settings[key].size()) 
+                    {
+                        loaded_settings[key] = value;
+                        flag_update = true;
+                    }
+                    else 
+                    {
+                        for (size_t i = 0; i < value.size(); ++i) 
+                        {
+                            if (value[i].is_object() && loaded_settings[key][i].is_object()) 
+                            {
+                                if (recursiveSeachSettings(loaded_settings[key][i], value[i], check_old))
+                                    flag_update = true;
+                            }
+                            else if (value[i].is_array() && loaded_settings[key][i].is_array()) 
+                            {
+                                if (recursiveSeachSettings(loaded_settings[key][i], value[i], check_old))
+                                    flag_update = true;
+                            }
+                            else if (value[i] != loaded_settings[key][i]) 
+                            {
+                                loaded_settings[key][i] = value[i];
+                                flag_update = true;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -709,39 +864,67 @@ namespace tools
         {
             std::vector<std::string> keys_to_erase;
 
-            auto items = base.items();
+            auto items = loaded_settings.items();
             for (const auto& [key, value] : items)
             {
-                if (updates.find(key) == updates.end())
+                if (base_settings.find(key) == base_settings.end())
                 {
                     keys_to_erase.push_back(key);
                     flag_update = true;
                 }
-                else if (value.is_object() && updates[key].is_object())
+                else if (value.is_object() && base_settings[key].is_object())
                 {
-                    if (recursiveSeachSettings(value, updates[key], check_old))
+                    if (recursiveSeachSettings(value, base_settings[key], check_old))
                         flag_update = true;
+                }
+                else if (value.is_array() && base_settings[key].is_array())
+                {
+                    if (value.size() != base_settings[key].size()) 
+                    {
+                        loaded_settings[key] = base_settings[key];
+                        flag_update = true;
+                    }
+                    else {
+                        for (size_t i = 0; i < value.size(); ++i) 
+                        {
+                            if (value[i].is_object() && base_settings[key][i].is_object()) 
+                            {
+                                if (recursiveSeachSettings(loaded_settings[key][i], base_settings[key][i], check_old))
+                                    flag_update = true;
+                            }
+                            else if (value[i].is_array() && base_settings[key][i].is_array()) 
+                            {
+                                if (recursiveSeachSettings(loaded_settings[key][i], base_settings[key][i], check_old)) 
+                                    flag_update = true;
+                            }
+                            else if (value[i] != base_settings[key][i]) 
+                            {
+                                loaded_settings[key][i] = base_settings[key][i];
+                                flag_update = true;
+                            }
+                        }
+                    }
                 }
             }
 
             for (const auto& key : keys_to_erase) 
             {
-                base.erase(key);
+                loaded_settings.erase(key);
             }
         }
 
         return flag_update;
     }
 
-    json loadSettings(const json& n)
+    json loadSettings(const json& default_settings, const std::string& name)
     {
         json settings;
 
-        std::ifstream ifs(std::filesystem::current_path().string() + "\\settings.json");
+        std::ifstream ifs(std::filesystem::current_path().string() + "\\" + name);
         if (!ifs.is_open())
         {
-            updateSettings(n);
-            settings = n;
+            updateSettings(default_settings, name);
+            settings = default_settings;
         }
         else
         {
@@ -750,10 +933,10 @@ namespace tools
         }
 
 
-        bool bNew = recursiveSeachSettings(settings, n);
-        bool bOld = recursiveSeachSettings(settings, n, true);
+        bool bNew = recursiveSeachSettings(settings, default_settings);
+        bool bOld = recursiveSeachSettings(settings, default_settings, true);
         if (bNew || bOld)
-            updateSettings(settings);
+            updateSettings(settings, name);
 
         return settings;
     }

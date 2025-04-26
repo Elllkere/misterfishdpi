@@ -75,7 +75,7 @@ void SharedZapret::terminate()
     }
 }
 
-void SharedZapret::start(const std::string& _id_name)
+void SharedZapret::start(const std::string& _l)
 {
     std::string cur_path = std::filesystem::current_path().string();
 
@@ -164,7 +164,7 @@ void Zapret::toggleActive()
         active ^= 1;
 
     vars::json_settings["services"][id_name]["active"] = active;
-    tools::updateSettings(vars::json_settings);
+    tools::updateSettings(vars::json_settings, vars::json_setting_name);
 
     if (active)
         start();
@@ -327,9 +327,9 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=datanoack --new ", cur_path, discord);
         }
         else
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=4 --new ", cur_path, discord);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=4 --dpi-desync-split-pos=1 --dpi-desync-repeats=8 --new ", cur_path, discord, cur_path);
 
         args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-repeats=7 --new ", cur_path, discord);
-        args += std::format("--filter-udp=50000-50100 --ipset=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, discord_ip, cur_path);
+        args += std::format("--filter-udp=50000-50100 --filter-l7=discord,stun --dpi-desync=fake --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, cur_path);
     }
 }
