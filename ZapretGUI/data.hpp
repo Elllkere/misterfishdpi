@@ -180,13 +180,9 @@ namespace vars
                 {
                     {"protocol", "dns"},
                     {"action", "hijack-dns"}
-                },
-                {
-                    {"outbound", "direct"},
-                    {"port_range", json::array({"0:65535"})},
-                },
+                }
             })},
-            {"rule_set", json::array()}
+            {"final", "direct"}
         }
         }
     };
@@ -241,22 +237,37 @@ namespace vars
         {1, u8"Messagebox"},
     };
 
-    std::string version = "v25.0426.2112";
+    std::string version = "v25.0430.0130";
 
     void init()
     {
         json_settings = tools::loadSettings(json_settings, json_setting_name);
         json_singbox = tools::loadSettings(json_singbox, json_singbox_name);
 
+        bool updade_singbox = false;
         for (auto& outbound : json_singbox["outbounds"]) 
         {
             if (outbound.contains("type") && outbound["type"].get<std::string>() == "http") 
             {
                 if (outbound.contains("username"))
+                {
                     vars::proxy_user = outbound["username"].get<std::string>();
+                    if (vars::proxy_user == "")
+                    {
+                        updade_singbox = true;
+                        outbound.erase("username");
+                    }
+                }
 
                 if (outbound.contains("password"))
+                {
                     vars::proxy_password = outbound["password"].get<std::string>();
+                    if (vars::proxy_password == "")
+                    {
+                        updade_singbox = true;
+                        outbound.erase("password");
+                    }
+                }
                 
                 if (outbound.contains("server"))
                     vars::proxy_ip = outbound["server"].get<std::string>();
@@ -265,6 +276,9 @@ namespace vars
                     vars::proxy_port = std::to_string(outbound["server_port"].get<int>());
             }
         }
+
+        if (updade_singbox)
+            tools::updateSettings(json_singbox, json_singbox_name);
 
         provider = json_settings["provider"];
         auto_start = json_settings["auto_start"];

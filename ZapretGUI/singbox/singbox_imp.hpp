@@ -34,7 +34,7 @@ void Singbox::terminate()
 void Singbox::startInternal()
 {
 	auto& rules = vars::json_singbox["route"]["rules"];
-	if (rules.size() <= 3)
+	if (rules.size() <= 2)
 		return;
 
 	std::string cur_path = std::filesystem::current_path().string();
@@ -44,9 +44,8 @@ void Singbox::startInternal()
 
 	std::string command = cur_path + "\\sing-box.exe" + " " + "run -c " + vars::json_singbox_name;
 
-	if (!CreateProcess(NULL, const_cast<char*>(command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+	if (!CreateProcess(NULL, const_cast<char*>(command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
 		MessageBoxA(0, std::format("Ошибка запуска процесса: {}", GetLastError()).c_str(), 0, 0);
-	}
 }
 
 void Singbox::writeRule()

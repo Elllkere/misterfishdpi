@@ -204,7 +204,18 @@ HANDLE hMutexOnce;
 void cleanup()
 {
     tools::killAll();
-    tools::sendStop("sing-box.exe");
+    for (auto& s : vars::services)
+    {
+        if (s->active)
+        {
+            if (Singbox* singbox = dynamic_cast<Singbox*>(s))
+            {
+                tools::sendStop("sing-box.exe");
+                break;
+            }
+        }
+    }
+
     DestroyTrayIcon();
     system("sc stop WinDivert");
 
@@ -479,7 +490,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
 
     tools::killAll();
-    tools::sendStop("sing-box.exe");
 
     if (vars::bUnlock_ech == true)
         cf_ech->active = true;
@@ -491,7 +501,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {
             Singbox* singbox = dynamic_cast<Singbox*>(s);
             if (singbox)
+            {
+                if (singbox_count == 0)
+                    tools::sendStop("sing-box.exe");
+
                 singbox_count++;
+            }
         }
     }
 
