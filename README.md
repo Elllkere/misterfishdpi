@@ -1,5 +1,5 @@
 # MisterFish DPI
-Обход блокировок РКН через [zapret](https://github.com/bol-van/zapret/) Windows
+Обход блокировки Discord, Youtube и других блокировок РКН через [zapret](https://github.com/bol-van/zapret/) Windows
 
 ![image](https://github.com/user-attachments/assets/3c63054e-a5af-4b7e-b13a-62efb74e4935)
 
