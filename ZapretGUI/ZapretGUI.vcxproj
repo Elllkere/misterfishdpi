@@ -19,27 +19,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\minizip\ioapi.c" />
-    <ClCompile Include="..\minizip\iowin32.c" />
-    <ClCompile Include="..\minizip\miniunz.c" />
-    <ClCompile Include="..\minizip\mztools.c" />
-    <ClCompile Include="..\minizip\unzip.c" />
-    <ClCompile Include="..\wintoast\wintoastlib.cpp" />
-    <ClCompile Include="..\zlib\adler32.c" />
-    <ClCompile Include="..\zlib\compress.c" />
-    <ClCompile Include="..\zlib\crc32.c" />
-    <ClCompile Include="..\zlib\deflate.c" />
-    <ClCompile Include="..\zlib\gzclose.c" />
-    <ClCompile Include="..\zlib\gzlib.c" />
-    <ClCompile Include="..\zlib\gzread.c" />
-    <ClCompile Include="..\zlib\gzwrite.c" />
-    <ClCompile Include="..\zlib\infback.c" />
-    <ClCompile Include="..\zlib\inffast.c" />
-    <ClCompile Include="..\zlib\inflate.c" />
-    <ClCompile Include="..\zlib\inftrees.c" />
-    <ClCompile Include="..\zlib\trees.c" />
-    <ClCompile Include="..\zlib\uncompr.c" />
-    <ClCompile Include="..\zlib\zutil.c" />
+    <ClCompile Include="..\libs\minizip\ioapi.c" />
+    <ClCompile Include="..\libs\minizip\iowin32.c" />
+    <ClCompile Include="..\libs\minizip\miniunz.c" />
+    <ClCompile Include="..\libs\minizip\mztools.c" />
+    <ClCompile Include="..\libs\minizip\unzip.c" />
+    <ClCompile Include="..\libs\wintoast\wintoastlib.cpp" />
+    <ClCompile Include="..\libs\zlib\adler32.c" />
+    <ClCompile Include="..\libs\zlib\compress.c" />
+    <ClCompile Include="..\libs\zlib\crc32.c" />
+    <ClCompile Include="..\libs\zlib\deflate.c" />
+    <ClCompile Include="..\libs\zlib\gzclose.c" />
+    <ClCompile Include="..\libs\zlib\gzlib.c" />
+    <ClCompile Include="..\libs\zlib\gzread.c" />
+    <ClCompile Include="..\libs\zlib\gzwrite.c" />
+    <ClCompile Include="..\libs\zlib\infback.c" />
+    <ClCompile Include="..\libs\zlib\inffast.c" />
+    <ClCompile Include="..\libs\zlib\inflate.c" />
+    <ClCompile Include="..\libs\zlib\inftrees.c" />
+    <ClCompile Include="..\libs\zlib\trees.c" />
+    <ClCompile Include="..\libs\zlib\uncompr.c" />
+    <ClCompile Include="..\libs\zlib\zutil.c" />
     <ClCompile Include="imgui\src\imgui.cpp" />
     <ClCompile Include="imgui\src\imgui_demo.cpp" />
     <ClCompile Include="imgui\src\imgui_draw.cpp" />
@@ -51,7 +51,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\wintoast\wintoastlib.h" />
+    <ClInclude Include="..\libs\wintoast\wintoastlib.h" />
     <ClInclude Include="data.hpp" />
     <ClInclude Include="icons\7tv.hpp" />
     <ClInclude Include="icons\avatar.hpp" />
@@ -147,8 +147,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>MisterFish</TargetName>
-    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\zlib;C:\Coding\MVS\C++\ZapretGUI\minizip;C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\include;C:\Coding\MVS\C++\ZapretGUI\wintoast;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\libs\zlib;C:\Coding\MVS\C++\ZapretGUI\libs\minizip;C:\Coding\MVS\C++\ZapretGUI\libs\curl\x64\Release\include;C:\Coding\MVS\C++\ZapretGUI\libs\wintoast;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\libs\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -210,12 +210,14 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <Optimization>MinSpace</Optimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <UACUIAccess>false</UACUIAccess>
       <AdditionalDependencies>libcurl_a.lib;advapi32.lib;crypt32.lib;normaliz.lib;ws2_32.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>

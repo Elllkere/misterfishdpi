@@ -5,6 +5,7 @@
 #include <comdef.h>
 #include <filesystem>
 #include <TlHelp32.h>
+#include <ShlObj.h>
 #include <set>
 #include <map>
 

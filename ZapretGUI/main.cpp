@@ -14,7 +14,9 @@
 #pragma comment(lib, "Urlmon.lib")
 #pragma comment(lib, "Wininet.lib")
 
+#ifdef _MSC_VER
 #include "resource.h"
+#endif
 
 #include "imgui/imgui_impl.hpp"
 #include "fonts/sf_pro_display_medium.h"

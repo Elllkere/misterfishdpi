@@ -72,71 +72,71 @@
     <ClCompile Include="main.cpp">
       <Filter>main</Filter>
     </ClCompile>
-    <ClCompile Include="..\wintoast\wintoastlib.cpp">
-      <Filter>wintoast</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minizip\ioapi.c">
-      <Filter>minizip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minizip\iowin32.c">
-      <Filter>minizip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minizip\miniunz.c">
-      <Filter>minizip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minizip\mztools.c">
-      <Filter>minizip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minizip\unzip.c">
-      <Filter>minizip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\zutil.c">
-      <Filter>minizip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\adler32.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\compress.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\crc32.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\deflate.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\gzclose.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\gzlib.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\gzread.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\gzwrite.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\infback.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\inffast.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\inflate.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\inftrees.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\trees.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib\uncompr.c">
-      <Filter>zlib</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\src\imgui_stdlib.cpp">
       <Filter>imgui\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\minizip\ioapi.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\minizip\iowin32.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\minizip\miniunz.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\minizip\mztools.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\minizip\unzip.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\adler32.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\compress.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\crc32.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\deflate.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\gzclose.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\gzlib.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\gzread.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\gzwrite.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\infback.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\inffast.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\inflate.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\inftrees.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\trees.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\uncompr.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\zlib\zutil.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\wintoast\wintoastlib.cpp">
+      <Filter>wintoast</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -212,9 +212,6 @@
     <ClInclude Include="icons\bestchange.hpp">
       <Filter>main\render\icons</Filter>
     </ClInclude>
-    <ClInclude Include="..\wintoast\wintoastlib.h">
-      <Filter>wintoast</Filter>
-    </ClInclude>
     <ClInclude Include="icons\avatar.hpp">
       <Filter>main\render\icons</Filter>
     </ClInclude>
@@ -238,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="icons\grok.hpp">
       <Filter>main\render\icons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\wintoast\wintoastlib.h">
+      <Filter>wintoast</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
