@@ -15,11 +15,20 @@ public:
         STARTUPINFO si = { sizeof(si) };
         PROCESS_INFORMATION pi;
 
-        std::string command = appName + " " + args;
+        std::string command = std::format("\"{}\" {}", appName, args);
 
         //CREATE_NO_WINDOW
-        if (!CreateProcess(NULL, const_cast<char*>(command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
-            MessageBoxA(0, std::format("Ошибка запуска процесса: {}", GetLastError()).c_str(), 0, 0);
+        if (!CreateProcess(NULL, const_cast<char*>(command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) 
+        {
+            std::string err = ""; 
+            DWORD err_code = GetLastError();
+            
+            if (err_code == 193)
+                err = std::format("Ошибка запуска процесса: {}\n{}\n{}", err_code, appName, command);
+            else
+                err = std::format("Ошибка запуска процесса: {}", err_code);
+
+            MessageBoxA(0, err.c_str(), 0, 0);
         }
         else
         {
