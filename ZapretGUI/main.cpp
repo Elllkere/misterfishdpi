@@ -416,7 +416,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     vars::services =
     {
         new SharedZapret(youtube_width, youtube_height, "Youtube", "youtube", youtube_texture, shared_service_youtube),
-        new Zapret(discord_width, discord_height, "Discord", "discord", discord_texture, "list-discord.txt|list-discord-ip.txt"),
+        new Zapret(discord_width, discord_height, "Discord", "discord", discord_texture, "list-discord.txt"),
         new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", _7tv_texture, shared_service_7tv),
         new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", proton_texture, shared_service_youtube),
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", ph_texture, shared_service_youtube),

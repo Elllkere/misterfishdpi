@@ -309,11 +309,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     }
     else if (id_name == "discord")
     {
-        std::string full = txt;
-        auto spl = tools::split(full, "|");
-
-        std::string discord = spl[0].data();
-        std::string discord_ip = std::string("lists\\") + spl[1].data();
+        std::string discord = txt;
 
         args = std::format("--wf-tcp=443 --wf-udp=443,50000-50100 ");
 
