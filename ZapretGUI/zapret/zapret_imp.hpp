@@ -282,7 +282,8 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         std::string ech_ip = txt;
 
         args = std::format("--wf-tcp=80,443 ");
-        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" ", cur_path, ech_ip, cur_path);
+        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, ech_ip, cur_path);
+        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, ech_ip);
     }
     else if (id_name == "discord")
     {
