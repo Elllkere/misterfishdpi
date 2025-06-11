@@ -170,10 +170,10 @@ void relaunch(LPSTR lpCmdLine, bool admin = true)
 
 void update(const std::string& version, const LPSTR& lpCmdLine)
 {
-    std::string path = std::filesystem::current_path().string() + "/new.zip";
+    std::string zip = std::filesystem::current_path().string() + "/new.zip";
 
     DeleteUrlCacheEntry(std::format("https://github.com/Elllkere/misterfishdpi/releases/download/{}/MisterFish-{}-x64.zip", version, version).c_str());
-    HRESULT res = URLDownloadToFile(NULL, std::format("https://github.com/Elllkere/misterfishdpi/releases/download/{}/MisterFish-{}-x64.zip", version, version).c_str(), path.c_str(), 0, NULL);
+    HRESULT res = URLDownloadToFile(NULL, std::format("https://github.com/Elllkere/misterfishdpi/releases/download/{}/MisterFish-{}-x64.zip", version, version).c_str(), zip.c_str(), 0, NULL);
 
     if (res == INET_E_DOWNLOAD_FAILURE) 
     {
@@ -191,8 +191,12 @@ void update(const std::string& version, const LPSTR& lpCmdLine)
     system("sc stop WinDivert");
 
     rename("MisterFish.exe", "MisterFish.exe.old");
-    extractFile(path, std::filesystem::current_path().string());
-    remove(path.c_str());
+
+    std::filesystem::remove_all(std::filesystem::current_path().string() + "/lists");
+
+    extractFile(zip, std::filesystem::current_path().string());
+    remove(zip.c_str());
+
     if (strlen(lpCmdLine) <= 0)
         relaunch((LPSTR)"/waitupdate");
     else

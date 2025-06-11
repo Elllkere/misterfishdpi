@@ -282,30 +282,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         std::string ech_ip = txt;
 
         args = std::format("--wf-tcp=80,443 ");
-        
-        switch (vars::provider)
-        {
-        case providers_list::PROVIDER_MTS:
-        {
-            args += std::format("--ipset=\"{}\\{}\" --filter-tcp=443 --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=6 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=6 --new ", cur_path, ech_ip);
-            //args += std::format("--ipset=\"{}\\{}\" --filter-upd=80,443 --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, ech_ip);
-            break;
-        }
-        case providers_list::PROVIDER_ROST:
-        {
-            args += std::format("--ipset=\"{}\\{}\" --filter-tcp=443 --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=6 --new ", cur_path, ech_ip);
-            break;
-        }
-
-        default:
-        {
-            args += std::format("--ipset=\"{}\\{}\" --filter-tcp=443 --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=2 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4 --new ", cur_path, ech_ip);
-            break;
-        }
-        }
-
-        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=syndata --new ", cur_path, ech_ip);
-        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=syndata", cur_path, "lists\\hetzner.txt");
+        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" ", cur_path, ech_ip, cur_path);
     }
     else if (id_name == "discord")
     {
