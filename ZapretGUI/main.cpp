@@ -398,7 +398,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {"pornhub", "list-ph.txt"},
         {"proton", "list-proton.txt"},
         {"youtube", "list-youtube.txt"},
-        {"patreon", "list-patreon.txt"},
         {"custom", "..\\list-custom.txt"}
     };
     
@@ -407,11 +406,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {"7tv", "list-7tv.txt"},
         {"tempmail", "list-tempmail.txt"},
         {"thatpervert", "list-thatpervert.txt"},
+        {"patreon", "list-patreon.txt"},
     };
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
     ZapretServiceInfo* shared_service_7tv = new ZapretServiceInfo{ "shared_service_7tv", shared_7tv, "list-7tv-service.txt" };
-    Zapret* cf_ech = new Zapret("cf-ech", "list-cf-ech.txt|list-cf-ech-ip.txt");
+    Zapret* cf_ech = new Zapret("cf-ech", "list-cf-ech-ip.txt");
 
     vars::services =
     {
@@ -420,7 +420,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", _7tv_texture, shared_service_7tv),
         new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", proton_texture, shared_service_youtube),
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", ph_texture, shared_service_youtube),
-        new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_youtube),
+        new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_7tv),
         new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_7tv),
         new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_7tv),
         new SharedZapret(custom_width, custom_height, u8"свой список", "custom", custom_texture, shared_service_youtube),
