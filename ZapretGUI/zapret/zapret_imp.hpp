@@ -279,11 +279,20 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     }
     else if (id_name == "cf-ech")
     {
-        std::string ech_ip = txt;
+        std::string full = txt;
+        auto spl = tools::split(full, "|");
+
+        std::string ech_ip = spl[0].data();
+        //https://ip-ranges.amazonaws.com/ip-ranges.json
+        std::string amazon_ip = std::string("lists\\") + spl[1].data();
 
         args = std::format("--wf-tcp=80,443 ");
+
         args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, ech_ip, cur_path);
-        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, ech_ip);
+        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, ech_ip);
+
+        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, amazon_ip, cur_path);
+        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, amazon_ip);
     }
     else if (id_name == "discord")
     {

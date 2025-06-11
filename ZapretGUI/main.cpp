@@ -415,7 +415,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
     ZapretServiceInfo* shared_service_7tv = new ZapretServiceInfo{ "shared_service_7tv", shared_7tv, "list-7tv-service.txt" };
-    Zapret* cf_ech = new Zapret("cf-ech", "list-cf-ech-ip.txt");
+    Zapret* cf_ech = new Zapret("cf-ech", "list-cf-ech-ip.txt|list-amazon-ip.txt");
 
     vars::services =
     {
