@@ -147,8 +147,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>MisterFish</TargetName>
-    <IncludePath>C:\Coding\MVS\C++\ZapretGUI\libs\zlib;C:\Coding\MVS\C++\ZapretGUI\libs\minizip;C:\Coding\MVS\C++\ZapretGUI\libs\curl\x64\Release\include;C:\Coding\MVS\C++\ZapretGUI\libs\wintoast;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\MVS\C++\ZapretGUI\libs\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)libs\zlib;$(SolutionDir)libs\minizip;$(SolutionDir)libs\curl\x64\Release\include;$(SolutionDir)libs\wintoast;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)libs\curl\x64\Release\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
