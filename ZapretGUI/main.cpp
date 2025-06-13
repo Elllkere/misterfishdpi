@@ -979,7 +979,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     ImGui::PopItemWidth();
 
                     if (ImGui::IsItemHovered())
-                        ImGui::SetTooltip(u8"Вся сеть - перехватывает всю сеть ОС и ищет IP от Amazon, возможны задержки или нет\nПорты игр - подобранный вручную список портов, которые используют игры,\nсоотвественно ваша игра может быть не добавлена");
+                        ImGui::SetTooltip(u8"Вся сеть - перехватывает всю сеть ОС и ищет IP от Amazon, возможны задержки или нет\nПорты игр - подобранный вручную список портов, которые используют игры,\nсоотвественно ваша игра может быть не добавлена\nСайты - разблокировать только для http/https");
                 }
 
                 if (ImGui::Checkbox(u8"Горячие клавиши", &vars::bHotkeys))

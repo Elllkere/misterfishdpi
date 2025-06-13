@@ -388,6 +388,13 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
             break;
         }
+        case 2:
+        {
+            tcp_filter = "--filter-tcp=21,22,80,443";
+            udp_filter = "--filter-udp=21,22,80,443";
+            wf_filter = "--wf-tcp=21,22,80,443 --wf-udp=21,22,80,443";
+            break;
+        }
         }
 
         args = std::format("{} ", wf_filter);
@@ -399,10 +406,12 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         {
         case providers_list::PROVIDER_MTS:
         case providers_list::PROVIDER_ROST:
+
             args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=16", cur_path, txt, udp_filter);
             break;
 
         default:
+
             args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=8", cur_path, txt, udp_filter);
             break;
         }

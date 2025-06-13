@@ -193,7 +193,7 @@ namespace vars
     int auto_start = 0;
     int x_method = 0;
     int notif = 0;
-    int amazon_type = 0;
+    int amazon_type = 2;
     //sec
     int start_delay = 5;
     bool bFirst_note = false;
@@ -245,9 +245,10 @@ namespace vars
     {
         {0, u8"Вся сеть"},
         {1, u8"Исключительные порты игр"},
+        {2, u8"Только сайты"}
     };
 
-    std::string version = "v25.0613.2241";
+    std::string version = "v25.0614.0248";
 
     void init()
     {
