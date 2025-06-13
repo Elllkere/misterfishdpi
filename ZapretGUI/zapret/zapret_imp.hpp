@@ -395,7 +395,18 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
         args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt, tcp_filter);
 
-        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=8", cur_path, txt, udp_filter);
+        switch (vars::provider)
+        {
+        case providers_list::PROVIDER_MTS:
+        case providers_list::PROVIDER_ROST:
+            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=16", cur_path, txt, udp_filter);
+            break;
+
+        default:
+            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=8", cur_path, txt, udp_filter);
+            break;
+        }
+        
     }
     else if (id_name == "discord")
     {
