@@ -143,6 +143,10 @@ public:
     virtual void start(const std::string& id_name = "");
 
     void getArgs(const std::string& id_name, std::string& args, const std::string& cur_path);
+
+private:
+    void addPorts(const std::string& input, std::set<int>& port_set);
+    std::string portsToString(const std::set<int>& ports);
 };
 
 class SharedZapret : public Zapret

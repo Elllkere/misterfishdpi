@@ -21,11 +21,13 @@ namespace vars
         {"update_notify", true},
         {"auto_update", true},
         {"unlock_ech", true},
+        {"unlock_amazon", true},
         {"hotkeys", false},
         {"show_hide", false},
         {"provider", 0},
         {"auto_start", 0},
         {"x_method", 0},
+        {"amazon_type", 0},
         {"notif", 0},
         {"start_delay", 5},
         {"services",
@@ -191,6 +193,7 @@ namespace vars
     int auto_start = 0;
     int x_method = 0;
     int notif = 0;
+    int amazon_type = 0;
     //sec
     int start_delay = 5;
     bool bFirst_note = false;
@@ -200,6 +203,7 @@ namespace vars
     bool bNotify_changes = false;
     bool bAuto_update = false;
     bool bUnlock_ech = true;
+    bool bUnlock_amazon = true;
     bool bHotkeys = true;
     bool bShow_hide = true;
     bool console_mode = false;
@@ -237,7 +241,13 @@ namespace vars
         {1, u8"Messagebox"},
     };
 
-    std::string version = "v25.0612.0043";
+    std::map<int, std::string> amazon_types =
+    {
+        {0, u8"Вся сеть"},
+        {1, u8"Исключительные порты игр"},
+    };
+
+    std::string version = "v25.0613.2241";
 
     void init()
     {
@@ -283,6 +293,7 @@ namespace vars
         provider = json_settings["provider"];
         auto_start = json_settings["auto_start"];
         x_method = json_settings["x_method"];
+        amazon_type = json_settings["amazon_type"];
         notif = json_settings["notif"];
         start_delay = json_settings["start_delay"];
 
@@ -303,6 +314,7 @@ namespace vars
         }
 
         bUnlock_ech = json_settings["unlock_ech"];
+        bUnlock_amazon = json_settings["unlock_amazon"];
         bHotkeys = json_settings["hotkeys"];
         bShow_hide = json_settings["show_hide"];
     }

@@ -415,7 +415,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
     ZapretServiceInfo* shared_service_7tv = new ZapretServiceInfo{ "shared_service_7tv", shared_7tv, "list-7tv-service.txt" };
-    Zapret* cf_ech = new Zapret("cf-ech", "list-cf-ech-ip.txt|list-amazon-ip.txt");
+    Zapret* cf_ech = new Zapret("cf-ech", "list-cf-ech-ip.txt");
+    Zapret* amazon = new Zapret("amazon", "list-amazon-ip.txt");
 
     vars::services =
     {
@@ -433,6 +434,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new Singbox(gemini_width, gemini_height, u8"Gemini", "gemini", gemini_texture, "domain_keyword", json::array({"gemini.google.com"})),
         new Singbox(grok_width, grok_height, u8"Grok", "grok", grok_texture, "domain_keyword", json::array({"grok.com", "x.ai"})),
         cf_ech,
+        amazon
     };
 
     delete shared_service_youtube;
@@ -499,6 +501,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     if (vars::bUnlock_ech == true)
         cf_ech->active = true;
+
+    if (vars::bUnlock_amazon == true)
+        amazon->active = true;
 
     int singbox_count = 0;
     for (auto& s : vars::services)
@@ -943,8 +948,39 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
+                if (ImGui::Checkbox(u8"Разблокировать хостинг провайдера Amazon", &vars::bUnlock_amazon))
+                {
+                    amazon->active = vars::bUnlock_amazon;
+                    if (vars::bUnlock_amazon)
+                        amazon->start();
+                    else
+                        amazon->terminate();
+
+                    vars::json_settings["unlock_amazon"] = vars::bUnlock_amazon;
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
+                }
+
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Если Вы не знаете что такое Cloudflare, то не стоит выключать.\nРазблокирует протокол ECH у Cloudflare, который включен всегда на бесплатном тарифе\nиз-за чего много обычных не забаненных сайтов не загружаются");
+                    ImGui::SetTooltip(u8"Amazon предоставляет множество серверов для сайтов, игр и прочего.\nИз-за блокировки всего Amazon много обычных не забаненных сайтов или игр не загружаются");
+
+                if (vars::bUnlock_amazon)
+                {
+                    ImGui::PushItemWidth(window::comboWidth);
+
+                    if (ImGui::Combo(u8"Тип разблокировки Amazon", &vars::amazon_type, tools::convertMapToCharArray(vars::amazon_types).data(), vars::amazon_types.size()))
+                    {
+                        vars::json_settings["amazon_type"] = vars::amazon_type;
+                        tools::updateSettings(vars::json_settings, vars::json_setting_name);
+
+                        amazon->terminate();
+                        amazon->start();
+                    }
+
+                    ImGui::PopItemWidth();
+
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip(u8"Вся сеть - перехватывает всю сеть ОС и ищет IP от Amazon, возможны задержки или нет\nПорты игр - подобранный вручную список портов, которые используют игры,\nсоотвественно ваша игра может быть не добавлена");
+                }
 
                 if (ImGui::Checkbox(u8"Горячие клавиши", &vars::bHotkeys))
                 {
@@ -962,6 +998,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip(u8"Для установки клавиши нужно нажать ПКМ по сервису");
+
+                ImGui::PushItemWidth(window::comboWidth);
 
                 if (ImGui::Combo(u8"Провайдер", &vars::provider, tools::convertMapToCharArray(vars::providers).data(), vars::providers.size()))
                 {
@@ -1050,7 +1088,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
-                ImGui::PushItemWidth(349);
+                ImGui::PopItemWidth();
+                ImGui::PushItemWidth(window::comboSlider);
 
                 if (ImGui::SliderInt(u8"Задержка автозапуска", &vars::start_delay, 1, 120))
                 {
@@ -1073,6 +1112,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::sendStop("sing-box.exe");
 
                     bool cf_prev = cf_ech->active;
+                    bool amazon_prev = amazon->active;
 
                     for (auto& service : vars::services)
                         service->active = false;
@@ -1081,6 +1121,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     {
                         cf_ech->active = true;
                         cf_ech->start();
+                    }
+
+                    if (amazon_prev)
+                    {
+                        amazon->active = true;
+                        amazon->start();
                     }
                 }
 

@@ -210,6 +210,75 @@ void Zapret::terminate()
     prc->terminate();
 }
 
+void Zapret::addPorts(const std::string& input, std::set<int>& port_set)
+{
+    std::stringstream ss(input);
+    std::string token;
+
+    while (std::getline(ss, token, ','))
+    {
+        size_t dash_pos = token.find('-');
+        if (dash_pos != std::string::npos)
+        {
+            int start = std::stoi(token.substr(0, dash_pos));
+            int end = std::stoi(token.substr(dash_pos + 1));
+            for (int p = start; p <= end; ++p)
+            {
+                port_set.insert(p);
+            }
+        }
+        else
+        {
+            int port = std::stoi(token);
+            port_set.insert(port);
+        }
+    }
+}
+
+std::string Zapret::portsToString(const std::set<int>& ports) 
+{
+    if (ports.empty()) return "";
+
+    std::ostringstream result;
+    auto it = ports.begin();
+    int range_start = *it;
+    int range_end = *it;
+
+    ++it;
+    for (; it != ports.end(); ++it) 
+    {
+        if (*it == range_end + 1) 
+        {
+            range_end = *it;
+        }
+        else 
+        {
+            if (range_start == range_end) 
+            {
+                result << range_start;
+            }
+            else 
+            {
+                result << range_start << "-" << range_end;
+            }
+
+            result << ",";
+            range_start = range_end = *it;
+        }
+    }
+
+    if (range_start == range_end) 
+    {
+        result << range_start;
+    }
+    else 
+    {
+        result << range_start << "-" << range_end;
+    }
+
+    return result.str();
+}
+
 void Zapret::getArgs(const std::string& id_name, std::string& args, const std::string& cur_path)
 {
     std::string txt = "";
@@ -279,20 +348,54 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     }
     else if (id_name == "cf-ech")
     {
-        std::string full = txt;
-        auto spl = tools::split(full, "|");
+        args = std::format("--wf-tcp=443 ");
 
-        std::string ech_ip = spl[0].data();
+        args += std::format("--ipset=\"{}\\{}\" --filter-tcp=443 --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+        args += std::format("--ipset=\"{}\\{}\" --filter-tcp=443 --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, txt);
+
+    }
+    else if (id_name == "amazon")
+    {
         //https://ip-ranges.amazonaws.com/ip-ranges.json
-        std::string amazon_ip = std::string("lists\\") + spl[1].data();
 
-        args = std::format("--wf-tcp=80,443 ");
+        std::string wf_filter = "";
+        std::string tcp_filter = "";
+        std::string udp_filter = "";
+        switch (vars::amazon_type)
+        {
+        case 0:
+        {
+            tcp_filter = "--filter-tcp=21,22,80,443,1024-65535";
+            udp_filter = "--filter-udp=21,22,80,443,1024-65535";
+            wf_filter = "--wf-tcp=21,22,80,443,1024-65535 --wf-udp=21,22,80,443,1024-65535";
+            break;
+        }
+        case 1:
+        {
+            std::set<int> udp_ports;
+            addPorts("21,22,80,443", udp_ports);
+            addPorts("7778-7781", udp_ports); //DBD
 
-        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, ech_ip, cur_path);
-        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, ech_ip);
+            std::set<int> tcp_ports;
+            addPorts("21,22,80,443", tcp_ports);
 
-        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, amazon_ip, cur_path);
-        args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, amazon_ip);
+            std::string tcp = portsToString(tcp_ports);
+            std::string udp = portsToString(udp_ports);
+
+            tcp_filter = std::format("--filter-tcp={}", tcp);
+            udp_filter = std::format("--filter-udp={}", udp);
+            wf_filter = std::format("--wf-tcp={} --wf-udp={}", tcp, udp);
+
+            break;
+        }
+        }
+
+        args = std::format("{} ", wf_filter);
+
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt, tcp_filter);
+
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=8", cur_path, txt, udp_filter);
     }
     else if (id_name == "discord")
     {
