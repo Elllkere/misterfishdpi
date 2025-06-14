@@ -350,8 +350,18 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     {
         args = std::format("--wf-tcp=443 ");
 
-        args += std::format("--ipset=\"{}\\{}\" --filter-tcp=443 --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
-        args += std::format("--ipset=\"{}\\{}\" --filter-tcp=443 --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, txt);
+        switch (vars::provider)
+        {
+        case providers_list::PROVIDER_OTHER:
+
+            args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4", cur_path, txt);
+            break;
+
+        default:
+
+            args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, txt);
+        }
 
     }
     else if (id_name == "amazon")
@@ -375,9 +385,12 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
             std::set<int> udp_ports;
             addPorts("21,22,80,443", udp_ports);
             addPorts("7778-7781", udp_ports); //DBD
+            addPorts("5055-5058, 27000-27003", udp_ports); //REPO (Photon)
 
             std::set<int> tcp_ports;
             addPorts("21,22,80,443", tcp_ports);
+            addPorts("40002", tcp_ports); //PUBG
+            addPorts("9090-9093,19090-19093", tcp_ports); //REPO (Photon)
 
             std::string tcp = portsToString(tcp_ports);
             std::string udp = portsToString(udp_ports);
@@ -399,18 +412,20 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
         args = std::format("{} ", wf_filter);
 
-        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
-        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt, tcp_filter);
-
         switch (vars::provider)
         {
         case providers_list::PROVIDER_MTS:
         case providers_list::PROVIDER_ROST:
 
+            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
+            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt, tcp_filter);
+
             args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=16", cur_path, txt, udp_filter);
             break;
 
         default:
+
+            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4 --new ", cur_path, txt, tcp_filter);
 
             args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=8", cur_path, txt, udp_filter);
             break;
