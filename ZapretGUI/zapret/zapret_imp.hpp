@@ -389,7 +389,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
             std::set<int> tcp_ports;
             addPorts("21,22,80,443", tcp_ports);
-            addPorts("40002", tcp_ports); //PUBG
+            //addPorts("40002", tcp_ports); //PUBG
             addPorts("9090-9093,19090-19093", tcp_ports); //REPO (Photon)
 
             std::string tcp = portsToString(tcp_ports);
