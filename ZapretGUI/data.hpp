@@ -27,7 +27,7 @@ namespace vars
         {"provider", 0},
         {"auto_start", 0},
         {"x_method", 0},
-        {"amazon_type", 0},
+        {"amazon_type", 2},
         {"notif", 0},
         {"start_delay", 5},
         {"services",
@@ -193,7 +193,7 @@ namespace vars
     int auto_start = 0;
     int x_method = 0;
     int notif = 0;
-    int amazon_type = 2;
+    int amazon_type = 0;
     //sec
     int start_delay = 5;
     bool bFirst_note = false;
@@ -248,7 +248,7 @@ namespace vars
         {2, u8"Только сайты"}
     };
 
-    std::string version = "v25.0615.1826";
+    std::string version = "v25.0615.1832";
 
     void init()
     {
