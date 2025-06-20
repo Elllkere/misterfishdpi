@@ -5,7 +5,8 @@ typedef enum _providers_list
     PROVIDER_OTHER          = 0,
     PROVIDER_ROST           = 1,
     PROVIDER_MTS            = 2,
-    PROVIDER_LOVIT          = 3
+    PROVIDER_LOVIT          = 3,
+    PROVIDER_ROST_DV        = 4,
 } providers_list;
 
 namespace vars
@@ -218,6 +219,7 @@ namespace vars
     {
         {providers_list::PROVIDER_OTHER, u8"Другой"},
         {providers_list::PROVIDER_ROST, u8"Ростелеком"},
+        {providers_list::PROVIDER_ROST_DV, u8"Ростелеком ДВ"},
         {providers_list::PROVIDER_MTS, u8"МТС"},
         {providers_list::PROVIDER_LOVIT, "Lovit"}
     };
@@ -248,7 +250,7 @@ namespace vars
         {2, u8"Только сайты"}
     };
 
-    std::string version = "v25.0618.1950";
+    std::string version = "v25.0620.2356";
 
     void init()
     {
