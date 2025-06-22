@@ -352,13 +352,6 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
         switch (vars::provider)
         {
-        case providers_list::PROVIDER_ROST_DV:
-            args += std::format("--ipset=\"{}\\{}\" --dpi-desync=disorder2 --dpi-desync-split-pos=1,midsld --new ", cur_path, txt);
-            args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=6 --dpi-desync-split-pos=midsld --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
-            args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-fooling=badseq --dpi-desync-split-pos=1,midsld --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
-
-            break;
-
         case providers_list::PROVIDER_OTHER:
 
             args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4", cur_path, txt);

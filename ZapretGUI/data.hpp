@@ -6,7 +6,7 @@ typedef enum _providers_list
     PROVIDER_ROST           = 1,
     PROVIDER_MTS            = 2,
     PROVIDER_LOVIT          = 3,
-    PROVIDER_ROST_DV        = 4,
+    MAX
 } providers_list;
 
 namespace vars
@@ -219,7 +219,6 @@ namespace vars
     {
         {providers_list::PROVIDER_OTHER, u8"Другой"},
         {providers_list::PROVIDER_ROST, u8"Ростелеком"},
-        {providers_list::PROVIDER_ROST_DV, u8"Ростелеком ДВ"},
         {providers_list::PROVIDER_MTS, u8"МТС"},
         {providers_list::PROVIDER_LOVIT, "Lovit"}
     };
@@ -250,12 +249,14 @@ namespace vars
         {2, u8"Только сайты"}
     };
 
-    std::string version = "v25.0620.2356";
+    std::string version = "v25.0622.2123";
 
     void init()
     {
         json_settings = tools::loadSettings(json_settings, json_setting_name);
         json_singbox = tools::loadSettings(json_singbox, json_singbox_name);
+        if (json_settings["provider"] >= providers_list::MAX)
+            json_settings["provider"] = 0;
 
         bool updade_singbox = false;
         for (auto& outbound : json_singbox["outbounds"]) 
