@@ -349,18 +349,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     else if (id_name == "cf-ech")
     {
         args = std::format("--wf-tcp=443 ");
-
-        switch (vars::provider)
-        {
-        case providers_list::PROVIDER_OTHER:
-
-            args += std::format("--ipset=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4", cur_path, txt);
-            break;
-
-        default:
-
-            args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, txt);
-        }
+        args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, txt);
 
     }
     else if (id_name == "amazon")
@@ -450,7 +439,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         default:
         {
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=4 --dpi-desync-split-pos=1 --dpi-desync-repeats=8 --new ", cur_path, discord);
-            //args += std::format("--ipset=\"{}\\{}\" --dpi-desync-any-protocol=1 --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4 --new ", cur_path, "lists\\list-google-ip.txt");
+            //args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync-any-protocol=1 --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=badseq --new ", cur_path, "lists\\list-google-ip.txt");
             //args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=4 --dpi-desync-split-pos=1 --dpi-desync-repeats=8 --new ", cur_path, "lists\\list-google-ip.txt");
             break;
         }
