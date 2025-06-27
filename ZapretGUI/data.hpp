@@ -21,7 +21,8 @@ namespace vars
         {"start_version_check", true},
         {"update_notify", true},
         {"auto_update", true},
-        {"unlock_ech", true},
+        {"unlock_cf", true},
+        {"unlock_akamai", true},
         {"unlock_amazon", true},
         {"hotkeys", false},
         {"show_hide", false},
@@ -203,7 +204,8 @@ namespace vars
     bool bStart_ver_check = false;
     bool bNotify_changes = false;
     bool bAuto_update = false;
-    bool bUnlock_ech = true;
+    bool bUnlock_cf = true;
+    bool bUnlock_akamai = true;
     bool bUnlock_amazon = true;
     bool bHotkeys = true;
     bool bShow_hide = true;
@@ -245,11 +247,11 @@ namespace vars
     std::map<int, std::string> amazon_types =
     {
         {0, u8"Вся сеть"},
-        {1, u8"Исключительные порты игр"},
+        {1, u8"Порты игр + сайты"},
         {2, u8"Только сайты"}
     };
 
-    std::string version = "v25.0625.0010";
+    std::string version = "v25.0628.0049";
 
     void init()
     {
@@ -317,7 +319,8 @@ namespace vars
             bNotify_changes = json_settings["update_notify"];
         }
 
-        bUnlock_ech = json_settings["unlock_ech"];
+        bUnlock_cf = json_settings["unlock_cf"];
+        bUnlock_akamai = json_settings["unlock_akamai"];
         bUnlock_amazon = json_settings["unlock_amazon"];
         bHotkeys = json_settings["hotkeys"];
         bShow_hide = json_settings["show_hide"];

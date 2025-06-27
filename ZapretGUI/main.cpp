@@ -361,6 +361,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     style.ChildRounding = 5.f;
     style.ChildBorderSize = 0.f;
     style.WindowBorderSize = 0.f;
+    style.ScrollbarSize = 3.f;
+    style.ScrollbarRounding = 5.f;
 
     window::top_padding = style.WindowPadding.y;
     window::right_padding = style.WindowPadding.x;
@@ -415,8 +417,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
     ZapretServiceInfo* shared_service_7tv = new ZapretServiceInfo{ "shared_service_7tv", shared_7tv, "list-7tv-service.txt" };
-    Zapret* cf_ech = new Zapret("cf-ech", "list-cf-ech-ip.txt");
+    Zapret* cloudflare = new Zapret("cf-ech", "list-cloudflare-ip.txt");
     Zapret* amazon = new Zapret("amazon", "list-amazon-ip.txt");
+    Zapret* akamai = new Zapret("akamai", "list-akamai-ip.txt");
 
     vars::services =
     {
@@ -433,8 +436,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new Singbox(chatgpt_width, chatgpt_height, u8"ChatGPT", "chatgpt", chatgpt_texture, "domain_keyword", json::array({"openai.com", "chatgpt.com"})),
         new Singbox(gemini_width, gemini_height, u8"Gemini", "gemini", gemini_texture, "domain_keyword", json::array({"gemini.google.com"})),
         new Singbox(grok_width, grok_height, u8"Grok", "grok", grok_texture, "domain_keyword", json::array({"grok.com", "x.ai"})),
-        cf_ech,
-        amazon
+        cloudflare,
+        amazon,
+        akamai
     };
 
     delete shared_service_youtube;
@@ -499,11 +503,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     tools::killAll();
 
-    if (vars::bUnlock_ech == true)
-        cf_ech->active = true;
+    if (vars::bUnlock_cf)
+        cloudflare->active = true;
 
-    if (vars::bUnlock_amazon == true)
+    if (vars::bUnlock_amazon)
         amazon->active = true;
+
+    if (vars::bUnlock_akamai)
+        akamai->active = true;
 
     int singbox_count = 0;
     for (auto& s : vars::services)
@@ -936,19 +943,37 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
-                if (ImGui::Checkbox(u8"Разблокировать протокол Cloudflare ECH", &vars::bUnlock_ech))
+                if (ImGui::Checkbox(u8"Разблокировать Cloudflare", &vars::bUnlock_cf))
                 {
-                    cf_ech->active = vars::bUnlock_ech;
-                    if (vars::bUnlock_ech)
-                        cf_ech->start();
+                    cloudflare->active = vars::bUnlock_cf;
+                    if (vars::bUnlock_cf)
+                        cloudflare->start();
                     else
-                        cf_ech->terminate();
+                        cloudflare->terminate();
 
-                    vars::json_settings["unlock_ech"] = vars::bUnlock_ech;
+                    vars::json_settings["unlock_cf"] = vars::bUnlock_cf;
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
-                if (ImGui::Checkbox(u8"Разблокировать хостинг провайдера Amazon", &vars::bUnlock_amazon))
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Cloudflare предоставляет собой сервис DDoS защиты.\nИз-за блокировки всего Cloudlfare много обычных не забаненных сайтов или игр не загружаются");
+
+                if (ImGui::Checkbox(u8"Разблокировать Akamai", &vars::bUnlock_akamai))
+                {
+                    akamai->active = vars::bUnlock_akamai;
+                    if (vars::bUnlock_akamai)
+                        akamai->start();
+                    else
+                        akamai->terminate();
+
+                    vars::json_settings["unlock_akamai"] = vars::bUnlock_akamai;
+                    tools::updateSettings(vars::json_settings, vars::json_setting_name);
+                }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Akamai предоставляет собой сервис DDoS защиты (аналог cloudflare).\nИз-за блокировки всего Akamai много обычных не забаненных сайтов или игр не загружаются");
+
+                if (ImGui::Checkbox(u8"Разблокировать Amazon", &vars::bUnlock_amazon))
                 {
                     amazon->active = vars::bUnlock_amazon;
                     if (vars::bUnlock_amazon)
@@ -1014,6 +1039,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         }
                     }
                 }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(u8"Представляет набор стратегий обычно работающих для выбранного провайдера.\nНе буквально провайдер. Можно выбирать любых");
 
                 if (ImGui::Combo(u8"Тип автозапуска", &vars::auto_start, tools::convertMapToCharArray(vars::auto_starts).data(), vars::auto_starts.size()))
                 {
@@ -1111,22 +1139,29 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::killAll();
                     tools::sendStop("sing-box.exe");
 
-                    bool cf_prev = cf_ech->active;
+                    bool cf_prev = cloudflare->active;
                     bool amazon_prev = amazon->active;
+                    bool akamai_prev = akamai->active;
 
                     for (auto& service : vars::services)
                         service->active = false;
 
                     if (cf_prev)
                     {
-                        cf_ech->active = true;
-                        cf_ech->start();
+                        cloudflare->active = true;
+                        cloudflare->start();
                     }
 
                     if (amazon_prev)
                     {
                         amazon->active = true;
                         amazon->start();
+                    }
+
+                    if (akamai_prev)
+                    {
+                        akamai->active = true;
+                        akamai->start();
                     }
                 }
 

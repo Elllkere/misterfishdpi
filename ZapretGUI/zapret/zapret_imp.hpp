@@ -346,10 +346,28 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
         args += std::format("--hostlist=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, txt);
     }
-    else if (id_name == "cf-ech")
+    else if (id_name == "cloudflare")
     {
         args = std::format("--wf-tcp=443 ");
         args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, txt);
+
+    }
+    else if (id_name == "akamai")
+    {
+        std::string wf_filter = "";
+        std::string tcp_filter = "";
+
+        std::set<int> tcp_ports;
+        addPorts("443", tcp_ports);
+        addPorts("6695-6705", tcp_ports); //Warframe (chat)
+
+        std::string tcp = portsToString(tcp_ports);
+
+        tcp_filter = std::format("--filter-tcp={}", tcp);
+        wf_filter = std::format("--wf-tcp={}", tcp);
+
+        args = std::format("{} ", wf_filter);
+        args += std::format("--ipset=\"{}\\{}\" {} --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, txt, tcp_filter);
 
     }
     else if (id_name == "amazon")
@@ -400,21 +418,8 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
         args = std::format("{} ", wf_filter);
 
-        switch (vars::provider)
-        {
-        case providers_list::PROVIDER_MTS:
-        case providers_list::PROVIDER_ROST:
-
-            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
-            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, txt, tcp_filter);
-            break;
-
-        default:
-
-            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4 --new ", cur_path, txt, tcp_filter);
-            break;
-        }
-
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt, tcp_filter);
 
         args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-ttl=8 --dpi-desync-repeats=20 --dpi-desync-fooling=none --dpi-desync-any-protocol=1 --dpi-desync=fake --dpi-desync-cutoff=n10 --dpi-desync-fake-unknown-udp=\"{}\\quic_initial_www_google_com.bin\"", cur_path, txt, udp_filter, cur_path);
         
@@ -438,7 +443,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
         default:
         {
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=4 --dpi-desync-split-pos=1 --dpi-desync-repeats=8 --new ", cur_path, discord);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4 --new ", cur_path, discord);
             //args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync-any-protocol=1 --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=badseq --new ", cur_path, "lists\\list-google-ip.txt");
             //args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=4 --dpi-desync-split-pos=1 --dpi-desync-repeats=8 --new ", cur_path, "lists\\list-google-ip.txt");
             break;

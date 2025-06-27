@@ -28,7 +28,7 @@ static HWND                     g_hWnd = nullptr;
 
 namespace window
 {
-    UINT g_Width = 760, g_Height = 600;
+    UINT g_Width = 760, g_Height = 550;
     UINT comboWidth = 325;
     UINT comboSlider = 299;
     UINT header_size = 27;
