@@ -404,6 +404,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {"pornhub", "list-ph.txt"},
         {"proton", "list-proton.txt"},
         {"youtube", "list-youtube.txt"},
+        {"thatpervert", "list-thatpervert.txt"},
         {"custom", "..\\list-custom.txt"}
     };
     
@@ -411,13 +412,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     {
         {"7tv", "list-7tv.txt"},
         {"tempmail", "list-tempmail.txt"},
-        {"thatpervert", "list-thatpervert.txt"},
-        {"patreon", "list-patreon.txt"},
+        {"patreon", "list-patreon.txt"}
     };
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
     ZapretServiceInfo* shared_service_7tv = new ZapretServiceInfo{ "shared_service_7tv", shared_7tv, "list-7tv-service.txt" };
-    Zapret* cloudflare = new Zapret("cf-ech", "list-cloudflare-ip.txt");
+    Zapret* cloudflare = new Zapret("cloudflare", "list-cloudflare-ip.txt");
     Zapret* amazon = new Zapret("amazon", "list-amazon-ip.txt");
     Zapret* akamai = new Zapret("akamai", "list-akamai-ip.txt");
 
@@ -430,7 +430,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", ph_texture, shared_service_youtube),
         new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_7tv),
         new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_7tv),
-        new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_7tv),
+        new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_youtube),
         new SharedZapret(custom_width, custom_height, u8"свой список", "custom", custom_texture, shared_service_youtube),
         new Singbox(spotify_width, spotify_height, u8"Spotify API\n(discord музыка)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
         new Singbox(chatgpt_width, chatgpt_height, u8"ChatGPT", "chatgpt", chatgpt_texture, "domain_keyword", json::array({"openai.com", "chatgpt.com"})),

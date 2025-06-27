@@ -350,7 +350,6 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     {
         args = std::format("--wf-tcp=443 ");
         args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, txt);
-
     }
     else if (id_name == "akamai")
     {
