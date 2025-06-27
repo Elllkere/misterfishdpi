@@ -354,6 +354,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     }
     else if (id_name == "akamai")
     {
+        //https://suip.biz/?act=all-isp&isp=Akamai%20Connected%20Cloud
         std::string wf_filter = "";
         std::string tcp_filter = "";
 
