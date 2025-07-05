@@ -23,7 +23,7 @@ namespace vars
         {"auto_update", true},
         {"unlock_cf", true},
         {"unlock_akamai", true},
-        {"unlock_amazon", true},
+        {"unlock_amazon", false},
         {"hotkeys", false},
         {"show_hide", false},
         {"provider", 0},
@@ -204,11 +204,11 @@ namespace vars
     bool bStart_ver_check = false;
     bool bNotify_changes = false;
     bool bAuto_update = false;
-    bool bUnlock_cf = true;
-    bool bUnlock_akamai = true;
-    bool bUnlock_amazon = true;
-    bool bHotkeys = true;
-    bool bShow_hide = true;
+    bool bUnlock_cf = false;
+    bool bUnlock_akamai = false;
+    bool bUnlock_amazon = false;
+    bool bHotkeys = false;
+    bool bShow_hide = false;
     bool console_mode = false;
 
     std::string proxy_user = "";
@@ -251,7 +251,7 @@ namespace vars
         {2, u8"Только сайты"}
     };
 
-    std::string version = "v25.0628.0113";
+    std::string version = "v25.0705.1620";
 
     void init()
     {

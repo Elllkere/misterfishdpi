@@ -971,7 +971,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Akamai предоставл€ет собой сервис DDoS защиты (аналог cloudflare).\n»з-за блокировки всего Akamai много обычных не забаненных сайтов или игр не загружаютс€");
+                    ImGui::SetTooltip(u8"Akamai предоставл€ет собой сервис DDoS защиты (аналог cloudflare).\n»з-за блокировки Akamai некоторые не забаненые сайты или игры не загружаютс€");
 
                 if (ImGui::Checkbox(u8"–азблокировать Amazon", &vars::bUnlock_amazon))
                 {
@@ -986,7 +986,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Amazon предоставл€ет множество серверов дл€ сайтов, игр и прочего.\n»з-за блокировки всего Amazon много обычных не забаненных сайтов или игр не загружаютс€");
+                    ImGui::SetTooltip(u8"ћогут быть конфликты игр\\сайтов\nAmazon предоставл€ет множество серверов дл€ сайтов, игр и прочего.\n»з-за блокировки Amazon некоторые не забаненые сайты или игры не загружаютс€");
 
                 if (vars::bUnlock_amazon)
                 {
