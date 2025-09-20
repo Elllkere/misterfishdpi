@@ -65,6 +65,7 @@
     <ClInclude Include="icons\spotify.hpp" />
     <ClInclude Include="icons\tempmail.hpp" />
     <ClInclude Include="icons\thatpervert.hpp" />
+    <ClInclude Include="icons\twitch.hpp" />
     <ClInclude Include="icons\youtube.hpp" />
     <ClInclude Include="imgui\imgui_impl.hpp" />
     <ClInclude Include="imgui\src\imconfig.h" />

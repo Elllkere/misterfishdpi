@@ -428,7 +428,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     {
         std::string discord = txt;
 
-        args = std::format("--wf-tcp=443 --wf-udp=80,443,50000-50100 ");
+        args = std::format("--wf-tcp=443 --wf-udp=443,50000-50100 ");
 
         switch (vars::provider)
         {
@@ -452,5 +452,15 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
         args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-repeats=7 --new ", cur_path, discord);
         args += std::format("--filter-udp=50000-50100 --filter-l7=discord,stun --dpi-desync=fake --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, cur_path);
+    }
+    else if (id_name == "twitch")
+    {
+        args = std::format("--wf-tcp=443 --wf-udp=443,65535 ");
+
+        args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=disorder2 --dpi-desync-split-pos=1,sniext+1,host+1,midsld-2,midsld,midsld+2,endhost-1 --new ", cur_path, txt);
+        args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=md5sig --new ", cur_path, txt);
+        args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=datanoack --new ", cur_path, txt);
+
+        args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-repeats=7", cur_path, txt);
     }
 }

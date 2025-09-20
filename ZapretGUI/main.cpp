@@ -50,6 +50,7 @@ namespace vars
 #include "icons/chatgpt.hpp"
 #include "icons/gemini.hpp"
 #include "icons/grok.hpp"
+#include "icons/twitch.hpp"
 
 int page = 0;
 
@@ -393,6 +394,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     LOAD_TEXTURE(patreon);
     LOAD_TEXTURE(tempmail);
     LOAD_TEXTURE(thatpervert);
+    LOAD_TEXTURE(twitch);
     LOAD_TEXTURE(spotify);
     LOAD_TEXTURE(chatgpt);
     LOAD_TEXTURE(grok);
@@ -431,6 +433,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_7tv),
         new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_7tv),
         new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_youtube),
+        new Zapret(twitch_width, twitch_height, "Twitch", "twitch", twitch_texture, "list-twitch.txt"),
         new SharedZapret(custom_width, custom_height, u8"свой список", "custom", custom_texture, shared_service_youtube),
         new Singbox(spotify_width, spotify_height, u8"Spotify API\n(discord музыка)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
         new Singbox(chatgpt_width, chatgpt_height, u8"ChatGPT", "chatgpt", chatgpt_texture, "domain_keyword", json::array({"openai.com", "chatgpt.com"})),

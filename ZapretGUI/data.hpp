@@ -14,24 +14,44 @@ namespace vars
     std::string json_setting_name = "settings.json";
     std::string json_singbox_name = "singbox.json";
 
+    int provider = 0;
+    int auto_start = 0;
+    int x_method = 0;
+    int notif = 0;
+    int amazon_type = 2;
+    int start_delay = 5; //sec
+
+    bool bFirst_note = false;
+    bool bWin_start = false;
+    bool bTray_start = false;
+    bool bStart_ver_check = false;
+    bool bNotify_changes = false;
+    bool bAuto_update = false;
+    bool bUnlock_cf = false;
+    bool bUnlock_akamai = false;
+    bool bUnlock_amazon = false;
+    bool bHotkeys = false;
+    bool bShow_hide = false;
+    bool console_mode = false;
+
     json json_settings = {
-        {"first_note", false},
-        {"win_start", false},
-        {"tray_start", false},
-        {"start_version_check", true},
-        {"update_notify", true},
-        {"auto_update", true},
-        {"unlock_cf", true},
-        {"unlock_akamai", true},
-        {"unlock_amazon", false},
-        {"hotkeys", false},
-        {"show_hide", false},
-        {"provider", 0},
-        {"auto_start", 0},
-        {"x_method", 0},
-        {"amazon_type", 2},
+        {"first_note", bFirst_note},
+        {"win_start", bWin_start},
+        {"tray_start", bTray_start},
+        {"start_version_check", bStart_ver_check},
+        {"update_notify", bNotify_changes},
+        {"auto_update", bAuto_update},
+        {"unlock_cf", bUnlock_cf},
+        {"unlock_akamai", bUnlock_akamai},
+        {"unlock_amazon", bUnlock_amazon},
+        {"hotkeys", bHotkeys},
+        {"show_hide", bShow_hide},
+        {"provider", provider},
+        {"auto_start", auto_start},
+        {"x_method", x_method},
+        {"amazon_type", amazon_type},
         {"notif", 0},
-        {"start_delay", 5},
+        {"start_delay", start_delay},
         {"services",
         {
             {"youtube",
@@ -84,6 +104,13 @@ namespace vars
             }},
 
             {"thatpervert",
+            {
+                {"active", false},
+                {"hide", false},
+                {"hotkey", 0}
+            }},
+
+            {"twitch",
             {
                 {"active", false},
                 {"hide", false},
@@ -191,26 +218,6 @@ namespace vars
         }
     };
 
-    int provider = 0;
-    int auto_start = 0;
-    int x_method = 0;
-    int notif = 0;
-    int amazon_type = 0;
-    //sec
-    int start_delay = 5;
-    bool bFirst_note = false;
-    bool bWin_start = false;
-    bool bTray_start = false;
-    bool bStart_ver_check = false;
-    bool bNotify_changes = false;
-    bool bAuto_update = false;
-    bool bUnlock_cf = false;
-    bool bUnlock_akamai = false;
-    bool bUnlock_amazon = false;
-    bool bHotkeys = false;
-    bool bShow_hide = false;
-    bool console_mode = false;
-
     std::string proxy_user = "";
     std::string proxy_password = "";
     std::string proxy_ip = "";
@@ -251,7 +258,7 @@ namespace vars
         {2, u8"Только сайты"}
     };
 
-    std::string version = "v25.0720.2314";
+    std::string version = "v25.0920.2233";
 
     void init()
     {
