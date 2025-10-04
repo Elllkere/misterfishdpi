@@ -49,9 +49,9 @@ public:
 
     ~Process()
     {
-        printf("%p", processHandle);
-        if (processHandle != INVALID_HANDLE_VALUE)
+        if (processHandle && processHandle != INVALID_HANDLE_VALUE)
             CloseHandle(processHandle);
+        processHandle = NULL;
     }
 
     bool isRunning()
@@ -59,33 +59,39 @@ public:
         if (processHandle == INVALID_HANDLE_VALUE || processHandle == NULL)
             return false;
 
-        try
+        DWORD exitCode = 0;
+        if (GetExitCodeProcess(processHandle, &exitCode))
         {
-            DWORD exitCode;
-            if (GetExitCodeProcess(processHandle, &exitCode)) {
-                return exitCode == STILL_ACTIVE;
-            }
-        }
-        catch (std::exception ex)
-        {
+            if (exitCode == STILL_ACTIVE)
+                return true;
+
             CloseHandle(processHandle);
             processHandle = NULL;
-
             return false;
         }
 
+        CloseHandle(processHandle);
+        processHandle = NULL;
         return false;
     }
 
     void terminate()
     {
-        if (!isRunning())
+        if (processHandle == INVALID_HANDLE_VALUE || processHandle == NULL)
             return;
 
-        if (!TerminateProcess(processHandle, 0))
-            MessageBoxA(0, std::format("Failed to stop process: {}", GetLastError()).c_str(), 0, 0);
+        if (isRunning())
+        {
+            if (!TerminateProcess(processHandle, 0))
+            {
+                DWORD err = GetLastError();
+                if (err != ERROR_INVALID_HANDLE)
+                    MessageBoxA(0, std::format("Failed to stop process: {}", err).c_str(), 0, 0);
+            }
+        }
 
         CloseHandle(processHandle);
+        processHandle = NULL;
     }
 
 private:

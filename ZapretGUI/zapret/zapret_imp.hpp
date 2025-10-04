@@ -124,7 +124,6 @@ namespace
 
             const std::string wf_tcp_prefix = "--wf-tcp=";
             const std::string wf_udp_prefix = "--wf-udp=";
-            const std::string wf_upd_prefix = "--wf-upd=";
 
             if (token.rfind(wf_tcp_prefix, 0) == 0)
             {
@@ -136,13 +135,6 @@ namespace
             if (token.rfind(wf_udp_prefix, 0) == 0)
             {
                 auto values = splitListValues(token.substr(wf_udp_prefix.size()));
-                appendUniqueOrdered(entry.wf_udp, values);
-                continue;
-            }
-
-            if (token.rfind(wf_upd_prefix, 0) == 0)
-            {
-                auto values = splitListValues(token.substr(wf_upd_prefix.size()));
                 appendUniqueOrdered(entry.wf_udp, values);
                 continue;
             }
