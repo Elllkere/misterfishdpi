@@ -154,6 +154,8 @@ public:
     Zapret(const std::string& id_name, const std::string& txt);
     Zapret(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture, const std::string& txt);
 
+    static void initializeOrder(const std::vector<Zapret*>& services);
+
     bool isRunning() override;
     void restart() override;
     void terminate() override;
@@ -177,6 +179,7 @@ private:
     static std::string s_current_cmdline;
     static std::string s_executable_path;
 
+    static void registerOrder(const std::string& key);
     static void rebuildProcess();
     static void stopProcess();
     static std::string composeCommandLine();

@@ -189,11 +189,13 @@ void ServiceBase::toggleActive()
 Zapret::Zapret(const std::string& id_name, const std::string& txt)
     : ServiceBase(id_name, true), txt("lists\\" + txt)
 {
+    registerOrder(this->id_name);
 }
 
 Zapret::Zapret(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture, const std::string& txt)
     : ServiceBase(width, height, name, id_name, texture), txt("lists\\" + txt)
 {
+    registerOrder(this->id_name);
 }
 
 void SharedZapret::restart()
@@ -340,6 +342,8 @@ void Zapret::upsertArgs(const std::string& key, const std::string& args, const s
     if (s_executable_path.empty())
         s_executable_path = cur_path + "\\winws.exe";
 
+    registerOrder(key);
+
     ZapretProcessEntry entry = parseProcessEntry(args);
 
     if (entry.strategies.empty())
@@ -347,9 +351,6 @@ void Zapret::upsertArgs(const std::string& key, const std::string& args, const s
         removeArgs(key);
         return;
     }
-
-    if (std::find(s_arg_order.begin(), s_arg_order.end(), key) == s_arg_order.end())
-        s_arg_order.push_back(key);
 
     s_entries[key] = entry;
 
@@ -366,7 +367,6 @@ void Zapret::removeArgs(const std::string& key)
         return;
 
     s_entries.erase(it);
-    s_arg_order.erase(std::remove(s_arg_order.begin(), s_arg_order.end(), key), s_arg_order.end());
 
     rebuildProcess();
 }
@@ -384,6 +384,32 @@ bool Zapret::hasActiveEntry(const std::string& key)
         return false;
 
     return s_process && s_process->isRunning();
+}
+
+void Zapret::initializeOrder(const std::vector<Zapret*>& services)
+{
+    s_arg_order.clear();
+    s_arg_order.reserve(services.size());
+
+    for (const auto* service : services)
+    {
+        if (!service)
+            continue;
+
+        const auto* shared = dynamic_cast<const SharedZapret*>(service);
+        const std::string& key = shared ? shared->info->shared_id : service->id_name;
+
+        registerOrder(key);
+    }
+}
+
+void Zapret::registerOrder(const std::string& key)
+{
+    if (key.empty())
+        return;
+
+    if (std::find(s_arg_order.begin(), s_arg_order.end(), key) == s_arg_order.end())
+        s_arg_order.push_back(key);    
 }
 
 std::string Zapret::composeCommandLine()

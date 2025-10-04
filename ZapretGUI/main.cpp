@@ -404,14 +404,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {"proton", "list-proton.txt"},
         {"youtube", "list-youtube.txt"},
         {"thatpervert", "list-thatpervert.txt"},
+        {"patreon", "list-patreon.txt"},
+        {"7tv", "list-7tv.txt"},
+        {"tempmail", "list-tempmail.txt"},
         {"custom", "..\\list-custom.txt"}
     };
     
     std::map<std::string, std::string> shared_7tv =
     {
-        {"7tv", "list-7tv.txt"},
-        {"tempmail", "list-tempmail.txt"},
-        {"patreon", "list-patreon.txt"}
+        
     };
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
@@ -424,11 +425,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     {
         new SharedZapret(youtube_width, youtube_height, "Youtube", "youtube", youtube_texture, shared_service_youtube),
         new Zapret(discord_width, discord_height, "Discord", "discord", discord_texture, "list-discord.txt"),
-        new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", _7tv_texture, shared_service_7tv),
+        new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", _7tv_texture, shared_service_youtube),
         new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", proton_texture, shared_service_youtube),
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", ph_texture, shared_service_youtube),
-        new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_7tv),
-        new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_7tv),
+        new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_youtube),
+        new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_youtube),
         new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_youtube),
         new Zapret(twitch_width, twitch_height, "Twitch", "twitch", twitch_texture, "list-twitch.txt"),
         new SharedZapret(custom_width, custom_height, u8"Свой список", "custom", custom_texture, shared_service_youtube),
@@ -450,6 +451,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         vars::render_services.push_back(service);
     for (auto* singbox : vars::singbox_services)
         vars::render_services.push_back(singbox);
+
+    Zapret::initializeOrder(vars::services);
 
     delete shared_service_youtube;
     delete shared_service_7tv;
