@@ -1,5 +1,9 @@
 #pragma once
 
+class Zapret;
+class Singbox;
+class ServiceBase;
+
 typedef enum _providers_list
 {
     PROVIDER_OTHER          = 0,
@@ -224,6 +228,8 @@ namespace vars
     std::string proxy_port = "";
 
     std::vector<Zapret*> services;
+    std::vector<Singbox*> singbox_services;
+    std::vector<ServiceBase*> render_services;
     std::map<int, std::string> providers =
     {
         {providers_list::PROVIDER_OTHER, u8"Другой"},

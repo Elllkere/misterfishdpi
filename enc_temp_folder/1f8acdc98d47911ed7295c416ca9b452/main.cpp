@@ -425,13 +425,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(youtube_width, youtube_height, "Youtube", "youtube", youtube_texture, shared_service_youtube),
         new Zapret(discord_width, discord_height, "Discord", "discord", discord_texture, "list-discord.txt"),
         new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", _7tv_texture, shared_service_7tv),
-        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", proton_texture, shared_service_youtube),
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", ph_texture, shared_service_youtube),
         new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_7tv),
         new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_7tv),
         new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_youtube),
         new Zapret(twitch_width, twitch_height, "Twitch", "twitch", twitch_texture, "list-twitch.txt"),
-        new SharedZapret(custom_width, custom_height, u8"Свой список", "custom", custom_texture, shared_service_youtube),
+        new SharedZapret(custom_width, custom_height, u8"Custom domains", "custom", custom_texture, shared_service_youtube),
         cloudflare,
         amazon,
         akamai
@@ -439,10 +438,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     vars::singbox_services =
     {
-        new Singbox(spotify_width, spotify_height, u8"Spotify API\n(discord музыка)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
-        new Singbox(chatgpt_width, chatgpt_height, "ChatGPT", "chatgpt", chatgpt_texture, "domain_keyword", json::array({"openai.com", "chatgpt.com"})),
-        new Singbox(gemini_width, gemini_height, "Gemini", "gemini", gemini_texture, "domain_keyword", json::array({"gemini.google.com"})),
-        new Singbox(grok_width, grok_height, "Grok", "grok", grok_texture, "domain_keyword", json::array({"grok.com", "x.ai"}))
+        new Singbox(spotify_width, spotify_height, u8"Spotify API\n(discord player)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
+        new Singbox(chatgpt_width, chatgpt_height, u8"ChatGPT", "chatgpt", chatgpt_texture, "domain_keyword", json::array({"openai.com", "chatgpt.com"})),
+        new Singbox(gemini_width, gemini_height, u8"Gemini", "gemini", gemini_texture, "domain_keyword", json::array({"gemini.google.com"})),
+        new Singbox(grok_width, grok_height, u8"Grok", "grok", grok_texture, "domain_keyword", json::array({"grok.com", "x.ai"}))
     };
 
     vars::render_services.clear();
@@ -542,7 +541,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         service->start();
 
         if (vars::console_mode && !service->name.empty())
-            printf("Запуск %s начат\n", service->name.c_str());
+            printf("Запуск %s начат", service->name.c_str());
     }
 
     if (singbox_count > 0 && !(vars::proxy_ip == "" || vars::proxy_port == "0" || vars::proxy_port == ""))
@@ -561,7 +560,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 singbox->writeRule();
 
             if (vars::console_mode && !singbox->name.empty())
-                printf("Запуск %s начат\n", singbox->name.c_str());
+                printf("Запуск %s начат", singbox->name.c_str());
         }
     }
 

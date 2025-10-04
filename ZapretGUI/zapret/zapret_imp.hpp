@@ -1,10 +1,212 @@
 #pragma once
 
 #include "zapret.hpp"
+#include "../tools/tools.hpp"
+#include "../data.hpp"
+
+#include <cctype>
+#include <sstream>
+#include <format>
+
+namespace
+{
+    std::string trimCopy(const std::string& value)
+    {
+        size_t start = 0;
+        while (start < value.size() && std::isspace(static_cast<unsigned char>(value[start])))
+            ++start;
+        size_t end = value.size();
+        while (end > start && std::isspace(static_cast<unsigned char>(value[end - 1])))
+            --end;
+        return value.substr(start, end - start);
+    }
+
+    std::vector<std::string> splitArgsTokens(const std::string& input)
+    {
+        std::vector<std::string> tokens;
+        std::string current;
+        for (char ch : input)
+        {
+            if (std::isspace(static_cast<unsigned char>(ch)))
+            {
+                if (!current.empty())
+                {
+                    tokens.push_back(current);
+                    current.clear();
+                }
+            }
+            else
+            {
+                current.push_back(ch);
+            }
+        }
+
+        if (!current.empty())
+            tokens.push_back(current);
+
+        return tokens;
+    }
+
+    std::vector<std::string> splitListValues(const std::string& input)
+    {
+        std::vector<std::string> values;
+        std::string current;
+        for (char ch : input)
+        {
+            if (ch == ',')
+            {
+                std::string token = trimCopy(current);
+                if (!token.empty())
+                    values.push_back(token);
+                current.clear();
+            }
+            else
+            {
+                current.push_back(ch);
+            }
+        }
+
+        std::string token = trimCopy(current);
+        if (!token.empty())
+            values.push_back(token);
+
+        return values;
+    }
+
+    void appendUniqueOrdered(std::vector<std::string>& destination, const std::vector<std::string>& source)
+    {
+        for (const auto& value : source)
+        {
+            if (std::find(destination.begin(), destination.end(), value) == destination.end())
+                destination.push_back(value);
+        }
+    }
+
+    std::string joinTokens(const std::vector<std::string>& tokens)
+    {
+        std::string result;
+        for (const auto& token : tokens)
+        {
+            if (token.empty())
+                continue;
+            if (!result.empty())
+                result += ' ';
+            result += token;
+        }
+        return result;
+    }
+
+    ZapretProcessEntry parseProcessEntry(const std::string& args)
+    {
+        ZapretProcessEntry entry;
+        auto tokens = splitArgsTokens(args);
+        std::vector<std::string> current;
+
+        auto flush = [&]()
+        {
+            std::string joined = joinTokens(current);
+            if (!joined.empty())
+                entry.strategies.push_back(joined);
+            current.clear();
+        };
+
+        for (const auto& token_raw : tokens)
+        {
+            std::string token = trimCopy(token_raw);
+            if (token.empty())
+                continue;
+
+            if (token == "--new")
+            {
+                flush();
+                continue;
+            }
+
+            const std::string wf_tcp_prefix = "--wf-tcp=";
+            const std::string wf_udp_prefix = "--wf-udp=";
+            const std::string wf_upd_prefix = "--wf-upd=";
+
+            if (token.rfind(wf_tcp_prefix, 0) == 0)
+            {
+                auto values = splitListValues(token.substr(wf_tcp_prefix.size()));
+                appendUniqueOrdered(entry.wf_tcp, values);
+                continue;
+            }
+
+            if (token.rfind(wf_udp_prefix, 0) == 0)
+            {
+                auto values = splitListValues(token.substr(wf_udp_prefix.size()));
+                appendUniqueOrdered(entry.wf_udp, values);
+                continue;
+            }
+
+            if (token.rfind(wf_upd_prefix, 0) == 0)
+            {
+                auto values = splitListValues(token.substr(wf_upd_prefix.size()));
+                appendUniqueOrdered(entry.wf_udp, values);
+                continue;
+            }
+
+            current.push_back(token);
+        }
+
+        flush();
+
+        return entry;
+    }
+}
+
+std::unique_ptr<Process> Zapret::s_process = nullptr;
+std::map<std::string, ZapretProcessEntry> Zapret::s_entries = {};
+std::vector<std::string> Zapret::s_arg_order = {};
+std::string Zapret::s_current_cmdline = "";
+std::string Zapret::s_executable_path = "";
+
+ServiceBase::ServiceBase(const std::string& id_name, bool hidden)
+    : id_name(id_name)
+{
+    hide = hidden;
+    panel_hide = false;
+}
+
+ServiceBase::ServiceBase(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture)
+    : width(width), height(height), name(name), id_name(id_name), texture(texture)
+{
+    hide = false;
+    active = vars::json_settings["services"][id_name]["active"];
+    hotkey = vars::json_settings["services"][id_name]["hotkey"];
+    panel_hide = vars::json_settings["services"][id_name]["hide"];
+}
+
+void ServiceBase::toggleActive()
+{
+    if (active && !isRunning())
+        active = true;
+    else
+        active = !active;
+
+    vars::json_settings["services"][id_name]["active"] = active;
+    tools::updateSettings(vars::json_settings, vars::json_setting_name);
+
+    if (active)
+        start();
+    else
+        terminate();
+}
+
+Zapret::Zapret(const std::string& id_name, const std::string& txt)
+    : ServiceBase(id_name, true), txt("lists\\" + txt)
+{
+}
+
+Zapret::Zapret(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture, const std::string& txt)
+    : ServiceBase(width, height, name, id_name, texture), txt("lists\\" + txt)
+{
+}
 
 void SharedZapret::restart()
 {
-    Zapret::terminate();
+    Zapret::removeArgs(this->info->shared_id);
     start();
 }
 
@@ -23,7 +225,7 @@ void SharedZapret::terminate()
         SharedZapret* shared = dynamic_cast<SharedZapret*>(service);
         if (!shared && service->id_name == id_name)
         {
-            MessageBoxA(0, "Ошибка запуска процесса: ошибка преобразования класса", 0, 0);
+            MessageBoxA(0, "Failed to start process: invalid shared service type", 0, 0);
             return;
         }
         else if (!shared)
@@ -49,30 +251,12 @@ void SharedZapret::terminate()
         service_file.close();
     }
     else
-        MessageBoxA(0, std::format("Ошибка остановления процесса: {}", GetLastError()).c_str(), 0, 0);
+        MessageBoxA(0, std::format("Failed to open file: {}", GetLastError()).c_str(), 0, 0);
 
-    if (isOnlyOneRunning())
-    {
-        if (Zapret::isRunning())
-            Zapret::terminate();
-        else
-        {
-            for (auto& service : vars::services)
-            {
-                if (this->info->shared_ids.find(service->id_name) != this->info->shared_ids.end())
-                {
-                    if (Zapret* base = dynamic_cast<Zapret*>(service))
-                    {
-                        if (base->Zapret::isRunning())
-                        {
-                            base->Zapret::terminate();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
+    if (domains_used.empty())
+        Zapret::removeArgs(this->info->shared_id);
+    else
+        Zapret::start(this->info->shared_id);
 }
 
 void SharedZapret::start(const std::string& _l)
@@ -90,7 +274,7 @@ void SharedZapret::start(const std::string& _l)
         SharedZapret* shared = dynamic_cast<SharedZapret*>(service);
         if (!shared && service->id_name == id_name)
         {
-            MessageBoxA(0, "Ошибка запуска процесса: ошибка преобразования класса", 0, 0);
+            MessageBoxA(0, "Failed to start process: invalid shared service type", 0, 0);
             return;
         }
         else if (!shared)
@@ -116,21 +300,9 @@ void SharedZapret::start(const std::string& _l)
         service_file.close();
     }
     else
-        MessageBoxA(0, std::format("Ошибка запуска процесса: {}", GetLastError()).c_str(), 0, 0);
+        MessageBoxA(0, std::format("Failed to start process: {}", GetLastError()).c_str(), 0, 0);
 
-    if (!isRunning())
-        Zapret::start(this->info->shared_id);
-}
-
-bool SharedZapret::isOnlyOneRunning() const
-{
-    for (auto& service : vars::services)
-    {
-        if (this->info->shared_ids.find(service->id_name) != this->info->shared_ids.end() && service->isRunning())
-            return false;
-    }
-
-    return true;
+    Zapret::start(this->info->shared_id);
 }
 
 bool SharedZapret::isRunning()
@@ -138,76 +310,184 @@ bool SharedZapret::isRunning()
     if (!active)
         return false;
 
-    if (Zapret::isRunning())
-        return true;
-
-    for (auto& service : vars::services)
-    {
-        if (this->info->shared_ids.find(service->id_name) != this->info->shared_ids.end())
-        {
-            if (Zapret* base = dynamic_cast<Zapret*>(service))
-            {
-                if (base->Zapret::isRunning())
-                    return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-void Zapret::toggleActive()
-{
-    if (active && !isRunning())
-        active = 1;
-    else
-        active ^= 1;
-
-    vars::json_settings["services"][id_name]["active"] = active;
-    tools::updateSettings(vars::json_settings, vars::json_setting_name);
-
-    if (active)
-        start();
-    else
-        terminate();
+    return Zapret::hasActiveEntry(this->info->shared_id);
 }
 
 bool Zapret::isRunning()
 {
-    if (prc == nullptr)
-        return false;
-
-    return prc->isRunning();
+    return hasActiveEntry(this->id_name);
 }
 
 void Zapret::start(const std::string& id_name)
 {
-    if (isRunning())
-        return;
+    std::string key = id_name.empty() ? this->id_name : id_name;
 
     std::string args = "";
     std::string cur_path = std::filesystem::current_path().string();
 
-    if (id_name.size() > 0)
-        getArgs(id_name, args, cur_path);
-    else
-        getArgs(this->id_name, args, cur_path);
-
-    prc = new Process(cur_path + "\\winws.exe", args);
+    getArgs(key, args, cur_path);
+    upsertArgs(key, args, cur_path);
 }
 
 void Zapret::restart()
 {
-    terminate();
+    removeArgs(this->id_name);
     start();
 }
 
 void Zapret::terminate()
 {
-    if (prc == nullptr)
+    removeArgs(this->id_name);
+}
+
+void Zapret::upsertArgs(const std::string& key, const std::string& args, const std::string& cur_path)
+{
+    if (key.empty())
         return;
 
-    prc->terminate();
+    if (s_executable_path.empty())
+        s_executable_path = cur_path + "\\winws.exe";
+
+    ZapretProcessEntry entry = parseProcessEntry(args);
+
+    if (entry.strategies.empty())
+    {
+        removeArgs(key);
+        return;
+    }
+
+    if (std::find(s_arg_order.begin(), s_arg_order.end(), key) == s_arg_order.end())
+        s_arg_order.push_back(key);
+
+    s_entries[key] = entry;
+
+    rebuildProcess();
+}
+
+void Zapret::removeArgs(const std::string& key)
+{
+    if (key.empty())
+        return;
+
+    auto it = s_entries.find(key);
+    if (it == s_entries.end())
+        return;
+
+    s_entries.erase(it);
+    s_arg_order.erase(std::remove(s_arg_order.begin(), s_arg_order.end(), key), s_arg_order.end());
+
+    rebuildProcess();
+}
+
+bool Zapret::hasActiveEntry(const std::string& key)
+{
+    if (key.empty())
+        return false;
+
+    auto it = s_entries.find(key);
+    if (it == s_entries.end())
+        return false;
+
+    if (it->second.strategies.empty())
+        return false;
+
+    return s_process && s_process->isRunning();
+}
+
+std::string Zapret::composeCommandLine()
+{
+    std::vector<std::string> wf_tcp;
+    std::vector<std::string> wf_udp;
+    std::vector<std::string> strategies;
+
+    for (const auto& key : s_arg_order)
+    {
+        auto it = s_entries.find(key);
+        if (it == s_entries.end())
+            continue;
+
+        appendUniqueOrdered(wf_tcp, it->second.wf_tcp);
+        appendUniqueOrdered(wf_udp, it->second.wf_udp);
+
+        for (const auto& strat : it->second.strategies)
+        {
+            if (!strat.empty())
+                strategies.push_back(strat);
+        }
+    }
+
+    auto joinList = [](const std::vector<std::string>& values)
+    {
+        std::string result;
+        for (size_t i = 0; i < values.size(); ++i)
+        {
+            if (i > 0)
+                result += ',';
+            result += values[i];
+        }
+        return result;
+    };
+
+    std::string command;
+
+    if (!wf_tcp.empty())
+        command += std::format("--wf-tcp={}", joinList(wf_tcp));
+
+    if (!wf_udp.empty())
+    {
+        if (!command.empty())
+            command += ' ';
+        command += std::format("--wf-udp={}", joinList(wf_udp));
+    }
+
+    for (size_t i = 0; i < strategies.size(); ++i)
+    {
+        if (strategies[i].empty())
+            continue;
+
+        if (!command.empty())
+            command += ' ';
+
+        if (i > 0)
+            command += "--new ";
+
+        command += strategies[i];
+    }
+
+    return command;
+}
+
+void Zapret::rebuildProcess()
+{
+    std::string command_line = composeCommandLine();
+
+    if (command_line.empty())
+    {
+        stopProcess();
+        s_current_cmdline.clear();
+        return;
+    }
+
+    bool running = s_process && s_process->isRunning();
+    if (running && command_line == s_current_cmdline)
+        return;
+
+    stopProcess();
+
+    if (s_executable_path.empty())
+        return;
+
+    s_process = std::make_unique<Process>(s_executable_path, command_line);
+    s_current_cmdline = command_line;
+}
+
+void Zapret::stopProcess()
+{
+    if (!s_process)
+        return;
+
+    s_process->terminate();
+    s_process.reset();
 }
 
 void Zapret::addPorts(const std::string& input, std::set<int>& port_set)
@@ -235,7 +515,7 @@ void Zapret::addPorts(const std::string& input, std::set<int>& port_set)
     }
 }
 
-std::string Zapret::portsToString(const std::set<int>& ports) 
+std::string Zapret::portsToString(const std::set<int>& ports)
 {
     if (ports.empty()) return "";
 
@@ -245,19 +525,19 @@ std::string Zapret::portsToString(const std::set<int>& ports)
     int range_end = *it;
 
     ++it;
-    for (; it != ports.end(); ++it) 
+    for (; it != ports.end(); ++it)
     {
-        if (*it == range_end + 1) 
+        if (*it == range_end + 1)
         {
             range_end = *it;
         }
-        else 
+        else
         {
-            if (range_start == range_end) 
+            if (range_start == range_end)
             {
                 result << range_start;
             }
-            else 
+            else
             {
                 result << range_start << "-" << range_end;
             }
@@ -267,11 +547,11 @@ std::string Zapret::portsToString(const std::set<int>& ports)
         }
     }
 
-    if (range_start == range_end) 
+    if (range_start == range_end)
     {
         result << range_start;
     }
-    else 
+    else
     {
         result << range_start << "-" << range_end;
     }

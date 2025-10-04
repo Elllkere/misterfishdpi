@@ -1,5 +1,15 @@
 #pragma once
 
+#include <algorithm>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
+#include <format>
+
+struct ID3D11ShaderResourceView;
+
 namespace vars
 {
     extern json json_settings;
@@ -24,9 +34,9 @@ public:
             DWORD err_code = GetLastError();
             
             if (err_code == 193)
-                err = std::format("Ошибка запуска процесса: {}\n{}\n{}", err_code, appName, command);
+                err = std::format("Failed to start process: {}\n{}\n{}", err_code, appName, command);
             else
-                err = std::format("Ошибка запуска процесса: {}", err_code);
+                err = std::format("Failed to start process: {}", err_code);
 
             MessageBoxA(0, err.c_str(), 0, 0);
         }
@@ -39,7 +49,8 @@ public:
 
     ~Process()
     {
-        if (processHandle)
+        printf("%p", processHandle);
+        if (processHandle != INVALID_HANDLE_VALUE)
             CloseHandle(processHandle);
     }
 
@@ -72,7 +83,7 @@ public:
             return;
 
         if (!TerminateProcess(processHandle, 0))
-            MessageBoxA(0, std::format("Ошибка завершения процесса: {}", GetLastError()).c_str(), 0, 0);
+            MessageBoxA(0, std::format("Failed to stop process: {}", GetLastError()).c_str(), 0, 0);
 
         CloseHandle(processHandle);
     }
@@ -80,6 +91,38 @@ public:
 private:
     HANDLE processHandle = NULL;
     DWORD processID = 0;
+};
+
+struct ZapretProcessEntry
+{
+    std::vector<std::string> strategies;
+    std::vector<std::string> wf_tcp;
+    std::vector<std::string> wf_udp;
+};
+
+class ServiceBase
+{
+public:
+    ServiceBase(const std::string& id_name, bool hidden = true);
+    ServiceBase(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture);
+    virtual ~ServiceBase() = default;
+
+    virtual bool isRunning() = 0;
+    virtual void restart() = 0;
+    virtual void terminate() = 0;
+    virtual void start(const std::string& id_name = "") = 0;
+
+    void toggleActive();
+
+    int width = 0;
+    int height = 0;
+    std::string name;
+    std::string id_name;
+    int hotkey = 0;
+    bool active = false;
+    bool hide = false;
+    bool panel_hide = false;
+    ID3D11ShaderResourceView* texture = nullptr;
 };
 
 class ZapretServiceInfo
@@ -99,54 +142,38 @@ public:
     }
 };
 
-class Zapret
+class Zapret : public ServiceBase
 {
 public:
-    int width = 0;
-    int height = 0;
-    std::string name;
-    std::string id_name;
-    std::string txt;
-    int hotkey = 0;
-    bool active = false;
-    bool hide = false;
-    bool panel_hide = false;
-    ID3D11ShaderResourceView* texture = NULL;
-    Process* prc = nullptr;
+    Zapret(const std::string& id_name, const std::string& txt);
+    Zapret(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture, const std::string& txt);
 
-    //for non interactive
-    Zapret(const std::string& id_name, const std::string& txt)
-    {
-        this->id_name = id_name;
-        this->hide = true;
-        this->txt = "lists\\" + txt;
-    }
-
-    Zapret(int width, int height, const std::string& name, const std::string& id_name, ID3D11ShaderResourceView* texture, const std::string& txt)
-    {
-        this->width = width;
-        this->height = height;
-        this->name = name;
-        this->id_name = id_name;
-        this->active = vars::json_settings["services"][id_name]["active"];
-        this->texture = texture;
-        this->hotkey = vars::json_settings["services"][id_name]["hotkey"];
-        this->txt = "lists\\" + txt;
-        this->panel_hide = vars::json_settings["services"][id_name]["hide"];
-    }
-
-    void toggleActive();
-
-    virtual bool isRunning();
-    virtual void restart();
-    virtual void terminate();
-    virtual void start(const std::string& id_name = "");
+    bool isRunning() override;
+    void restart() override;
+    void terminate() override;
+    void start(const std::string& id_name = "") override;
 
     void getArgs(const std::string& id_name, std::string& args, const std::string& cur_path);
+
+    std::string txt;
+protected:
+    static void upsertArgs(const std::string& key, const std::string& args, const std::string& cur_path);
+    static void removeArgs(const std::string& key);
+    static bool hasActiveEntry(const std::string& key);
 
 private:
     void addPorts(const std::string& input, std::set<int>& port_set);
     std::string portsToString(const std::set<int>& ports);
+
+    static std::unique_ptr<Process> s_process;
+    static std::map<std::string, ZapretProcessEntry> s_entries;
+    static std::vector<std::string> s_arg_order;
+    static std::string s_current_cmdline;
+    static std::string s_executable_path;
+
+    static void rebuildProcess();
+    static void stopProcess();
+    static std::string composeCommandLine();
 };
 
 class SharedZapret : public Zapret
@@ -173,7 +200,6 @@ public:
         this->info = info;
     }
 
-    bool isOnlyOneRunning() const;
     bool isRunning() override;
     void restart() override;
     void terminate() override;
