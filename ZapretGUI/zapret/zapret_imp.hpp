@@ -349,7 +349,18 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     else if (id_name == "cloudflare")
     {
         args = std::format("--wf-tcp=443 ");
-        args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, txt);
+
+        std::string discord_target = "discord";
+
+        auto it = std::find_if(vars::services.begin(), vars::services.end(),
+            [discord_target](Zapret* z) {
+                return z->id_name == discord_target;
+            });
+
+        if (it != vars::services.end())
+            args += std::format("--hostlist-exclude=\"{}\\{}\" --ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, (*it)->txt, cur_path, txt);
+        else
+            args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, txt);
     }
     else if (id_name == "akamai")
     {
@@ -428,7 +439,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     {
         std::string discord = txt;
 
-        args = std::format("--wf-tcp=443 --wf-udp=443,50000-50100 ");
+        args = std::format("--wf-tcp=80,443,2053,2083,2087,2096,8443 --wf-udp=443,50000-50100 ");
 
         switch (vars::provider)
         {
@@ -438,19 +449,21 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=md5sig --new ", cur_path, discord);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=datanoack --new ", cur_path, discord);
 
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-repeats=7 --new ", cur_path, discord);
             break;
         }
 
         default:
         {
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-fake-tls-mod=rnd,dupsid --dpi-desync-repeats=4 --dpi-desync-split-pos=100,midsld,sniext+1,endhost-2,-10 --dpi-desync-ttl=4 --new ", cur_path, discord);
-            //args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync-any-protocol=1 --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=badseq --new ", cur_path, "lists\\list-google-ip.txt");
-            //args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=4 --dpi-desync-split-pos=1 --dpi-desync-repeats=8 --new ", cur_path, "lists\\list-google-ip.txt");
+            args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,multisplit --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, discord);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=652 --dpi-desync-split-pos=2 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, discord, cur_path);
+            args += std::format("--filter-tcp=2053,2083,2087,2096,8443 --hostlist-domains=discord.media --dpi-desync=multisplit --dpi-desync-split-seqovl=652 --dpi-desync-split-pos=2 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path);
+
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, discord, cur_path);
             break;
         }
-        }            
+        }
 
-        args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-repeats=7 --new ", cur_path, discord);
         args += std::format("--filter-udp=50000-50100 --filter-l7=discord,stun --dpi-desync=fake --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, cur_path);
     }
     else if (id_name == "twitch")
