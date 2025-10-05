@@ -410,13 +410,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {"custom", "..\\list-custom.txt"}
     };
     
-    std::map<std::string, std::string> shared_7tv =
-    {
-        
-    };
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
-    ZapretServiceInfo* shared_service_7tv = new ZapretServiceInfo{ "shared_service_7tv", shared_7tv, "list-7tv-service.txt" };
     Zapret* cloudflare = new Zapret("cloudflare", "list-cloudflare-ip.txt");
     Zapret* amazon = new Zapret("amazon", "list-amazon-ip.txt");
     Zapret* akamai = new Zapret("akamai", "list-akamai-ip.txt");
@@ -455,7 +450,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     Zapret::initializeOrder(vars::services);
 
     delete shared_service_youtube;
-    delete shared_service_7tv;
 
     bool failed_ver_check = false;
     if (vars::bStart_ver_check)
@@ -596,7 +590,37 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             }
         }
 
-        if (silent || very_silent|| vars::console_mode)
+        for (auto* service : vars::services)
+        {
+            if (!service->active)
+                continue;
+
+            static DWORD64 g_lastWinwsCheck = 0;
+            static int g_winwsRetries = 0;
+
+            if (!service->isRunning() && service->active)
+            {
+                if (g_winwsRetries == 5)
+                {
+                    tools::sendNotif(u8"winws.exe был неожиданно закрыт. Перезапустить процесс не удалось", "", vars::notif != 0);
+                    exit(0);
+                }
+
+                const DWORD64 now = GetTickCount64();
+                if (now - g_lastWinwsCheck >= 1500)
+                {
+                    g_lastWinwsCheck = now;
+
+                    service->restart();
+                    if (!service->isRunning())
+                        g_winwsRetries++;
+                    else
+                        g_winwsRetries = 0;
+                }
+            }
+        }
+
+        if (silent || very_silent || vars::console_mode)
         {
             ::Sleep(10);
             continue;

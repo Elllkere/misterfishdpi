@@ -264,7 +264,7 @@ namespace vars
         {2, u8"Только сайты"}
     };
 
-    std::string version = "v25.1005.0250";
+    std::string version = "v25.1005.2212";
 
     void init()
     {
