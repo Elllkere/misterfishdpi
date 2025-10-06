@@ -607,6 +607,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 const DWORD64 now = GetTickCount64();
+                if (g_lastWinwsCheck == 0)
+                    g_lastWinwsCheck = now;
+
                 if (now - g_lastWinwsCheck >= 1500)
                 {
                     g_lastWinwsCheck = now;
