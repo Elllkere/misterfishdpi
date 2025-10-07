@@ -618,7 +618,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     if (!service->isRunning())
                         g_winwsRetries++;
                     else
+                    {
                         g_winwsRetries = 0;
+                        g_lastWinwsCheck = 0;
+                    }
                 }
             }
         }
