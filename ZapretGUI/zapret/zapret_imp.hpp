@@ -666,7 +666,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         wf_filter = std::format("--wf-tcp={}", tcp);
 
         args = std::format("{} ", wf_filter);
-        args += std::format("--ipset=\"{}\\{}\" {} --filter-l7=tls --dpi-desync=fake --dpi-desync-fake-tls=0x00 --dpi-desync-start=n2 --dpi-desync-cutoff=n3 --dpi-desync-fooling=md5sig", cur_path, txt, tcp_filter);
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, tcp_filter, cur_path);
 
     }
     else if (id_name == "amazon")
@@ -717,8 +717,11 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
         args = std::format("{} ", wf_filter);
 
-        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,split --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
-        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt, tcp_filter);
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-seqovl=652 --dpi-desync-split-pos=2,sniext+1 --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
+        //args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-pos=2,sniext+1 --dpi-desync-split-seqovl=679 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
+        //args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,multisplit --dpi-desync-repeats=6 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
+        //args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=syndata --new ", cur_path, txt, tcp_filter);
+        //args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-fooling=ts --dpi-desync-repeats=8 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com --new ", cur_path, txt, tcp_filter, cur_path);
 
         args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-ttl=8 --dpi-desync-repeats=20 --dpi-desync-fooling=none --dpi-desync-any-protocol=1 --dpi-desync=fake --dpi-desync-cutoff=n10 --dpi-desync-fake-unknown-udp=\"{}\\quic_initial_www_google_com.bin\"", cur_path, txt, udp_filter, cur_path);
         
