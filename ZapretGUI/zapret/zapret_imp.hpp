@@ -648,7 +648,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     {
         args = std::format("--wf-tcp=443 ");
 
-        args += std::format("--ipset=\"{}\\{}\" --filter-l7=tls --dpi-desync=multisplit --dpi-desync-split-seqovl=652 --dpi-desync-split-pos=2 --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
+        args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
     }
     else if (id_name == "akamai")
     {
@@ -725,29 +725,23 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     }
     else if (id_name == "discord")
     {
-        std::string discord = txt;
-
         args = std::format("--wf-tcp=80,443,2053,2083,2087,2096,8443 --wf-udp=443,50000-50100 ");
+
+        args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,multisplit --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt);
+        args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+        args += std::format("--filter-tcp=2053,2083,2087,2096,8443 --hostlist-domains=discord.media --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path);
 
         switch (vars::provider)
         {
         case providers_list::PROVIDER_ROST:
         {
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=disorder2 --dpi-desync-split-pos=1,sniext+1,host+1,midsld-2,midsld,midsld+2,endhost-1 --new ", cur_path, discord);
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=md5sig --new ", cur_path, discord);
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-fooling=datanoack --new ", cur_path, discord);
-
-            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-repeats=7 --new ", cur_path, discord);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-repeats=7 --new ", cur_path, txt);
             break;
         }
 
         default:
         {
-            args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,multisplit --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, discord);
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=652 --dpi-desync-split-pos=2 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, discord, cur_path);
-            args += std::format("--filter-tcp=2053,2083,2087,2096,8443 --hostlist-domains=discord.media --dpi-desync=multisplit --dpi-desync-split-seqovl=652 --dpi-desync-split-pos=2 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path);
-
-            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, discord, cur_path);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             break;
         }
         }
