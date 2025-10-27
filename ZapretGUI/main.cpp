@@ -413,7 +413,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     ZapretServiceInfo* shared_service_youtube = new ZapretServiceInfo{ "shared_service_youtube", shared_youtube, "list-youtube-service.txt" };
     Zapret* cloudflare = new Zapret("cloudflare", "list-cloudflare-ip.txt");
-    Zapret* amazon = new Zapret("amazon", "list-amazon-ip.txt");
+    Zapret* amazon = new Zapret("amazon", "list-amazon.txt|lists\\list-amazon-ip.txt");
     Zapret* akamai = new Zapret("akamai", "list-akamai-ip.txt");
 
     vars::services =

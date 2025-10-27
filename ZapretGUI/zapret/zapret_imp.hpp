@@ -595,41 +595,41 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         {
         default:
         {
-            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\fakes\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=disorder2 --dpi-desync-split-pos=1,midsld --new ", cur_path, txt);
             args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=8 --new ", cur_path, txt);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=split --dpi-desync-fooling=md5sig --dpi-desync-split-pos=midsld --new ", cur_path, txt);
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=1 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=1 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\fakes\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
 
             break;
         }
 
         case providers_list::PROVIDER_ROST:
         {
-            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\fakes\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=disorder2 --dpi-desync-split-pos=1,midsld --new ", cur_path, txt);
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=6 --dpi-desync-split-pos=midsld --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-fooling=badseq --dpi-desync-split-pos=1,midsld --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split --dpi-desync-ttl=6 --dpi-desync-split-pos=midsld --dpi-desync-fake-tls=\"{}\\fakes\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-fooling=badseq --dpi-desync-split-pos=1,midsld --dpi-desync-fake-tls=\"{}\\fakes\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
 
             break;
         }
 
         case providers_list::PROVIDER_MTS:
         {
-            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\fakes\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt);
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=\"{}\\fakes\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
 
             break;
         }
 
         case providers_list::PROVIDER_LOVIT:
         {
-            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=5 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=5 --dpi-desync-fake-quic=\"{}\\fakes\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync-any-protocol --dpi-desync=ipfrag2 --dpi-desync-ipfrag-pos-udp=16 --new ", cur_path, txt);
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=disorder --dpi-desync-fooling=badseq --dpi-desync-split-pos=midsld --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=disorder --dpi-desync-fooling=badseq --dpi-desync-split-pos=midsld --dpi-desync-fake-tls=\"{}\\fakes\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-ttl=1 --dpi-desync-autottl=1 --new ", cur_path, txt);
             args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-split-pos=midsld --dpi-desync-repeats=6 --dpi-desync-fooling=badseq,md5sig --new ", cur_path, txt);
             args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, txt);
@@ -641,14 +641,14 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
     else if (id_name == "shared_service_7tv")
     {
         args = std::format("--wf-tcp=443 --wf-udp=443 ");
-        args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+        args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-fake-quic=\"{}\\fakes\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
         args += std::format("--filter-udp=443 --filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,disorder2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig", cur_path, txt);
     }
     else if (id_name == "cloudflare")
     {
         args = std::format("--wf-tcp=443 ");
 
-        args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
+        args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\fakes\\tls_clienthello_www_google_com.bin\"", cur_path, txt, cur_path);
     }
     else if (id_name == "akamai")
     {
@@ -666,12 +666,16 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         wf_filter = std::format("--wf-tcp={}", tcp);
 
         args = std::format("{} ", wf_filter);
-        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\"", cur_path, txt, tcp_filter, cur_path);
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\fakes\\tls_clienthello_www_google_com.bin\"", cur_path, txt, tcp_filter, cur_path);
 
     }
     else if (id_name == "amazon")
     {
         //https://ip-ranges.amazonaws.com/ip-ranges.json
+
+        std::vector<std::string> spl = tools::split(txt, "|");
+        std::string list = spl[0];
+        std::string ip = spl[1];
 
         std::string wf_filter = "";
         std::string tcp_filter = "";
@@ -680,7 +684,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         {
         case 0:
         {
-            tcp_filter = "--filter-tcp=21,22,80,443,1024-65535";
+            tcp_filter = "--filter-tcp=21,22,443,1024-65535";
             udp_filter = "--filter-udp=21,22,80,443,1024-65535";
             wf_filter = "--wf-tcp=21,22,80,443,1024-65535 --wf-udp=21,22,80,443,1024-65535";
             break;
@@ -696,6 +700,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
             addPorts("21,22,80,443", tcp_ports);
             //addPorts("40002", tcp_ports); //PUBG
             addPorts("9090-9093,19090-19093", tcp_ports); //REPO (Photon)
+            addPorts("20000-22000", tcp_ports); //BF6
 
             std::string tcp = portsToString(tcp_ports);
             std::string udp = portsToString(udp_ports);
@@ -708,7 +713,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         }
         case 2:
         {
-            tcp_filter = "--filter-tcp=21,22,80,443";
+            tcp_filter = "--filter-tcp=21,22,443";
             udp_filter = "--filter-udp=21,22,80,443";
             wf_filter = "--wf-tcp=21,22,80,443 --wf-udp=21,22,80,443";
             break;
@@ -717,13 +722,16 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
         args = std::format("{} ", wf_filter);
 
-        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-seqovl=652 --dpi-desync-split-pos=2,sniext+1 --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
-        //args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-pos=2,sniext+1 --dpi-desync-split-seqovl=679 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
-        //args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,multisplit --dpi-desync-repeats=6 --dpi-desync-fooling=md5sig --dpi-desync-fake-tls=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, tcp_filter, cur_path);
-        //args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=syndata --new ", cur_path, txt, tcp_filter);
-        //args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-fooling=ts --dpi-desync-repeats=8 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com --new ", cur_path, txt, tcp_filter, cur_path);
+        args += std::format("--hostlist=\"{}\\{}\" --filter-tcp=80 --dpi-desync=fake,fakedsplit --dpi-desync-autottl=2 --dpi-desync-fooling=badseq --dpi-desync-badseq-increment=2 --new ", cur_path, list);
+        args += std::format("--hostlist=\"{}\\{}\" {} --dpi-desync=fake --dpi-desync-fake-tls-mod=none --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-badseq-increment=2 --new ", cur_path, list, tcp_filter);
+        args += std::format("--hostlist=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=2 --dpi-desync-split-seqovl-pattern=\"{}\\fakes\\tls_clienthello_www_google_com.bin\" --new ", cur_path, list, tcp_filter, cur_path);
+        
+        args += std::format("--ipset=\"{}\\{}\" --filter-tcp=80 --dpi-desync=fake,fakedsplit --dpi-desync-autottl=2 --dpi-desync-fooling=badseq --dpi-desync-badseq-increment=2 --new ", cur_path, list);
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake --dpi-desync-fake-tls-mod=none --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-badseq-increment=2 --new ", cur_path, list, tcp_filter);
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=2 --dpi-desync-split-seqovl-pattern=\"{}\\fakes\\tls_clienthello_www_google_com.bin\" --new ", cur_path, list, tcp_filter, cur_path);
 
-        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-ttl=8 --dpi-desync-repeats=20 --dpi-desync-fooling=none --dpi-desync-any-protocol=1 --dpi-desync=fake --dpi-desync-cutoff=n10 --dpi-desync-fake-unknown-udp=\"{}\\quic_initial_www_google_com.bin\"", cur_path, txt, udp_filter, cur_path);
+        args += std::format("--hostlist=\"{}\\{}\" {} --dpi-desync-ttl=8 --dpi-desync-repeats=20 --dpi-desync-fooling=none --dpi-desync-any-protocol=1 --dpi-desync=fake --dpi-desync-cutoff=n10 --dpi-desync-fake-unknown-udp=\"{}\\fakes\\quic_initial_www_google_com.bin\" --new ", cur_path, list, udp_filter, cur_path);
+        args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync-ttl=8 --dpi-desync-repeats=20 --dpi-desync-fooling=none --dpi-desync-any-protocol=1 --dpi-desync=fake --dpi-desync-cutoff=n10 --dpi-desync-fake-unknown-udp=\"{}\\fakes\\quic_initial_www_google_com.bin\"", cur_path, ip, udp_filter, cur_path);
         
     }
     else if (id_name == "discord")
@@ -731,8 +739,8 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         args = std::format("--wf-tcp=80,443,2053,2083,2087,2096,8443 --wf-udp=443,50000-50100 ");
 
         args += std::format("--filter-tcp=80 --hostlist=\"{}\\{}\" --dpi-desync=fake,multisplit --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt);
-        args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
-        args += std::format("--filter-tcp=2053,2083,2087,2096,8443 --hostlist-domains=discord.media --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\tls_clienthello_www_google_com.bin\" --new ", cur_path);
+        args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\fakes\\tls_clienthello_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+        args += std::format("--filter-tcp=2053,2083,2087,2096,8443 --hostlist-domains=discord.media --dpi-desync=multisplit --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1 --dpi-desync-split-seqovl-pattern=\"{}\\fakes\\tls_clienthello_www_google_com.bin\" --new ", cur_path);
 
         switch (vars::provider)
         {
@@ -744,12 +752,12 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
 
         default:
         {
-            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
+            args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=\"{}\\fakes\\quic_initial_www_google_com.bin\" --new ", cur_path, txt, cur_path);
             break;
         }
         }
 
-        args += std::format("--filter-udp=50000-50100 --filter-l7=discord,stun --dpi-desync=fake --dpi-desync-fake-quic=\"{}\\quic_initial_www_google_com.bin\"", cur_path, cur_path);
+        args += std::format("--filter-udp=50000-50100 --filter-l7=discord,stun --dpi-desync=fake --dpi-desync-fake-quic=\"{}\\fakes\\quic_initial_www_google_com.bin\"", cur_path, cur_path);
     }
     else if (id_name == "twitch")
     {
