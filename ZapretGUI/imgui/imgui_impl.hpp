@@ -46,7 +46,7 @@ namespace window
     int name##_height = 0; \
     ID3D11ShaderResourceView* name##_texture = nullptr; \
     if (!LoadTextureFromMemory(name##_data, sizeof(name##_data), &name##_texture, &name##_width, &name##_height)) { \
-        tools::sendNotif(u8"Œ¯Ë·Í‡ Á‡„ÛÁÍË ÚÂÍÒÚÛ˚ " #name, "", vars::notif != 0); \
+        tools::sendNotif("–û—à–∏–±–∫–∞ –∑–∞–≥—Ä—É–∑–∫–∏ —Ç–µ–∫—Å—Ç—É—Ä—ã " #name, "", vars::notif != 0); \
         ::DestroyWindow(g_hWnd); \
         return 0; \
     }
@@ -157,8 +157,17 @@ void ShowTrayContextMenu(HWND hwnd, POINT pt)
 {
     HMENU hMenu = CreatePopupMenu();
     if (hMenu) {
-        InsertMenu(hMenu, -1, MF_BYPOSITION | MF_STRING, ID_TRAY_RESTORE, "ŒÚÍ˚Ú¸");
-        InsertMenu(hMenu, -1, MF_BYPOSITION | MF_STRING, ID_TRAY_EXIT, "¬˚ıÓ‰");
+
+        auto utf8_to_wide = [](const char* utf8_str) -> std::wstring {
+            if (!utf8_str || !*utf8_str) return L"";
+            int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8_str, -1, nullptr, 0);
+            std::wstring wstr(size_needed - 1, 0);
+            MultiByteToWideChar(CP_UTF8, 0, utf8_str, -1, &wstr[0], size_needed);
+            return wstr;
+        };
+
+        InsertMenuW(hMenu, -1, MF_BYPOSITION | MF_STRING, ID_TRAY_RESTORE, utf8_to_wide(u8"–û—Ç–∫—Ä—ã—Ç—å").c_str());
+        InsertMenuW(hMenu, -1, MF_BYPOSITION | MF_STRING, ID_TRAY_EXIT, utf8_to_wide(u8"–í—ã—Ö–æ–¥").c_str());
 
         SetForegroundWindow(hwnd);
         TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, 0, hwnd, nullptr);

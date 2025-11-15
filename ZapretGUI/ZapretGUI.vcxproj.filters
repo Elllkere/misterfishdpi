@@ -242,6 +242,9 @@
     <ClInclude Include="icons\twitch.hpp">
       <Filter>main\render\icons</Filter>
     </ClInclude>
+    <ClInclude Include="icons\telegram.hpp">
+      <Filter>main\render\icons</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

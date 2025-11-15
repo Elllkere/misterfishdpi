@@ -51,6 +51,7 @@ namespace vars
 #include "icons/gemini.hpp"
 #include "icons/grok.hpp"
 #include "icons/twitch.hpp"
+#include "icons/telegram.hpp"
 
 int page = 0;
 
@@ -61,13 +62,13 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
     unzFile zipFile = unzOpen(zipFilePath.c_str());
     if (zipFile == nullptr) 
     {
-        tools::sendNotif(u8"Не удалось открыть архив", "", true);
+        tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ Р°СЂС…РёРІ", "", true);
         return false;
     }
 
     if (unzGoToFirstFile(zipFile) != UNZ_OK) 
     {
-        tools::sendNotif(u8"Не удалось найти первый файл", "", true);
+        tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ РЅР°Р№С‚Рё РїРµСЂРІС‹Р№ С„Р°Р№Р»", "", true);
         unzClose(zipFile);
         return false;
     }
@@ -78,7 +79,7 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
 
         if (unzGetCurrentFileInfo(zipFile, &fileInfo, fileName, sizeof(fileName), nullptr, 0, nullptr, 0) != UNZ_OK) 
         {
-            tools::sendNotif(u8"Не удалось получить файл", "", true);
+            tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ С„Р°Р№Р»", "", true);
 
             result = false;
             break;
@@ -86,7 +87,7 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
 
         if (unzOpenCurrentFile(zipFile) != UNZ_OK) 
         {
-            tools::sendNotif(u8"Не удалось открыть файл", "", true);
+            tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р»", "", true);
 
             result = false;
             break;
@@ -97,7 +98,7 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
 
         if (bytesRead < 0) 
         {
-            tools::sendNotif(u8"Не удалось прочитать файл", "", true);
+            tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ С„Р°Р№Р»", "", true);
             unzCloseCurrentFile(zipFile);
 
             result = false;
@@ -115,7 +116,7 @@ bool extractFile(const std::string& zipFilePath, const std::string& outputDir)
 
             if (!outputFile.is_open())
             {
-                tools::sendNotif(u8"Не удалось разархивировать файл", "", true);
+                tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ СЂР°Р·Р°СЂС…РёРІРёСЂРѕРІР°С‚СЊ С„Р°Р№Р»", "", true);
                 unzCloseCurrentFile(zipFile);
 
                 result = false;
@@ -140,11 +141,11 @@ bool IsRunAsAdmin()
     BOOL isAdmin = FALSE;
     PSID adminGroup = NULL;
 
-    // Создаем SID для группы администраторов
+    // РЎРѕР·РґР°РµРј SID РґР»СЏ РіСЂСѓРїРїС‹ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂРѕРІ
     SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
     if (AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS,
         0, 0, 0, 0, 0, 0, &adminGroup)) {
-        // Проверяем, входит ли текущий процесс в группу администраторов
+        // РџСЂРѕРІРµСЂСЏРµРј, РІС…РѕРґРёС‚ Р»Рё С‚РµРєСѓС‰РёР№ РїСЂРѕС†РµСЃСЃ РІ РіСЂСѓРїРїСѓ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂРѕРІ
         CheckTokenMembership(NULL, adminGroup, &isAdmin);
         FreeSid(adminGroup);
     }
@@ -166,7 +167,7 @@ void relaunch(LPSTR lpCmdLine, bool admin = true)
     sei.nShow = SW_SHOWNORMAL;
 
     if (!ShellExecuteEx(&sei))
-        MessageBox(NULL, "Не удалось перезапустить приложение с правами администратора.", "Ошибка", MB_OK | MB_ICONERROR);
+        MessageBox(NULL, "РќРµ СѓРґР°Р»РѕСЃСЊ РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚СЊ РїСЂРёР»РѕР¶РµРЅРёРµ СЃ РїСЂР°РІР°РјРё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°.", "РћС€РёР±РєР°", MB_OK | MB_ICONERROR);
 }
 
 void update(const std::string& version, const LPSTR& lpCmdLine)
@@ -178,12 +179,12 @@ void update(const std::string& version, const LPSTR& lpCmdLine)
 
     if (res == INET_E_DOWNLOAD_FAILURE) 
     {
-        tools::sendNotif(u8"Не удалось найти ссылку на новую версию", "", vars::notif != 0);
+        tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ РЅР°Р№С‚Рё СЃСЃС‹Р»РєСѓ РЅР° РЅРѕРІСѓСЋ РІРµСЂСЃРёСЋ", "", vars::notif != 0);
         return;
     }
     else if (res != S_OK)
     {
-        tools::sendNotif(std::format(u8"Не удалось скачать новую версию: {}", res), "", vars::notif != 0);
+        tools::sendNotif(std::format("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРєР°С‡Р°С‚СЊ РЅРѕРІСѓСЋ РІРµСЂСЃРёСЋ: {}", res), "", vars::notif != 0);
         return;
     }
 
@@ -269,8 +270,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
             if (result && !answer.empty() && !strstr(answer.c_str(), "error"))
             {
-                answer += u8"\nбольше информации на github";
-                tools::sendNotif(std::format(u8"Обновление {}", vars::version), answer, false, false);
+                answer += "\nР±РѕР»СЊС€Рµ РёРЅС„РѕСЂРјР°С†РёРё РЅР° github";
+                tools::sendNotif(std::format("РћР±РЅРѕРІР»РµРЅРёРµ {}", vars::version), answer, false, false);
             }
         }
     }
@@ -392,6 +393,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     LOAD_TEXTURE(tempmail);
     LOAD_TEXTURE(thatpervert);
     LOAD_TEXTURE(twitch);
+    LOAD_TEXTURE(telegram);
     LOAD_TEXTURE(spotify);
     LOAD_TEXTURE(chatgpt);
     LOAD_TEXTURE(grok);
@@ -421,13 +423,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(youtube_width, youtube_height, "Youtube", "youtube", youtube_texture, shared_service_youtube),
         new Zapret(discord_width, discord_height, "Discord", "discord", discord_texture, "list-discord.txt"),
         new SharedZapret(_7tv_width, _7tv_height, "7tv", "7tv", _7tv_texture, shared_service_youtube),
-        new SharedZapret(proton_width, proton_height, u8"Proton (без mail)", "proton", proton_texture, shared_service_youtube),
+        new SharedZapret(proton_width, proton_height, "Proton (Р±РµР· mail)", "proton", proton_texture, shared_service_youtube),
         new SharedZapret(ph_width, ph_height, "PornHub", "pornhub", ph_texture, shared_service_youtube),
         new SharedZapret(patreon_width, patreon_height, "Patreon", "patreon", patreon_texture, shared_service_youtube),
         new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_youtube),
         new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_youtube),
         new Zapret(twitch_width, twitch_height, "Twitch", "twitch", twitch_texture, "list-twitch.txt"),
-        new SharedZapret(custom_width, custom_height, u8"Свой список", "custom", custom_texture, shared_service_youtube),
+        new Zapret(telegram_width, telegram_height, "Telegram", "telegram", telegram_texture, "list-telegram-ip.txt"),
+        new SharedZapret(custom_width, custom_height, "РЎРІРѕР№ СЃРїРёСЃРѕРє", "custom", custom_texture, shared_service_youtube),
         cloudflare,
         amazon,
         akamai
@@ -435,7 +438,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     vars::singbox_services =
     {
-        new Singbox(spotify_width, spotify_height, u8"Spotify API\n(discord музыка)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
+        new Singbox(spotify_width, spotify_height, "Spotify API\n(discord РјСѓР·С‹РєР°)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
         new Singbox(chatgpt_width, chatgpt_height, "ChatGPT", "chatgpt", chatgpt_texture, "domain_keyword", json::array({"openai.com", "chatgpt.com"})),
         new Singbox(gemini_width, gemini_height, "Gemini", "gemini", gemini_texture, "domain_keyword", json::array({"gemini.google.com"})),
         new Singbox(grok_width, grok_height, "Grok", "grok", grok_texture, "domain_keyword", json::array({"grok.com", "x.ai"}))
@@ -461,11 +464,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         else if (answer != vars::version)
         {
             if (!vars::bAuto_update)
-                tools::sendNotif(u8"Вышла новая версия, скачать можно в настройках", "", vars::notif != 0);
+                tools::sendNotif("Р’С‹С€Р»Р° РЅРѕРІР°СЏ РІРµСЂСЃРёСЏ, СЃРєР°С‡Р°С‚СЊ РјРѕР¶РЅРѕ РІ РЅР°СЃС‚СЂРѕР№РєР°С…", "", vars::notif != 0);
 #ifndef _DEBUG
             else
             {
-                tools::sendNotif(u8"Вышла новая версия", u8"Программа обновляется в фоне", false, false);
+                tools::sendNotif("Р’С‹С€Р»Р° РЅРѕРІР°СЏ РІРµСЂСЃРёСЏ", "РџСЂРѕРіСЂР°РјРјР° РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РІ С„РѕРЅРµ", false, false);
                 update(answer, lpCmdLine);
             }
 #endif
@@ -495,7 +498,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         ::ShowWindow(g_hWnd, nCmdShow);
         ::UpdateWindow(g_hWnd);
 
-        tools::sendNotif(u8"Не удалось проверить версию", "", vars::notif != 0);
+        tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕРІРµСЂРёС‚СЊ РІРµСЂСЃРёСЋ", "", vars::notif != 0);
     }
 
     if (!very_silent)
@@ -539,7 +542,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         service->start();
 
         if (vars::console_mode && !service->name.empty())
-            printf("Запуск %s начат\n", service->name.c_str());
+            printf("Р—Р°РїСѓСЃРє %s РЅР°С‡Р°С‚\n", service->name.c_str());
     }
 
     if (singbox_count > 0 && !(vars::proxy_ip == "" || vars::proxy_port == "0" || vars::proxy_port == ""))
@@ -558,7 +561,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 singbox->writeRule();
 
             if (vars::console_mode && !singbox->name.empty())
-                printf("Запуск %s начат\n", singbox->name.c_str());
+                printf("Р—Р°РїСѓСЃРє %s РЅР°С‡Р°С‚\n", singbox->name.c_str());
         }
     }
 
@@ -602,7 +605,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             {
                 if (g_winwsRetries == 5)
                 {
-                    tools::sendNotif(u8"winws.exe был неожиданно закрыт. Перезапустить процесс не удалось", "", vars::notif != 0);
+                    tools::sendNotif("winws.exe Р±С‹Р» РЅРµРѕР¶РёРґР°РЅРЅРѕ Р·Р°РєСЂС‹С‚. РџРµСЂРµР·Р°РїСѓСЃС‚РёС‚СЊ РїСЂРѕС†РµСЃСЃ РЅРµ СѓРґР°Р»РѕСЃСЊ", "", vars::notif != 0);
                     exit(0);
                 }
 
@@ -629,6 +632,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         if (silent || very_silent || vars::console_mode)
         {
             ::Sleep(10);
+            continue;
+        }
+
+        // When the UI is hidden or minimized we don't need to render
+        // every iteration, so yield the CPU and try again later.
+        if (!::IsWindowVisible(g_hWnd) || ::IsIconic(g_hWnd))
+        {
+            ::Sleep(30);
             continue;
         }
 
@@ -667,11 +678,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         {
             ImGui::SetNextWindowSize(ImGui::GetContentRegionAvail());
             
-            std::string text = u8"Это ваш первый запуск программы, это сообщение будет показано только 1 раз.\n";
-            text += u8"Пожалуйста посетите раздел настройки и выберите нужного для себя провайдера,\n";
-            text += u8"если вашего провайдера в списке нет и с выбранным 'другой' сервисы все равно не работают,\n";
-            text += u8"то вы можете попробовать других провайдеров, возможно их настройки подойдут для вашего.\n";
-            text += u8"Если с никаким провайдером не работают сервисы тогда можно создать issue на github";
+            std::string text = "Р­С‚Рѕ РІР°С€ РїРµСЂРІС‹Р№ Р·Р°РїСѓСЃРє РїСЂРѕРіСЂР°РјРјС‹, СЌС‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ Р±СѓРґРµС‚ РїРѕРєР°Р·Р°РЅРѕ С‚РѕР»СЊРєРѕ 1 СЂР°Р·.\n";
+            text += "РџРѕР¶Р°Р»СѓР№СЃС‚Р° РїРѕСЃРµС‚РёС‚Рµ СЂР°Р·РґРµР» РЅР°СЃС‚СЂРѕР№РєРё Рё РІС‹Р±РµСЂРёС‚Рµ РЅСѓР¶РЅРѕРіРѕ РґР»СЏ СЃРµР±СЏ РїСЂРѕРІР°Р№РґРµСЂР°,\n";
+            text += "РµСЃР»Рё РІР°С€РµРіРѕ РїСЂРѕРІР°Р№РґРµСЂР° РІ СЃРїРёСЃРєРµ РЅРµС‚ Рё СЃ РІС‹Р±СЂР°РЅРЅС‹Рј 'РґСЂСѓРіРѕР№' СЃРµСЂРІРёСЃС‹ РІСЃРµ СЂР°РІРЅРѕ РЅРµ СЂР°Р±РѕС‚Р°СЋС‚,\n";
+            text += "С‚Рѕ РІС‹ РјРѕР¶РµС‚Рµ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РґСЂСѓРіРёС… РїСЂРѕРІР°Р№РґРµСЂРѕРІ, РІРѕР·РјРѕР¶РЅРѕ РёС… РЅР°СЃС‚СЂРѕР№РєРё РїРѕРґРѕР№РґСѓС‚ РґР»СЏ РІР°С€РµРіРѕ.\n";
+            text += "Р•СЃР»Рё СЃ РЅРёРєР°РєРёРј РїСЂРѕРІР°Р№РґРµСЂРѕРј РЅРµ СЂР°Р±РѕС‚Р°СЋС‚ СЃРµСЂРІРёСЃС‹ С‚РѕРіРґР° РјРѕР¶РЅРѕ СЃРѕР·РґР°С‚СЊ issue РЅР° github";
 
             ImGui::Text(text.c_str());
 
@@ -746,7 +757,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
         ImGui::BeginChild("##left", ImVec2(150, 0));
         {
-            std::vector<std::string> buttons = { u8"Сервисы", u8"Настройки", "SingBox"};
+            std::vector<std::string> buttons = { "РЎРµСЂРІРёСЃС‹", "РќР°СЃС‚СЂРѕР№РєРё", "SingBox"};
             for (int i = 0; i < buttons.size(); i++)
             {
                 if (page == i)
@@ -801,7 +812,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     {
                         Singbox* singbox = dynamic_cast<Singbox*>(service);
                         if (!service->active && singbox && (vars::proxy_ip == "" || vars::proxy_port == ""))
-                            tools::sendNotif(u8"Задайте данные прокси в разделе Singbox", "", true);
+                            tools::sendNotif("Р—Р°РґР°Р№С‚Рµ РґР°РЅРЅС‹Рµ РїСЂРѕРєСЃРё РІ СЂР°Р·РґРµР»Рµ Singbox", "", true);
                         else 
                             service->toggleActive();
                     }
@@ -810,7 +821,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     if (ImGui::BeginPopupContextItem((std::string("##pop_") + service->id_name).c_str()))
                     {
                         bool hided = service->panel_hide;
-                        if (ImGui::MenuItem(hided ? u8"Показать" : u8"Скрыть"))
+                        if (ImGui::MenuItem(hided ? "РџРѕРєР°Р·Р°С‚СЊ" : "РЎРєСЂС‹С‚СЊ"))
                         {
                             service->panel_hide = vars::json_settings["services"][service->id_name]["hide"] = !hided;
                             tools::updateSettings(vars::json_settings, vars::json_setting_name);
@@ -818,12 +829,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                         if (vars::bHotkeys)
                         {
-                            if (ImGui::MenuItem(u8"Задать клавишу"))
+                            if (ImGui::MenuItem("Р—Р°РґР°С‚СЊ РєР»Р°РІРёС€Сѓ"))
                             {
                                 open_key_bind = true;
                             }
 
-                            ImGui::MenuItem((u8"Клавиша: " + std::string(tools::getKeyName(service->hotkey))).c_str(), 0, false, false);
+                            ImGui::MenuItem(("РљР»Р°РІРёС€Р°: " + std::string(tools::getKeyName(service->hotkey))).c_str(), 0, false, false);
                         }
                         ImGui::EndPopup();
                     }
@@ -833,7 +844,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                     if (ImGui::BeginPopup((std::string("##key_") + service->id_name).c_str(), ImGuiWindowFlags_AlwaysAutoResize))
                     {
-                        ImGui::Text(u8"Нажмите любую клавишу...");
+                        ImGui::Text("РќР°Р¶РјРёС‚Рµ Р»СЋР±СѓСЋ РєР»Р°РІРёС€Сѓ...");
 
                         for (int i = 3; i <= 0xFE; i++)
                         {
@@ -848,7 +859,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                             }
                         }
 
-                        if (ImGui::Button(u8"Сбросить"))
+                        if (ImGui::Button("РЎР±СЂРѕСЃРёС‚СЊ"))
                         {
                             vars::json_settings["services"][service->id_name]["hotkey"] = service->hotkey = 0;
                             tools::updateSettings(vars::json_settings, vars::json_setting_name);
@@ -856,7 +867,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                             ImGui::CloseCurrentPopup();
                         }
 
-                        if (ImGui::Button(u8"Отмена"))
+                        if (ImGui::Button("РћС‚РјРµРЅР°"))
                             ImGui::CloseCurrentPopup();
 
                         ImGui::EndPopup();
@@ -865,9 +876,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     if (ImGui::IsItemHovered())
                     {
                         ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-                        std::string status = service->isRunning() ? u8"Выключить" : u8"Включить";
+                        std::string status = service->isRunning() ? "Р’С‹РєР»СЋС‡РёС‚СЊ" : "Р’РєР»СЋС‡РёС‚СЊ";
                         if (service->id_name == "custom")
-                            status += u8"\n(URL добавлять в list-custom.txt)";
+                            status += "\n(URL РґРѕР±Р°РІР»СЏС‚СЊ РІ list-custom.txt)";
 
                         ImGui::SetTooltip(status.c_str());
                     }
@@ -922,14 +933,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImColor(10, 10, 10).Value);
                 ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImColor(25, 25, 25).Value);
 
-                if (ImGui::Checkbox(u8"Проверка версии при запуске", &vars::bStart_ver_check))
+                if (ImGui::Checkbox("РџСЂРѕРІРµСЂРєР° РІРµСЂСЃРёРё РїСЂРё Р·Р°РїСѓСЃРєРµ", &vars::bStart_ver_check))
                 {
                     vars::json_settings["start_version_check"] = vars::bStart_ver_check;
                     vars::json_settings["auto_update"] = vars::bAuto_update = false;
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
-                if (ImGui::Checkbox(u8"Уведомлять об изменениях", &vars::bNotify_changes))
+                if (ImGui::Checkbox("РЈРІРµРґРѕРјР»СЏС‚СЊ РѕР± РёР·РјРµРЅРµРЅРёСЏС…", &vars::bNotify_changes))
                 {
                     if (!vars::bStart_ver_check)
                         vars::bNotify_changes = false;
@@ -939,9 +950,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Будет работать только при типе уведомления - Windows уведомления");
+                    ImGui::SetTooltip("Р‘СѓРґРµС‚ СЂР°Р±РѕС‚Р°С‚СЊ С‚РѕР»СЊРєРѕ РїСЂРё С‚РёРїРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ - Windows СѓРІРµРґРѕРјР»РµРЅРёСЏ");
 
-                if (ImGui::Checkbox(u8"Автоматическое обновление", &vars::bAuto_update))
+                if (ImGui::Checkbox("РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ", &vars::bAuto_update))
                 {
                     if (!vars::bStart_ver_check)
                         vars::bAuto_update = false;
@@ -950,7 +961,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
-                if (ImGui::Checkbox(u8"Автозапуск с windows", &vars::bWin_start))
+                if (ImGui::Checkbox("РђРІС‚РѕР·Р°РїСѓСЃРє СЃ windows", &vars::bWin_start))
                 {
                     vars::json_settings["win_start"] = vars::bWin_start;
                     vars::json_settings["tray_start"] = vars::bTray_start = false;
@@ -979,7 +990,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     }
                 }
 
-                if (ImGui::Checkbox(u8"Автозапуск в свернутом состоянии", &vars::bTray_start))
+                if (ImGui::Checkbox("РђРІС‚РѕР·Р°РїСѓСЃРє РІ СЃРІРµСЂРЅСѓС‚РѕРј СЃРѕСЃС‚РѕСЏРЅРёРё", &vars::bTray_start))
                 {
                     if (!vars::bWin_start)
                         vars::bTray_start = false;
@@ -988,7 +999,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
-                if (ImGui::Checkbox(u8"Разблокировать Cloudflare", &vars::bUnlock_cf))
+                if (ImGui::Checkbox("Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ Cloudflare", &vars::bUnlock_cf))
                 {
                     cloudflare->active = vars::bUnlock_cf;
                     if (vars::bUnlock_cf)
@@ -1001,9 +1012,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Cloudflare предоставляет собой сервис DDoS защиты.\nИз-за блокировки всего Cloudlfare много обычных не забаненных сайтов или игр не загружаются");
+                    ImGui::SetTooltip("Cloudflare РїСЂРµРґРѕСЃС‚Р°РІР»СЏРµС‚ СЃРѕР±РѕР№ СЃРµСЂРІРёСЃ DDoS Р·Р°С‰РёС‚С‹.\nРР·-Р·Р° Р±Р»РѕРєРёСЂРѕРІРєРё РІСЃРµРіРѕ Cloudlfare РјРЅРѕРіРѕ РѕР±С‹С‡РЅС‹С… РЅРµ Р·Р°Р±Р°РЅРµРЅРЅС‹С… СЃР°Р№С‚РѕРІ РёР»Рё РёРіСЂ РЅРµ Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ");
 
-                if (ImGui::Checkbox(u8"Разблокировать Akamai", &vars::bUnlock_akamai))
+                if (ImGui::Checkbox("Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ Akamai", &vars::bUnlock_akamai))
                 {
                     akamai->active = vars::bUnlock_akamai;
                     if (vars::bUnlock_akamai)
@@ -1016,9 +1027,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Akamai предоставляет собой сервис DDoS защиты (аналог cloudflare).\nИз-за блокировки Akamai некоторые не забаненые сайты или игры не загружаются");
+                    ImGui::SetTooltip("Akamai РїСЂРµРґРѕСЃС‚Р°РІР»СЏРµС‚ СЃРѕР±РѕР№ СЃРµСЂРІРёСЃ DDoS Р·Р°С‰РёС‚С‹ (Р°РЅР°Р»РѕРі cloudflare).\nРР·-Р·Р° Р±Р»РѕРєРёСЂРѕРІРєРё Akamai РЅРµРєРѕС‚РѕСЂС‹Рµ РЅРµ Р·Р°Р±Р°РЅРµРЅС‹Рµ СЃР°Р№С‚С‹ РёР»Рё РёРіСЂС‹ РЅРµ Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ");
 
-                if (ImGui::Checkbox(u8"Разблокировать Amazon", &vars::bUnlock_amazon))
+                if (ImGui::Checkbox("Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ Amazon", &vars::bUnlock_amazon))
                 {
                     amazon->active = vars::bUnlock_amazon;
                     if (vars::bUnlock_amazon)
@@ -1031,13 +1042,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Могут быть конфликты игр\\сайтов\nAmazon предоставляет множество серверов для сайтов, игр и прочего.\nИз-за блокировки Amazon некоторые не забаненые сайты или игры не загружаются");
+                    ImGui::SetTooltip("РњРѕРіСѓС‚ Р±С‹С‚СЊ РєРѕРЅС„Р»РёРєС‚С‹ РёРіСЂ\\СЃР°Р№С‚РѕРІ\nAmazon РїСЂРµРґРѕСЃС‚Р°РІР»СЏРµС‚ РјРЅРѕР¶РµСЃС‚РІРѕ СЃРµСЂРІРµСЂРѕРІ РґР»СЏ СЃР°Р№С‚РѕРІ, РёРіСЂ Рё РїСЂРѕС‡РµРіРѕ.\nРР·-Р·Р° Р±Р»РѕРєРёСЂРѕРІРєРё Amazon РЅРµРєРѕС‚РѕСЂС‹Рµ РЅРµ Р·Р°Р±Р°РЅРµРЅС‹Рµ СЃР°Р№С‚С‹ РёР»Рё РёРіСЂС‹ РЅРµ Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ");
 
                 if (vars::bUnlock_amazon)
                 {
                     ImGui::PushItemWidth(window::comboWidth);
 
-                    if (ImGui::Combo(u8"Тип разблокировки Amazon", &vars::amazon_type, tools::convertMapToCharArray(vars::amazon_types).data(), vars::amazon_types.size()))
+                    if (ImGui::Combo("РўРёРї СЂР°Р·Р±Р»РѕРєРёСЂРѕРІРєРё Amazon", &vars::amazon_type, tools::convertMapToCharArray(vars::amazon_types).data(), vars::amazon_types.size()))
                     {
                         vars::json_settings["amazon_type"] = vars::amazon_type;
                         tools::updateSettings(vars::json_settings, vars::json_setting_name);
@@ -1049,10 +1060,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     ImGui::PopItemWidth();
 
                     if (ImGui::IsItemHovered())
-                        ImGui::SetTooltip(u8"Вся сеть - перехватывает всю сеть ОС и ищет IP от Amazon, возможны задержки или нет\nПорты игр - подобранный вручную список портов, которые используют игры,\nсоотвественно ваша игра может быть не добавлена\nСайты - разблокировать только для http/https");
+                        ImGui::SetTooltip("Р’СЃСЏ СЃРµС‚СЊ - РїРµСЂРµС…РІР°С‚С‹РІР°РµС‚ РІСЃСЋ СЃРµС‚СЊ РћРЎ Рё РёС‰РµС‚ IP РѕС‚ Amazon, РІРѕР·РјРѕР¶РЅС‹ Р·Р°РґРµСЂР¶РєРё РёР»Рё РЅРµС‚\nРџРѕСЂС‚С‹ РёРіСЂ - РїРѕРґРѕР±СЂР°РЅРЅС‹Р№ РІСЂСѓС‡РЅСѓСЋ СЃРїРёСЃРѕРє РїРѕСЂС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ РёСЃРїРѕР»СЊР·СѓСЋС‚ РёРіСЂС‹,\nСЃРѕРѕС‚РІРµСЃС‚РІРµРЅРЅРѕ РІР°С€Р° РёРіСЂР° РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµ РґРѕР±Р°РІР»РµРЅР°\nРЎР°Р№С‚С‹ - СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РґР»СЏ http/https");
                 }
 
-                if (ImGui::Checkbox(u8"Горячие клавиши", &vars::bHotkeys))
+                if (ImGui::Checkbox("Р“РѕСЂСЏС‡РёРµ РєР»Р°РІРёС€Рё", &vars::bHotkeys))
                 {
                     vars::json_settings["hotkeys"] = vars::bHotkeys;
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
@@ -1060,18 +1071,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     tools::resetKeysQueue();
                 }
 
-                if (ImGui::Checkbox(u8"Показать скрытые сервисы", &vars::bShow_hide))
+                if (ImGui::Checkbox("РџРѕРєР°Р·Р°С‚СЊ СЃРєСЂС‹С‚С‹Рµ СЃРµСЂРІРёСЃС‹", &vars::bShow_hide))
                 {
                     vars::json_settings["show_hide"] = vars::bShow_hide;
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Для установки клавиши нужно нажать ПКМ по сервису");
+                    ImGui::SetTooltip("Р”Р»СЏ СѓСЃС‚Р°РЅРѕРІРєРё РєР»Р°РІРёС€Рё РЅСѓР¶РЅРѕ РЅР°Р¶Р°С‚СЊ РџРљРњ РїРѕ СЃРµСЂРІРёСЃСѓ");
 
                 ImGui::PushItemWidth(window::comboWidth);
 
-                if (ImGui::Combo(u8"Провайдер", &vars::provider, tools::convertMapToCharArray(vars::providers).data(), vars::providers.size()))
+                if (ImGui::Combo("РџСЂРѕРІР°Р№РґРµСЂ", &vars::provider, tools::convertMapToCharArray(vars::providers).data(), vars::providers.size()))
                 {
                     vars::json_settings["provider"] = vars::provider;
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
@@ -1086,9 +1097,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Представляет набор стратегий обычно работающих для выбранного провайдера.\nНе буквально провайдер. Можно выбирать любых");
+                    ImGui::SetTooltip("РџСЂРµРґСЃС‚Р°РІР»СЏРµС‚ РЅР°Р±РѕСЂ СЃС‚СЂР°С‚РµРіРёР№ РѕР±С‹С‡РЅРѕ СЂР°Р±РѕС‚Р°СЋС‰РёС… РґР»СЏ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РїСЂРѕРІР°Р№РґРµСЂР°.\nРќРµ Р±СѓРєРІР°Р»СЊРЅРѕ РїСЂРѕРІР°Р№РґРµСЂ. РњРѕР¶РЅРѕ РІС‹Р±РёСЂР°С‚СЊ Р»СЋР±С‹С…");
 
-                if (ImGui::Combo(u8"Тип автозапуска", &vars::auto_start, tools::convertMapToCharArray(vars::auto_starts).data(), vars::auto_starts.size()))
+                if (ImGui::Combo("РўРёРї Р°РІС‚РѕР·Р°РїСѓСЃРєР°", &vars::auto_start, tools::convertMapToCharArray(vars::auto_starts).data(), vars::auto_starts.size()))
                 {
                     if (vars::bWin_start)
                     {
@@ -1144,18 +1155,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"UAC - контроль учетных записей\n(окошко с подтверждением при запуске программы)\nПользовательский - запускает только когда вход выполнит конкретный пользователь");
+                    ImGui::SetTooltip("UAC - РєРѕРЅС‚СЂРѕР»СЊ СѓС‡РµС‚РЅС‹С… Р·Р°РїРёСЃРµР№\n(РѕРєРѕС€РєРѕ СЃ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёРµРј РїСЂРё Р·Р°РїСѓСЃРєРµ РїСЂРѕРіСЂР°РјРјС‹)\nРџРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёР№ - Р·Р°РїСѓСЃРєР°РµС‚ С‚РѕР»СЊРєРѕ РєРѕРіРґР° РІС…РѕРґ РІС‹РїРѕР»РЅРёС‚ РєРѕРЅРєСЂРµС‚РЅС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ");
 
-                if (ImGui::Combo(u8"Действие при Х", &vars::x_method, tools::convertMapToCharArray(vars::x_methods).data(), vars::x_methods.size()))
+                if (ImGui::Combo("Р”РµР№СЃС‚РІРёРµ РїСЂРё РҐ", &vars::x_method, tools::convertMapToCharArray(vars::x_methods).data(), vars::x_methods.size()))
                 {
                     vars::json_settings["x_method"] = vars::x_method;
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Что делать при нажатии на Х");
+                    ImGui::SetTooltip("Р§С‚Рѕ РґРµР»Р°С‚СЊ РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° РҐ");
 
-                if (ImGui::Combo(u8"Тип уведомлений", &vars::notif, tools::convertMapToCharArray(vars::notifs).data(), vars::notifs.size()))
+                if (ImGui::Combo("РўРёРї СѓРІРµРґРѕРјР»РµРЅРёР№", &vars::notif, tools::convertMapToCharArray(vars::notifs).data(), vars::notifs.size()))
                 {
                     vars::json_settings["notif"] = vars::notif;
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
@@ -1164,14 +1175,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 ImGui::PopItemWidth();
                 ImGui::PushItemWidth(window::comboSlider);
 
-                if (ImGui::SliderInt(u8"Задержка автозапуска", &vars::start_delay, 1, 120))
+                if (ImGui::SliderInt("Р—Р°РґРµСЂР¶РєР° Р°РІС‚РѕР·Р°РїСѓСЃРєР°", &vars::start_delay, 1, 120))
                 {
                     vars::json_settings["start_delay"] = vars::start_delay;
                     tools::updateSettings(vars::json_settings, vars::json_setting_name);
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Задержка перед запуском приложения при включенном автозапуске\n(для того чтобы интернет успел подключится)\nв секундах\nCTRL+клик \\ Tab чтобы активировать ввод");
+                    ImGui::SetTooltip("Р—Р°РґРµСЂР¶РєР° РїРµСЂРµРґ Р·Р°РїСѓСЃРєРѕРј РїСЂРёР»РѕР¶РµРЅРёСЏ РїСЂРё РІРєР»СЋС‡РµРЅРЅРѕРј Р°РІС‚РѕР·Р°РїСѓСЃРєРµ\n(РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РёРЅС‚РµСЂРЅРµС‚ СѓСЃРїРµР» РїРѕРґРєР»СЋС‡РёС‚СЃСЏ)\nРІ СЃРµРєСѓРЅРґР°С…\nCTRL+РєР»РёРє \\ Tab С‡С‚РѕР±С‹ Р°РєС‚РёРІРёСЂРѕРІР°С‚СЊ РІРІРѕРґ");
 
                 ImGui::PopItemWidth();
 
@@ -1179,7 +1190,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(45, 45, 45).Value);
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(45, 45, 45).Value);
 
-                if (ImGui::Button(u8"Завершить все обходы", ImVec2(200, 30)))
+                if (ImGui::Button("Р—Р°РІРµСЂС€РёС‚СЊ РІСЃРµ РѕР±С…РѕРґС‹", ImVec2(200, 30)))
                 {
                     tools::killAll();
                     tools::sendStop("sing-box.exe");
@@ -1213,28 +1224,28 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 }
 
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"Завершит все прошлые и нынешние процессы zapret");
+                    ImGui::SetTooltip("Р—Р°РІРµСЂС€РёС‚ РІСЃРµ РїСЂРѕС€Р»С‹Рµ Рё РЅС‹РЅРµС€РЅРёРµ РїСЂРѕС†РµСЃСЃС‹ zapret");
 
-                if (ImGui::Button(u8"Проверить версию", ImVec2(200, 30)))
+                if (ImGui::Button("РџСЂРѕРІРµСЂРёС‚СЊ РІРµСЂСЃРёСЋ", ImVec2(200, 30)))
                 {
                     std::string answer;
                     bool result = tools::request("https://elllkere.top/misterfish/version.txt", &answer, true);
                     if (!result || (answer.empty() || strstr(answer.c_str(), "error")))
-                        tools::sendNotif(u8"Не удалось проверить версию", "", vars::notif != 0);
+                        tools::sendNotif("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕРІРµСЂРёС‚СЊ РІРµСЂСЃРёСЋ", "", vars::notif != 0);
                     else
                     {
                         if (answer == vars::version)
-                            tools::sendNotif(u8"Версия актуальна", "", vars::notif != 0);
+                            tools::sendNotif("Р’РµСЂСЃРёСЏ Р°РєС‚СѓР°Р»СЊРЅР°", "", vars::notif != 0);
                         else
                         {
                             if (vars::bAuto_update)
                             {
-                                tools::sendNotif(u8"Вышла новая версия", u8"Программа обновляется в фоне", false, false);
+                                tools::sendNotif("Р’С‹С€Р»Р° РЅРѕРІР°СЏ РІРµСЂСЃРёСЏ", "РџСЂРѕРіСЂР°РјРјР° РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РІ С„РѕРЅРµ", false, false);
                                 update(answer, lpCmdLine);
                             }
                             else
                             {
-                                tools::sendNotif(u8"Вышла новая версия", "", false, false);
+                                tools::sendNotif("Р’С‹С€Р»Р° РЅРѕРІР°СЏ РІРµСЂСЃРёСЏ", "", false, false);
                                 system("start https://github.com/Elllkere/misterfishdpi/releases/latest");
                             }
                         }
@@ -1265,10 +1276,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                 ImGui::PushItemWidth(349);
 
-                bool proxy_ip = ImGui::InputTextWithHint("IP", u8"прокси ip", &vars::proxy_ip);
-                bool proxy_port = ImGui::InputTextWithHint(u8"порт", u8"прокси порт", &vars::proxy_port);
-                bool proxy_user = ImGui::InputTextWithHint(u8"пользователь", u8"необязательно", &vars::proxy_user);
-                bool proxy_password = ImGui::InputTextWithHint(u8"пароль", u8"необязательно", &vars::proxy_password, ImGuiInputTextFlags_Password);
+                bool proxy_ip = ImGui::InputTextWithHint("IP", "РїСЂРѕРєСЃРё ip", &vars::proxy_ip);
+                bool proxy_port = ImGui::InputTextWithHint("РїРѕСЂС‚", "РїСЂРѕРєСЃРё РїРѕСЂС‚", &vars::proxy_port);
+                bool proxy_user = ImGui::InputTextWithHint("РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ", "РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅРѕ", &vars::proxy_user);
+                bool proxy_password = ImGui::InputTextWithHint("РїР°СЂРѕР»СЊ", "РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅРѕ", &vars::proxy_password, ImGuiInputTextFlags_Password);
 
                 for (auto& outbound : vars::json_singbox["outbounds"])
                 {
@@ -1293,7 +1304,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
                 ImGui::PopItemWidth();
 
-                if (ImGui::Button(u8"Перезагрузить", ImVec2(200, 30)))
+                if (ImGui::Button("РџРµСЂРµР·Р°РіСЂСѓР·РёС‚СЊ", ImVec2(200, 30)))
                 {
                     for (auto* singbox : vars::singbox_services)
                     {

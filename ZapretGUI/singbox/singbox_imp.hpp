@@ -45,7 +45,7 @@ void Singbox::startInternal()
 	std::string command = cur_path + "\\sing-box.exe" + " " + "run -c " + vars::json_singbox_name;
 
 	if (!CreateProcess(NULL, const_cast<char*>(command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
-		MessageBoxA(0, std::format("Ошибка запуска процесса: {}", GetLastError()).c_str(), 0, 0);
+		MessageBoxA(0, std::format("РћС€РёР±РєР° Р·Р°РїСѓСЃРєР° РїСЂРѕС†РµСЃСЃР°: {}", GetLastError()).c_str(), 0, 0);
 }
 
 void Singbox::writeRule()
@@ -140,7 +140,7 @@ bool Singbox::isRunningInternal()
     }
 	else
 	{
-		tools::sendNotif(std::format(u8"Неудалось прочитать конфиг. er {}", GetLastError()), "", true);
+		tools::sendNotif(std::format("РќРµСѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ РєРѕРЅС„РёРі. er {}", GetLastError()), "", true);
 		return false;
 	}
 

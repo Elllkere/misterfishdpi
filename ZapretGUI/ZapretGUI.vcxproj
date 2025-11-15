@@ -63,6 +63,7 @@
     <ClInclude Include="icons\ph.hpp" />
     <ClInclude Include="icons\proton.hpp" />
     <ClInclude Include="icons\spotify.hpp" />
+    <ClInclude Include="icons\telegram.hpp" />
     <ClInclude Include="icons\tempmail.hpp" />
     <ClInclude Include="icons\thatpervert.hpp" />
     <ClInclude Include="icons\twitch.hpp" />
@@ -209,10 +210,10 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <Optimization>MinSpace</Optimization>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalOptions>/utf-8 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -121,6 +121,13 @@ namespace vars
                 {"hotkey", 0}
             }},
 
+            {"telegram",
+            {
+                {"active", false},
+                {"hide", false},
+                {"hotkey", 0}
+            }},
+
             {"spotify",
             {
                 {"active", false},
@@ -232,36 +239,36 @@ namespace vars
     std::vector<ServiceBase*> render_services;
     std::map<int, std::string> providers =
     {
-        {providers_list::PROVIDER_OTHER, u8"Другой"},
-        {providers_list::PROVIDER_ROST, u8"Ростелеком"},
-        {providers_list::PROVIDER_MTS, u8"МТС"},
+        {providers_list::PROVIDER_OTHER, "Р”СЂСѓРіРѕР№"},
+        {providers_list::PROVIDER_ROST, "Р РѕСЃС‚РµР»РµРєРѕРј"},
+        {providers_list::PROVIDER_MTS, "РњРўРЎ"},
         {providers_list::PROVIDER_LOVIT, "Lovit"}
     };
 
     std::map<int, std::string> auto_starts =
     {
-        {0, u8"Планировщик задач (с вкл. UAC)"},
-        {1, u8"Реестр (с выкл. UAC)"},
-        {2, u8"Пользовательский"},
+        {0, "РџР»Р°РЅРёСЂРѕРІС‰РёРє Р·Р°РґР°С‡ (СЃ РІРєР». UAC)"},
+        {1, "Р РµРµСЃС‚СЂ (СЃ РІС‹РєР». UAC)"},
+        {2, "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёР№"},
     };
 
     std::map<int, std::string> x_methods =
     {
-        {0, u8"Закрыть"},
-        {1, u8"Свернуть"},
+        {0, "Р—Р°РєСЂС‹С‚СЊ"},
+        {1, "РЎРІРµСЂРЅСѓС‚СЊ"},
     };
     
     std::map<int, std::string> notifs =
     {
-        {0, u8"Windows уведомления"},
-        {1, u8"Messagebox"},
+        {0, "Windows СѓРІРµРґРѕРјР»РµРЅРёСЏ"},
+        {1, "Messagebox"},
     };
 
     std::map<int, std::string> amazon_types =
     {
-        {0, u8"Вся сеть"},
-        {1, u8"Порты игр + сайты"},
-        {2, u8"Только сайты"}
+        {0, "Р’СЃСЏ СЃРµС‚СЊ"},
+        {1, "РџРѕСЂС‚С‹ РёРіСЂ + СЃР°Р№С‚С‹"},
+        {2, "РўРѕР»СЊРєРѕ СЃР°Р№С‚С‹"}
     };
 
     std::string version = "v25.1027.2154";
