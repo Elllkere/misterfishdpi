@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <unordered_map>
 
 #include <minizip/unzip.h>
 
@@ -54,6 +55,37 @@ namespace vars
 #include "icons/telegram.hpp"
 
 int page = 0;
+
+struct ServiceStatusCacheEntry
+{
+    bool running = false;
+    DWORD64 last_check = 0;
+};
+
+static std::unordered_map<ServiceBase*, ServiceStatusCacheEntry> g_service_status_cache;
+
+bool GetServiceRunningCached(ServiceBase* service)
+{
+    if (!service)
+        return false;
+
+    ServiceStatusCacheEntry& entry = g_service_status_cache[service];
+    DWORD64 now = GetTickCount64();
+    if (entry.last_check == 0 || now - entry.last_check >= 200)
+    {
+        entry.running = service->isRunning();
+        entry.last_check = now;
+    }
+    return entry.running;
+}
+
+void InvalidateServiceRunningCache(ServiceBase* service)
+{
+    if (!service)
+        return;
+
+    g_service_status_cache.erase(service);
+}
 
 bool extractFile(const std::string& zipFilePath, const std::string& outputDir) 
 {
@@ -393,7 +425,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     LOAD_TEXTURE(tempmail);
     LOAD_TEXTURE(thatpervert);
     LOAD_TEXTURE(twitch);
-    LOAD_TEXTURE(telegram);
+    //LOAD_TEXTURE(telegram);
     LOAD_TEXTURE(spotify);
     LOAD_TEXTURE(chatgpt);
     LOAD_TEXTURE(grok);
@@ -429,7 +461,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         new SharedZapret(tempmail_width, tempmail_height, "temp-mail.org", "tempmail", tempmail_texture, shared_service_youtube),
         new SharedZapret(thatpervert_width, thatpervert_height, "thatpervert", "thatpervert", thatpervert_texture, shared_service_youtube),
         new Zapret(twitch_width, twitch_height, "Twitch", "twitch", twitch_texture, "list-twitch.txt"),
-        new Zapret(telegram_width, telegram_height, "Telegram", "telegram", telegram_texture, "list-telegram-ip.txt"),
+        //new Zapret(telegram_width, telegram_height, "Telegram", "telegram", telegram_texture, "list-telegram-ip.txt"),
         new SharedZapret(custom_width, custom_height, "Свой список", "custom", custom_texture, shared_service_youtube),
         cloudflare,
         amazon,
@@ -438,7 +470,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     vars::singbox_services =
     {
-        new Singbox(spotify_width, spotify_height, "Spotify API\n(discord музыка)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
+        new Singbox(spotify_width, spotify_height, "Spotify API\n(discord)", "spotify", spotify_texture, "domain_keyword", json::array({"api.spotify.com", "spclient.spotify.com", "spclient.wg.spotify.com"})),
         new Singbox(chatgpt_width, chatgpt_height, "ChatGPT", "chatgpt", chatgpt_texture, "domain_keyword", json::array({"openai.com", "chatgpt.com"})),
         new Singbox(gemini_width, gemini_height, "Gemini", "gemini", gemini_texture, "domain_keyword", json::array({"gemini.google.com"})),
         new Singbox(grok_width, grok_height, "Grok", "grok", grok_texture, "domain_keyword", json::array({"grok.com", "x.ai"}))
@@ -589,7 +621,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             {
                 if (service->hotkey != 0)
                     if (GetAsyncKeyState(service->hotkey) & 1)
+                    {
                         service->toggleActive();
+                        InvalidateServiceRunningCache(service);
+                    }
             }
         }
 
@@ -814,7 +849,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         if (!service->active && singbox && (vars::proxy_ip == "" || vars::proxy_port == ""))
                             tools::sendNotif("Задайте данные прокси в разделе Singbox", "", true);
                         else 
+                        {
                             service->toggleActive();
+                            InvalidateServiceRunningCache(service);
+                        }
                     }
 
                     bool open_key_bind = false;
@@ -873,10 +911,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         ImGui::EndPopup();
                     }
 
+                    bool service_running_cached = GetServiceRunningCached(service);
+
                     if (ImGui::IsItemHovered())
                     {
                         ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-                        std::string status = service->isRunning() ? "Выключить" : "Включить";
+                        std::string status = service_running_cached ? "Выключить" : "Включить";
                         if (service->id_name == "custom")
                             status += "\n(URL добавлять в list-custom.txt)";
 
@@ -884,7 +924,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     }
 
                     int alpha = service->panel_hide ? 100 : 255;
-                    if (service->isRunning())
+                    if (service_running_cached)
                         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 255, 100, alpha));
                     else
                         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(120, 120, 120, alpha));

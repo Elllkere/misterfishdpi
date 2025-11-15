@@ -57,8 +57,15 @@
 ## Почему MisterFish?
 https://www.youtube.com/watch?v=I7JVD-wo3cI
 
+## Сторонние библиотеки
+Проект хранит необходимые исходники в папке `libs/` и внутри `ZapretGUI/imgui/`: там лежат minizip, zlib и другие зависимости, которые собираются вместе с приложением. Также проект использует curl, но он поставляется только в виде уже собранного бинарника и поэтому не включен в репозиторий, в отличие от остальных библиотек.
+
 ## Credits & Contributors
 * [bol-van](https://github.com/bol-van/), creator of original [zapret](https://github.com/bol-van/zapret/) repository.
 * [ocornut](https://github.com/ocornut/), creator of original [ImGui](https://github.com/ocornut/imgui) repository.
 * [mohabouje](https://github.com/mohabouje/), creator of original [WinToast](https://github.com/mohabouje/WinToast) repository.
 * [SagerNet](https://github.com/SagerNet/), creator of original [sing-box](https://github.com/SagerNet/sing-box/) repository.
+
+* [nmoinvaz](https://github.com/nmoinvaz/), maintainer of the [minizip](https://github.com/nmoinvaz/minizip) fork vendored in `libs/minizip`.
+* [Jean-loup Gailly](https://www.zlib.net/) and [Mark Adler](https://www.zlib.net/), authors of [zlib](https://www.zlib.net/) used via `libs/zlib`.
+* [Daniel Stenberg](https://github.com/bagder) and the [curl](https://curl.se/) contributors for the prebuilt curl binary shipped with the app.

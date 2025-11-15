@@ -556,6 +556,15 @@ namespace tools
             pPrincipal->Release();
         }
 
+        ITaskSettings* pSettings = NULL;
+        hr = pTask->get_Settings(&pSettings);
+        if (SUCCEEDED(hr))
+        {
+            pSettings->put_DisallowStartIfOnBatteries(VARIANT_FALSE);
+            pSettings->put_StopIfGoingOnBatteries(VARIANT_FALSE);
+            pSettings->Release();
+        }
+
         IRegisteredTask* pRegisteredTask = NULL;
         hr = pRootFolder->RegisterTaskDefinition(_bstr_t(window::window_name), pTask, TASK_CREATE_OR_UPDATE,
             _variant_t(), _variant_t(), TASK_LOGON_INTERACTIVE_TOKEN, _variant_t(L""), &pRegisteredTask);

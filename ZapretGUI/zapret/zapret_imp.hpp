@@ -776,7 +776,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         //args += std::format("--ipset=\"{}\\{}\" --filter-tcp=80 --dpi-desync=fake,fakedsplit --dpi-desync-autottl=2 --dpi-desync-fooling=badseq --dpi-desync-badseq-increment=2 --new ", cur_path, txt);
         //args += std::format("--ipset=\"{}\\{}\" --filter-tcp=443 --dpi-desync=fake --dpi-desync-fake-tls-mod=none --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-badseq-increment=2 --new ", cur_path, txt);
         //args += std::format("--filter-tcp=80 --ipset=\"{}\\{}\" --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig --new ", cur_path, txt);
-        args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=1 --dpi-desync-split-pos=midsld-1", cur_path, txt);
-        //args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com", cur_path, txt);
+        args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=multisplit --dpi-desync-split-seqovl=1 --dpi-desync-split-pos=midsld-1 --new ", cur_path, txt);
+        args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=6 --dpi-desync-fooling=badseq --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com", cur_path, txt);
     }
 }
