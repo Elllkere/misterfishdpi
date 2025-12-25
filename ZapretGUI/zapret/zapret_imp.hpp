@@ -657,6 +657,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         std::string tcp_filter = "";
 
         std::set<int> tcp_ports;
+        addPorts("80", tcp_ports);
         addPorts("443", tcp_ports);
         addPorts("6695-6705", tcp_ports); //Warframe (chat)
 

@@ -54,7 +54,7 @@ namespace vars
         {"auto_start", auto_start},
         {"x_method", x_method},
         {"amazon_type", amazon_type},
-        {"notif", 0},
+        {"notif", notif},
         {"start_delay", start_delay},
         {"services",
         {
@@ -271,7 +271,7 @@ namespace vars
         {2, "Только сайты"}
     };
 
-    std::string version = "v25.1115.1937";
+    std::string version = "v25.1225.2352";
 
     void init()
     {
