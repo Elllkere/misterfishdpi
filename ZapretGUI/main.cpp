@@ -55,6 +55,7 @@ namespace vars
 #include "icons/telegram.hpp"
 
 int page = 0;
+std::string g_capturedrv_name = "monkey";
 
 struct ServiceStatusCacheEntry
 {
@@ -222,7 +223,7 @@ void update(const std::string& version, const LPSTR& lpCmdLine)
 
     tools::killAll();
     tools::sendStop("sing-box.exe");
-    system("sc stop WinDivert");
+    system(("sc stop " + g_capturedrv_name).c_str());
 
     rename("MisterFish.exe", "MisterFish.exe.old");
 
@@ -230,6 +231,7 @@ void update(const std::string& version, const LPSTR& lpCmdLine)
 
     extractFile(zip, std::filesystem::current_path().string());
     remove(zip.c_str());
+    remove("WinDivert64.sys");
 
     if (strlen(lpCmdLine) <= 0)
         relaunch((LPSTR)"/waitupdate");
@@ -254,7 +256,7 @@ void cleanup()
     }
 
     DestroyTrayIcon();
-    system("sc stop WinDivert");
+    system(("sc stop " + g_capturedrv_name).c_str());
 
     if (hMutexOnce)
     {
