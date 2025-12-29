@@ -22,37 +22,29 @@ public:
 
     Process(const std::string& appName, const std::string& args)
     {
-        STARTUPINFOW si{};
-        si.cb = sizeof(si);
-        PROCESS_INFORMATION pi{};
+        STARTUPINFO si = { sizeof(si) };
+        PROCESS_INFORMATION pi;
 
-        std::wstring app = tools::to_wstring(appName);
-        std::wstring cmd = L"cmd.exe /c \"\"" + app + L"\" " + tools::to_wstring(args) + L"\"";
+        std::string command = std::format("\"{}\" {}", appName, args);
 
-        std::vector<wchar_t> cmdBuf(cmd.begin(), cmd.end());
-        cmdBuf.push_back(L'\0');
-
-        std::wstring workDir = std::filesystem::path(app).parent_path().wstring();
-
-        if (!CreateProcessW(
-            /*lpApplicationName*/ nullptr,
-            /*lpCommandLine*/    cmdBuf.data(),
-            /*lpProcessAttributes*/ nullptr,
-            /*lpThreadAttributes*/  nullptr,
-            /*bInheritHandles*/  FALSE,
-            /*dwCreationFlags*/  CREATE_NO_WINDOW,
-            /*lpEnvironment*/    nullptr,
-            /*lpCurrentDirectory*/ workDir.c_str(),
-            &si, &pi))
+        //CREATE_NO_WINDOW
+        if (!CreateProcess(NULL, const_cast<char*>(command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) 
         {
-            DWORD err = GetLastError();
-            MessageBoxW(nullptr, (L"CreateProcessW failed: " + std::to_wstring(err)).c_str(), L"Error", MB_OK);
-            return;
-        }
+            std::string err = ""; 
+            DWORD err_code = GetLastError();
+            
+            if (err_code == 193)
+                err = std::format("Failed to start process: {}\n{}\n{}", err_code, appName, command);
+            else
+                err = std::format("Failed to start process: {}", err_code);
 
-        processHandle = pi.hProcess;
-        processID = pi.dwProcessId;
-        CloseHandle(pi.hThread);
+            MessageBoxA(0, err.c_str(), 0, 0);
+        }
+        else
+        {
+            processHandle = pi.hProcess;
+            processID = pi.dwProcessId;
+        }
     }
 
     ~Process()
