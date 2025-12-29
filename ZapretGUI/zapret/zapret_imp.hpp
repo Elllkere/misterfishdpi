@@ -657,7 +657,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         }
         default:
         {
-            args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=11 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=0x00000000 --dpi-desync-fake-tls=^! --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com", cur_path, txt);
+            args += std::format("--filter-tcp=443 --ipset=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=11 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=0x00000000 --dpi-desync-fake-tls=! --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com", cur_path, txt);
             break;
         }
         }
@@ -689,7 +689,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         }
         default:
         {
-            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=11 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=0x00000000 --dpi-desync-fake-tls=^! --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com", cur_path, txt, tcp_filter);
+            args += std::format("--ipset=\"{}\\{}\" {} --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=11 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=0x00000000 --dpi-desync-fake-tls=! --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com", cur_path, txt, tcp_filter);
             break;
         }
         }
@@ -769,7 +769,7 @@ void Zapret::getArgs(const std::string& id_name, std::string& args, const std::s
         {
         default:
         {
-            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=11 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=0x00000000 --dpi-desync-fake-tls=^! --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com --new ", cur_path, txt);
+            args += std::format("--filter-tcp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=11 --dpi-desync-fooling=badseq --dpi-desync-fake-tls=0x00000000 --dpi-desync-fake-tls=! --dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com --new ", cur_path, txt);
             args += std::format("--filter-udp=443 --hostlist=\"{}\\{}\" --dpi-desync=fake --dpi-desync-any-protocol --dpi-desync-repeats=7 --new ", cur_path, txt);
             break;
         }
